@@ -213,6 +213,47 @@
     "seed_file": "diffsim_dr_seed2.npz",
     "points_with_saturated_trim_action": 0
    }
+  ],
+  "residual_dr": [
+   {
+    "points": 325,
+    "off_grid": 262,
+    "stable": 211,
+    "worst_real_eig": 0.14332610387022374,
+    "min_delay_ms": -20.0,
+    "certified": 0,
+    "on_grid_stable": 41,
+    "on_grid_certified": 0,
+    "min_delay_ms_on_grid": -20.0,
+    "seed_file": "residual_dr_seed0.npz",
+    "points_with_saturated_trim_action": 0
+   },
+   {
+    "points": 325,
+    "off_grid": 262,
+    "stable": 232,
+    "worst_real_eig": 0.1338327847700328,
+    "min_delay_ms": -20.0,
+    "certified": 0,
+    "on_grid_stable": 45,
+    "on_grid_certified": 0,
+    "min_delay_ms_on_grid": -20.0,
+    "seed_file": "residual_dr_seed1.npz",
+    "points_with_saturated_trim_action": 0
+   },
+   {
+    "points": 325,
+    "off_grid": 262,
+    "stable": 221,
+    "worst_real_eig": 0.13568964361729896,
+    "min_delay_ms": -20.0,
+    "certified": 0,
+    "on_grid_stable": 44,
+    "on_grid_certified": 0,
+    "min_delay_ms_on_grid": -20.0,
+    "seed_file": "residual_dr_seed2.npz",
+    "points_with_saturated_trim_action": 0
+   }
   ]
  }
 }

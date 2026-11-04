@@ -8,6 +8,7 @@
 | PPO + domain rand. | 0.49° · 100.0% | 0.48° · 100.0% | 0.56° · 100.0% | 0.50° · 100.0% | 2.66° · 99.7% |
 | Diff-sim policy | 0.23° · 100.0% | 0.22° · 100.0% | 9.86° · 100.0% | 0.23° · 100.0% | 1.73° · 99.7% |
 | Diff-sim + domain rand. | 0.42° · 100.0% | 0.41° · 100.0% | 0.51° · 100.0% | 0.42° · 100.0% | 2.00° · 100.0% |
+| LPV + residual PPO (DR) | 0.95° · 100.0% | 0.91° · 100.0% | 1.02° · 100.0% | 0.98° · 100.0% | 3.52° · 100.0% |
 
 Cells: roll-tracking RMS error over successful runs · share of runs without loss of control. 95 % bootstrap intervals are in `metrics.json`.
 
@@ -21,5 +22,6 @@ Cells: roll-tracking RMS error over successful runs · share of runs without los
 | PPO + domain rand. | 0.56° | 0.16 /s | 0.90 % |
 | Diff-sim policy | 0.23° | 0.33 /s | 0.38 % |
 | Diff-sim + domain rand. | 0.44° | 0.14 /s | 0.62 % |
+| LPV + residual PPO (DR) | 0.60° | 0.48 /s | 3.27 % |
 
 Command activity: mean |du/dt| of aileron, rudder and asymmetric-span commands, each divided by its position limit (higher = busier actuators).

@@ -82,8 +82,10 @@ def _legend(fig, names):
 
 def plain_log_ticks(axis) -> None:
     """Log-scale axis labelled with plain numbers (0.3, 1, 10) instead of 3x10^-1."""
-    from matplotlib.ticker import FuncFormatter, NullFormatter
+    from matplotlib.ticker import FuncFormatter, LogLocator, NullFormatter
 
+    # 1-2-5 steps so that axes spanning less than a decade still get labels.
+    axis.set_major_locator(LogLocator(base=10, subs=(1.0, 2.0, 5.0)))
     axis.set_major_formatter(FuncFormatter(lambda v, _: f"{v:g}"))
     axis.set_minor_formatter(NullFormatter())
 

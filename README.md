@@ -68,9 +68,10 @@ paired comparisons. Learned rows pool 3 training seeds, giving 768 runs per cell
 | PPO + domain randomization | 0.49° | 0.48° | 0.56° | 0.50° | 2.66°† |
 | **Diff-sim policy** | **0.23°** | **0.22°** | 9.86° | **0.23°** | **1.73°**† |
 | **Diff-sim + domain randomization** | 0.42° | 0.41° | **0.51°** | 0.42° | 2.00° |
+| LPV + residual PPO (±20 %, domain rand.) | 0.95° | 0.91° | 1.02° | 0.98° | 3.52° |
 
-† Lost control in some runs: 5.1 % for the no-margin LQR, 0.3 % for each learned policy. All
-other cells keep control in 100 % of runs. The 95 % bootstrap intervals are within about ±10 % of
+† Lost control in some runs: 5.1 % for the no-margin LQR, 0.3 % for each marked learned
+policy. All other cells keep control in 100 % of runs. The 95 % bootstrap intervals are within about ±10 % of
 each value. Per-scenario arrays are in [`results/per_scenario.npz`](results/per_scenario.npz) and
 the summaries in [`results/metrics.json`](results/metrics.json). The step morphing rate is
 stored as `null` in the sweeps. Sideslip and actuator activity are in
@@ -100,6 +101,18 @@ stored as `null` in the sweeps. Sideslip and actuator activity are in
 6. **Certification is a tax that pays out at the edges.** The LPV design is about 40 % less
    accurate than the tuned LQR in nominal flight. With no aileron at all, it is the most accurate
    design (3.6° vs 4.1–12° for the others).
+7. **A bounded residual on the certified law is only half a fix.** In this design, PPO with
+   domain randomization learns a correction of at most 20 % of each actuator range on top of the
+   LPV law. It closes about half of the nominal gap to PPO (1.50° → 0.95°) and keeps the LPV's
+   robustness up to 60 ms of delay. It is not free:
+   - its commands are busier (0.48 vs 0.17 for the LPV law);
+   - it is worse than the LPV law with no aileron (6.5° vs 3.6°) and at 80 ms of delay (11° vs
+     2.4°);
+   - its linearization is frozen-unstable at 26–33 % of in-envelope trim points, so the LPV
+     certificate no longer holds.
+
+   Keeping the guarantee needs a residual that is itself constrained (a safety filter), not
+   just bounded.
 
 ## Why gradients through the simulator work here
 
@@ -135,13 +148,14 @@ the frozen loop tolerates each delay, next to the simulated result.
 | Diff-sim (3 seeds) | 0 / 0 / 0 % | 3.5° / 9.8° / 17.0° |
 | PPO + domain randomization | 78 / 78 / 67 % | 0.50° / 0.51° / 0.67° |
 | Diff-sim + domain randomization | 100 / 100 / 79 % | 0.43° / 0.45° / 0.77° |
+| LPV + residual PPO | 70 / 70 / 31 % | 0.93° / 0.96° / 1.28° |
 
 The check flags exactly the controllers that fail. Every design cleared at 0 % of points for a
 delay degrades sharply or loses control at that delay in simulation. Every design cleared
 everywhere holds up. The check is conservative, never optimistic: LPV is cleared for 60 ms at
-only 27 % of points, yet barely degrades in simulation. Three policies are frozen-unstable at
-8–47 % of in-envelope trim points (one PPO seed and two PPO + domain-randomization seeds), yet
-never lost control in simulation. A linearization at the exact trim point is conservative for
+only 27 % of points, yet barely degrades in simulation. Six policies are frozen-unstable at
+8–47 % of in-envelope trim points, yet never lost control in simulation: one PPO seed, two
+PPO + domain-randomization seeds, and all three residual seeds. A linearization at the exact trim point is conservative for
 policies that are strongly nonlinear near it. The LPV certificate holds at all 325 points; no
 other design satisfies it everywhere. Data:
 [`results/verification.json`](results/verification.json) and
