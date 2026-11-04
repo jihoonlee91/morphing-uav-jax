@@ -24,7 +24,7 @@ import numpy as np
 import optax
 
 from morphjax.airframe import DEG
-from morphjax.control import Schedule, lateral_error_state
+from morphjax.control import Schedule, lateral_error_state, lateral_law
 from morphjax.dynamics import Plant, W, body_to_wind
 from morphjax.scenarios import sample_scenario
 from morphjax.sim import Carry, Scenario, closed_loop_step, initial_carry, measure
@@ -112,12 +112,29 @@ def action_to_command(u0: jnp.ndarray, act: jnp.ndarray) -> jnp.ndarray:
     return u0 + ACT_SCALE * jnp.clip(act, -1.0, 1.0)
 
 
-def make_policy_lateral(sched: Schedule, params: Params) -> Callable:
+# Residual mode: the policy adds at most 20 % of each actuator range
+# (aileron, rudder in deg; eta_a in %) on top of a model-based law.
+RESIDUAL_SCALE = 0.2 * jnp.array([30.0, 30.0, 12.5])
+
+
+def lateral_command(xw, phi_cmd, integ_phi, u0, act, base: Schedule | None = None):
+    """Aileron, rudder, and asymmetric-span commands for a policy action.
+
+    Without ``base`` the policy commands around the scheduled trim with full
+    authority. With ``base`` it is a bounded residual on top of that
+    model-based law (e.g. the certified LPV design): ``u = u_base + r * a``.
+    """
+    if base is None:
+        return action_to_command(u0, act)
+    return lateral_law(base, xw, phi_cmd, integ_phi) + RESIDUAL_SCALE * jnp.clip(act, -1.0, 1.0)
+
+
+def make_policy_lateral(sched: Schedule, params: Params, base: Schedule | None = None) -> Callable:
     """Deterministic policy as a :data:`morphjax.sim.LateralFn`."""
 
     def lateral(xw, phi_cmd, integ_phi):
         obs, u0 = observation(sched, xw, phi_cmd, integ_phi)
-        return action_to_command(u0, policy_mean(params, obs))
+        return lateral_command(xw, phi_cmd, integ_phi, u0, policy_mean(params, obs), base)
 
     return lateral
 
@@ -162,7 +179,9 @@ class Batch(NamedTuple):
     term: jnp.ndarray  # departure happened at this step
 
 
-def collect(plant: Plant, lon: Schedule, params: Params, key, cfg: PPOConfig):
+def collect(
+    plant: Plant, lon: Schedule, params: Params, key, cfg: PPOConfig, base: Schedule | None = None
+):
     """Run ``num_envs`` episodes in parallel; returns a time-major batch."""
     k_scen, k_act = jax.random.split(key)
     scen = jax.vmap(lambda k: training_scenario(k, cfg))(jax.random.split(k_scen, cfg.num_envs))
@@ -175,7 +194,7 @@ def collect(plant: Plant, lon: Schedule, params: Params, key, cfg: PPOConfig):
         obs, u0 = observation(lon, xw_meas, phi_cmd, carry.integ[2])
         mu = policy_mean(params, obs)
         act = mu + jnp.exp(params["log_std"]) * jax.random.normal(k, mu.shape)
-        lat = action_to_command(u0, act)
+        lat = lateral_command(xw_meas, phi_cmd, carry.integ[2], u0, act, base)
         new, _ = closed_loop_step(plant, lon, carry, lat, phi_cmd, eta_cmd, scen, xw_meas)
         r = reward(body_to_wind(new.x), phi_cmd, act, prev_act)
         term = new.failed & ~carry.failed
@@ -230,7 +249,7 @@ def ppo_loss(params, cfg: PPOConfig, obs, act, logp_old, adv, ret, mask):
     return loss, (jnp.sum(pg * mask) / n, jnp.sum(vf * mask) / n)
 
 
-def make_train(plant: Plant, lon: Schedule, cfg: PPOConfig):
+def make_train(plant: Plant, lon: Schedule, cfg: PPOConfig, base: Schedule | None = None):
     """Return ``(init_state, update)``; ``update`` is one jitted PPO iteration."""
     sched = optax.linear_schedule(cfg.lr, cfg.lr * 0.1, cfg.updates * cfg.epochs * cfg.minibatches)
     tx = optax.chain(optax.clip_by_global_norm(cfg.max_grad_norm), optax.adam(sched, eps=1e-5))
@@ -242,7 +261,7 @@ def make_train(plant: Plant, lon: Schedule, cfg: PPOConfig):
     @jax.jit
     def update(params, opt_state, key):
         k_col, k_perm = jax.random.split(key)
-        batch, last_val = collect(plant, lon, params, k_col, cfg)
+        batch, last_val = collect(plant, lon, params, k_col, cfg, base)
         adv, ret = gae(batch, last_val, cfg.gamma, cfg.lam)
         flat = jax.tree_util.tree_map(
             lambda x: x.reshape(-1, *x.shape[2:]),
@@ -280,9 +299,15 @@ def make_train(plant: Plant, lon: Schedule, cfg: PPOConfig):
     return init_state, update
 
 
-def train(plant: Plant, lon: Schedule, cfg: PPOConfig, log: Callable[[str], None] = print):
+def train(
+    plant: Plant,
+    lon: Schedule,
+    cfg: PPOConfig,
+    log: Callable[[str], None] = print,
+    base: Schedule | None = None,
+):
     """Train a policy; returns ``(params, history)``."""
-    init_state, update = make_train(plant, lon, cfg)
+    init_state, update = make_train(plant, lon, cfg, base)
     key = jax.random.PRNGKey(cfg.seed)
     key, k0 = jax.random.split(key)
     params, opt_state = init_state(k0)

@@ -40,7 +40,12 @@ COLORS = {
     "diffsim": "#008300",
     "diffsim_dr": "#6250d6",
     "gs_hg": "#e34948",
+    # Eight categorical slots for nine controllers: the fixed-point LQR is left
+    # out of the line charts (it tracks the gain-scheduled LQR everywhere) and
+    # its blue goes to the residual policy there.
+    "residual_dr": "#2a78d6",
 }
+PLOTTED = ("gs", "gs_hg", "lpv", "ppo", "ppo_dr", "diffsim", "diffsim_dr", "residual_dr")
 MARKERS = {
     "fixed": "o",
     "gs": "s",
@@ -50,6 +55,7 @@ MARKERS = {
     "diffsim": "P",
     "diffsim_dr": "X",
     "gs_hg": "h",
+    "residual_dr": "*",
 }
 
 plt.rcParams.update({

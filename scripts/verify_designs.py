@@ -17,7 +17,7 @@ from pathlib import Path
 import numpy as np
 
 from morphjax import pipeline
-from morphjax.rl import PPOConfig, load_params
+from morphjax.rl import RESIDUAL_SCALE, PPOConfig, load_params
 from morphjax.verify import check_gains, dense_grid, interpolate_gains, policy_gains, summarize
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -44,7 +44,14 @@ def main() -> None:
     learned: dict[str, list] = {}
     for name, (method, variant) in pipeline.LEARNED.items():
         for f in sorted((ROOT / "results" / "policies").glob(f"{method}_{variant}_seed*.npz")):
-            gains, saturated = policy_gains(load_params(f, PPOConfig()), dense)
+            params = load_params(f, PPOConfig())
+            if name in pipeline.RESIDUAL_BASE:
+                # Residual policies act on top of the base law: K = K_base + K_residual.
+                base = setup.lat_gains[pipeline.RESIDUAL_BASE[name]]
+                gains, saturated = policy_gains(params, dense, RESIDUAL_SCALE)
+                gains = gains + interpolate_gains(setup.grid, base, dense)
+            else:
+                gains, saturated = policy_gains(params, dense)
             checks = check_gains(setup, dense, gains)
             row = summarize(checks, on_grid)._asdict()
             row["seed_file"] = f.name

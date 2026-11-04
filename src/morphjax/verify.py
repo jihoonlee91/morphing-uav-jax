@@ -64,7 +64,9 @@ def interpolate_gains(coarse: design.DesignGrid, gains: np.ndarray, dense: desig
     return f(pts.reshape(-1, 3)).reshape(*pts.shape[:3], *gains.shape[3:])
 
 
-def policy_command(params: Params, dx: jnp.ndarray, rho: jnp.ndarray) -> jnp.ndarray:
+def policy_command(
+    params: Params, dx: jnp.ndarray, rho: jnp.ndarray, scale: jnp.ndarray = ACT_SCALE
+) -> jnp.ndarray:
     """Unclipped policy command (deviation from trim) for lateral deviation ``dx`` at ``rho``.
 
     ``rho = (V_syn, h, eta_s)``. Uses the observation layout of
@@ -73,10 +75,12 @@ def policy_command(params: Params, dx: jnp.ndarray, rho: jnp.ndarray) -> jnp.nda
     """
     v_syn, h, eta_s = rho
     raw = jnp.concatenate([dx, jnp.array([eta_s, v_syn, h, dx[3]])])
-    return ACT_SCALE * policy_mean(params, (raw - OBS_SHIFT) / OBS_SCALE)
+    return scale * policy_mean(params, (raw - OBS_SHIFT) / OBS_SCALE)
 
 
-def policy_gains(params: Params, grid: design.DesignGrid) -> tuple[np.ndarray, np.ndarray]:
+def policy_gains(
+    params: Params, grid: design.DesignGrid, scale: jnp.ndarray = ACT_SCALE
+) -> tuple[np.ndarray, np.ndarray]:
     """Local gains ``K_pi = d(command)/d(deviation)`` of a learned policy at each grid point.
 
     Returns ``(gains, saturated)``: gains in the same units as the LQR gains
@@ -86,13 +90,13 @@ def policy_gains(params: Params, grid: design.DesignGrid) -> tuple[np.ndarray, n
     """
 
     def command(dx, rho):
-        return policy_command(params, dx, rho)
+        return policy_command(params, dx, rho, scale)
 
     pts = np.stack(np.meshgrid(grid.v_syn, grid.alt, grid.eta_s, indexing="ij"), axis=-1)
     rho = jnp.asarray(pts.reshape(-1, 3))
     zero = jnp.zeros(8)
     jac = jax.vmap(lambda r: jax.jacfwd(command)(zero, r))(rho)
-    mean = jax.vmap(lambda r: command(zero, r) / ACT_SCALE)(rho)
+    mean = jax.vmap(lambda r: command(zero, r) / scale)(rho)
     shape = pts.shape[:3]
     saturated = np.asarray(jnp.any(jnp.abs(mean) >= 1.0, axis=-1)).reshape(shape)
     return np.asarray(jac).reshape(*shape, 3, 8), saturated

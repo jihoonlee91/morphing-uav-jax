@@ -23,6 +23,7 @@ LABELS = {
     "ppo_dr": "PPO + domain rand.",
     "diffsim": "Diff-sim policy",
     "diffsim_dr": "Diff-sim + domain rand.",
+    "residual_dr": "LPV + residual PPO (DR)",
 }
 # Learned controllers: name -> (training method, variant); files are
 # results/policies/<method>_<variant>_seed<k>.npz
@@ -31,7 +32,10 @@ LEARNED = {
     "ppo_dr": ("ppo", "dr"),
     "diffsim": ("diffsim", "nominal"),
     "diffsim_dr": ("diffsim", "dr"),
+    "residual_dr": ("residual", "dr"),
 }
+# Learned controllers that are residuals on top of a model-based law.
+RESIDUAL_BASE = {"residual_dr": "lpv"}
 
 
 class Setup(NamedTuple):

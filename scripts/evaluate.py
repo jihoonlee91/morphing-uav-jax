@@ -74,8 +74,13 @@ def controllers(setup, policy_dir: Path, max_seeds: int | None = None):
     for name, (method, variant) in pipeline.LEARNED.items():
         files = sorted(policy_dir.glob(f"{method}_{variant}_seed*.npz"))[:max_seeds]
         if files:
+            base = (
+                setup.schedules[pipeline.RESIDUAL_BASE[name]]
+                if name in pipeline.RESIDUAL_BASE
+                else None
+            )
             out[name] = [
-                (lon, make_policy_lateral(lon, load_params(f, PPOConfig()))) for f in files
+                (lon, make_policy_lateral(lon, load_params(f, PPOConfig()), base)) for f in files
             ]
     return out
 
@@ -184,12 +189,12 @@ def main() -> None:
     print(markdown_table(table))
 
     if not args.quick:
-        from figures import example_rollout, learning_curves, stress_tests
+        from figures import PLOTTED, example_rollout, learning_curves, stress_tests
 
         fig_dir = args.out / "figures"
         fig_dir.mkdir(exist_ok=True)
-        stress_tests(sweeps, list(runners), fig_dir / "stress_tests.png")
-        shown = ("gs", "lpv", "ppo", "ppo_dr", "diffsim", "diffsim_dr")
+        stress_tests(sweeps, [n for n in PLOTTED if n in runners], fig_dir / "stress_tests.png")
+        shown = ("gs", "lpv", "ppo", "ppo_dr", "diffsim", "diffsim_dr", "residual_dr")
         example = {k: ctrls[k] for k in shown if k in ctrls}
         example_rollout(setup, example, raw_example, fig_dir / "example_rollout.png")
         learning_curves(args.policies, fig_dir / "learning_curve.png", train_return.get("gs"))

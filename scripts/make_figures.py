@@ -13,7 +13,7 @@ import json
 from pathlib import Path
 
 from evaluate import CONDITIONS, controllers, scenarios
-from figures import example_rollout, learning_curves, stress_tests
+from figures import PLOTTED, example_rollout, learning_curves, stress_tests
 
 from morphjax import pipeline
 
@@ -24,7 +24,7 @@ def main() -> None:
     results = ROOT / "results"
     metrics = json.loads((results / "metrics.json").read_text(encoding="utf-8"))
     fig_dir = results / "figures"
-    names = [k for k in metrics["table"]["nominal"] if k != "label"]
+    names = [k for k in PLOTTED if k in metrics["table"]["nominal"]]
     stress_tests(metrics["sweeps"], names, fig_dir / "stress_tests.png")
     learning_curves(
         results / "policies",
@@ -36,8 +36,9 @@ def main() -> None:
     i = list(CONDITIONS).index("aileron_fail")
     _, kw = CONDITIONS["aileron_fail"]
     scen = scenarios(metrics["meta"]["n_per_condition"], seed=1000 + i, **dict(kw))
-    shown = ("gs", "lpv", "ppo", "ppo_dr", "diffsim", "diffsim_dr")
-    example_rollout(setup, {k: ctrls[k] for k in shown}, scen, fig_dir / "example_rollout.png")
+    shown = ("gs", "lpv", "ppo", "ppo_dr", "diffsim", "diffsim_dr", "residual_dr")
+    example = {k: ctrls[k] for k in shown if k in ctrls}
+    example_rollout(setup, example, scen, fig_dir / "example_rollout.png")
     print(f"figures written to {fig_dir}")
 
 
