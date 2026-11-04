@@ -23,6 +23,7 @@ from morphjax import design, pipeline
 from morphjax.control import lateral_law
 from morphjax.evaluation import Metrics, batch_rollout, scenario_metrics, summarize
 from morphjax.rl import PPOConfig, load_params, make_policy_lateral, training_scenario
+from morphjax.safety import make_projected_residual_lateral, make_safety_filter
 from morphjax.scenarios import sample_scenario
 from morphjax.sim import DT
 
@@ -71,6 +72,7 @@ def controllers(setup, policy_dir: Path, max_seeds: int | None = None):
         s = setup.schedules[name]
         out[name] = [(s, lambda xw, pc, ig, s=s: lateral_law(s, xw, pc, ig))]
     lon = setup.schedules["gs"]
+    filt = make_safety_filter(setup)
     for name, (method, variant) in pipeline.LEARNED.items():
         files = sorted(policy_dir.glob(f"{method}_{variant}_seed*.npz"))[:max_seeds]
         if files:
@@ -79,9 +81,21 @@ def controllers(setup, policy_dir: Path, max_seeds: int | None = None):
                 if name in pipeline.RESIDUAL_BASE
                 else None
             )
-            out[name] = [
-                (lon, make_policy_lateral(lon, load_params(f, PPOConfig()), base)) for f in files
-            ]
+            if name in pipeline.PROJECTED:
+                out[name] = [
+                    (
+                        lon,
+                        make_projected_residual_lateral(
+                            lon, load_params(f, PPOConfig()), base, filt
+                        ),
+                    )
+                    for f in files
+                ]
+            else:
+                out[name] = [
+                    (lon, make_policy_lateral(lon, load_params(f, PPOConfig()), base))
+                    for f in files
+                ]
     return out
 
 

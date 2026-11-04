@@ -18,6 +18,7 @@ import numpy as np
 
 from morphjax import pipeline
 from morphjax.rl import RESIDUAL_SCALE, PPOConfig, load_params
+from morphjax.safety import make_safety_filter, sampled_decrease
 from morphjax.verify import check_gains, dense_grid, interpolate_gains, policy_gains, summarize
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -43,6 +44,8 @@ def main() -> None:
 
     learned: dict[str, list] = {}
     for name, (method, variant) in pipeline.LEARNED.items():
+        if name in pipeline.PROJECTED:
+            continue  # not linearizable at trim; checked by sampling below
         for f in sorted((ROOT / "results" / "policies").glob(f"{method}_{variant}_seed*.npz")):
             params = load_params(f, PPOConfig())
             if name in pipeline.RESIDUAL_BASE:
@@ -59,6 +62,46 @@ def main() -> None:
             learned.setdefault(name, []).append(row)
             record(f"{name}/{f.stem}", checks)
     out["learned_policies_linearized"] = learned
+
+    # One entry per controller, pooled over seeds, in the same fields as "designs".
+    pooled = {}
+    for name, rows in learned.items():
+        pooled[name] = {
+            "seeds": len(rows),
+            "points": sum(r["points"] for r in rows),
+            "stable": sum(r["stable"] for r in rows),
+            "worst_real_eig": max(r["worst_real_eig"] for r in rows),
+            "min_delay_ms": min(r["min_delay_ms"] for r in rows),
+            "certified": sum(r["certified"] for r in rows),
+        }
+
+    # The projected residual: the filtered law is not differentiable at trim when
+    # the residual is nonzero there, so check the certificate condition directly on
+    # the true linearization at every point, for random states and residuals.
+    filt = make_safety_filter(setup)
+    dec = sampled_decrease(
+        filt, dense, interpolate_gains(setup.grid, setup.lat_gains["lpv"], dense)
+    )
+    for k, v in dec.items():
+        points[f"residual_proj/{k}"] = v
+    holds = dec["filtered_decay"] >= 1.0
+    pooled["residual_proj"] = {
+        "seeds": None,  # the check covers any residual in the box, not a particular policy
+        "points": int(holds.size),
+        "stable": int((dec["filtered_neg"] >= 1.0).sum()),
+        "worst_real_eig": None,
+        "min_delay_ms": None,
+        "certified": int(holds.sum()),
+        "samples_per_point": 4096,
+        "min_fraction_decay_holds": float(dec["filtered_decay"].min()),
+        "unfiltered_points_decay_always_holds": int((dec["raw_decay"] >= 1.0).sum()),
+        "unfiltered_min_fraction_decay_holds": float(dec["raw_decay"].min()),
+        "note": (
+            "certified = V-dot <= -2*lambda*V held for every sampled state and residual on the "
+            "true frozen linearization; stable = V-dot < 0 for every sample. Not a delay check."
+        ),
+    }
+    out["learned_policies_pooled"] = pooled
 
     (ROOT / "results" / "verification.json").write_text(json.dumps(out, indent=1), encoding="utf-8")
     np.savez_compressed(ROOT / "results" / "verification_points.npz", **points)

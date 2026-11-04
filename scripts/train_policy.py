@@ -15,16 +15,19 @@ from __future__ import annotations
 
 import argparse
 import json
+from functools import partial
 from pathlib import Path
 
-from morphjax import diffsim, pipeline, rl
+from morphjax import diffsim, pipeline, rl, safety
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
-    ap.add_argument("--method", choices=["ppo", "diffsim", "residual"], default="ppo")
+    ap.add_argument(
+        "--method", choices=["ppo", "diffsim", "residual", "residual_proj"], default="ppo"
+    )
     ap.add_argument("--variant", choices=["nominal", "dr"], default="nominal")
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--iters", type=int, default=None, help="PPO updates / diff-sim iterations")
@@ -36,13 +39,17 @@ def main() -> None:
     # schedule are unused (the policy replaces them).
     lon = setup.schedules["gs"]
     dr = args.variant == "dr"
-    if args.method in ("ppo", "residual"):
-        # "residual": PPO learns a bounded correction on top of the certified LPV law.
-        base = setup.schedules["lpv"] if args.method == "residual" else None
+    if args.method in ("ppo", "residual", "residual_proj"):
+        # "residual": PPO learns a bounded correction on top of the certified LPV law;
+        # "residual_proj" also projects it onto the LPV certificate inside the loop.
+        base = setup.schedules["lpv"] if args.method != "ppo" else None
+        filt = None
+        if args.method == "residual_proj":
+            filt = partial(safety.project, safety.make_safety_filter(setup))
         cfg = rl.PPOConfig(seed=args.seed, domain_randomization=dr)
         if args.iters:
             cfg = cfg._replace(updates=args.iters)
-        params, history = rl.train(setup.plant, lon, cfg, base=base)
+        params, history = rl.train(setup.plant, lon, cfg, base=base, residual_filter=filt)
     else:
         cfg = diffsim.DiffSimConfig(seed=args.seed, domain_randomization=dr)
         if args.iters:

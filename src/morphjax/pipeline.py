@@ -24,6 +24,8 @@ LABELS = {
     "diffsim": "Diff-sim policy",
     "diffsim_dr": "Diff-sim + domain rand.",
     "residual_dr": "LPV + residual PPO (DR)",
+    "residual_proj": "LPV + residual, Lyapunov-projected",
+    "residual_proj_trained": "LPV + residual, projected in training",
 }
 # Learned controllers: name -> (training method, variant); files are
 # results/policies/<method>_<variant>_seed<k>.npz
@@ -33,9 +35,15 @@ LEARNED = {
     "diffsim": ("diffsim", "nominal"),
     "diffsim_dr": ("diffsim", "dr"),
     "residual_dr": ("residual", "dr"),
+    # Same trained residuals, projected at run time onto the LPV certificate.
+    "residual_proj": ("residual", "dr"),
+    # Residuals trained with the projection inside the PPO loop.
+    "residual_proj_trained": ("residual_proj", "dr"),
 }
 # Learned controllers that are residuals on top of a model-based law.
-RESIDUAL_BASE = {"residual_dr": "lpv"}
+RESIDUAL_BASE = {"residual_dr": "lpv", "residual_proj": "lpv", "residual_proj_trained": "lpv"}
+# Residuals passed through the Lyapunov projection of morphjax.safety.
+PROJECTED = ("residual_proj", "residual_proj_trained")
 
 
 class Setup(NamedTuple):

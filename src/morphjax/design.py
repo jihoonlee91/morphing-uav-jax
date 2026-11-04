@@ -242,6 +242,7 @@ class LPVResult(NamedTuple):
     status: str
     cost_bound: float
     lyapunov_margin: float  # max eigenvalue of the Lyapunov derivative (< 0 = certified)
+    decay: float = 0.1  # guaranteed decay rate lambda of the synthesis
 
 
 def lateral_gains_lpv(
@@ -308,4 +309,4 @@ def lateral_gains_lpv(
         worst = max(worst, float(np.linalg.eigvalsh(acl.T @ Xinv + Xinv @ acl).max()))
     if worst >= 0:
         raise RuntimeError(f"common Lyapunov certificate does not hold (max eig {worst:.3g})")
-    return LPVResult(out, Xv, str(prob.status), float(np.asarray(prob.value)), worst)
+    return LPVResult(out, Xv, str(prob.status), float(np.asarray(prob.value)), worst, decay)
