@@ -52,8 +52,8 @@ activity are in [`results/results.md`](results/results.md).
    33× the nominal value, and at 80 ms it loses control in 68 % of runs (right column). The LQR,
    tuned under a 60 ms delay-margin requirement, barely moves.
 4. **Domain randomization buys the robustness back** for a 40 % increase in nominal error
-   (0.49°), and it cuts actuator activity from 0.56 to 0.16 full-scale/s, close to the LQR's
-   0.13. Nominal PPO's tight tracking comes partly from a chattering limit cycle
+   (0.49°), and it cuts actuator activity from 0.56 to 0.16 limit-normalized travel per second, close
+   to the LQR's 0.13. Nominal PPO's tight tracking comes partly from a chattering limit cycle
    ([example](results/figures/example_rollout.png)).
 5. **The LPV design pays about 40 % in nominal tracking for its certificate**: one Lyapunov matrix
    that proves stability for arbitrarily fast parameter variation at all 63 design points. With

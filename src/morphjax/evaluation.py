@@ -23,7 +23,7 @@ class Metrics(NamedTuple):
     max_alt_dev_ft: np.ndarray
     rms_aileron_deg: np.ndarray
     rms_eta_a: np.ndarray
-    cmd_activity: np.ndarray  # lateral command travel, full-scale units per second
+    cmd_activity: np.ndarray  # lateral command travel per second, in units of each limit
 
 
 def scenario_metrics(traj: Trajectory, scen: Scenario) -> Metrics:
@@ -44,9 +44,9 @@ def scenario_metrics(traj: Trajectory, scen: Scenario) -> Metrics:
 
 
 def command_activity(cmd: np.ndarray) -> np.ndarray:
-    """Mean |du/dt| of the lateral commands, each scaled by its full range.
+    """Mean |du/dt| of the lateral commands, each scaled by its position limit.
 
-    1.0 means the commands sweep their full range once per second on average;
+    1.0 means the commands travel one limit (e.g. 30 deg of aileron) per second;
     it separates smooth control from chattering that RMS tracking error hides.
     """
     limits = np.array([30.0, 30.0, 12.5])  # aileron, rudder (deg), eta_a (%)

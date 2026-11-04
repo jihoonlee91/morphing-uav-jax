@@ -230,7 +230,7 @@ def markdown_table(table: dict) -> str:
         lines += [
             "",
             "Command activity: mean |du/dt| of aileron, rudder and asymmetric-span commands, "
-            "each divided by its full range (higher = busier actuators).",
+            "each divided by its position limit (higher = busier actuators).",
         ]
     return "\n".join(lines) + "\n"
 
