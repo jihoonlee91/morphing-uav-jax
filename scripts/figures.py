@@ -39,6 +39,7 @@ COLORS = {
     "ppo_dr": "#e87ba4",
     "diffsim": "#008300",
     "diffsim_dr": "#6250d6",
+    "gs_hg": "#e34948",
 }
 MARKERS = {
     "fixed": "o",
@@ -48,6 +49,7 @@ MARKERS = {
     "ppo_dr": "v",
     "diffsim": "P",
     "diffsim_dr": "X",
+    "gs_hg": "h",
 }
 
 plt.rcParams.update({
@@ -67,12 +69,30 @@ def _legend(fig, names):
         plt.Line2D([], [], color=COLORS[n], marker=MARKERS[n], label=pipeline.LABELS[n])
         for n in names
     ]
-    fig.legend(handles=handles, loc="upper center", ncol=len(names), bbox_to_anchor=(0.5, 1.0))
+    fig.legend(
+        handles=handles, loc="upper center", ncol=min(len(names), 4), bbox_to_anchor=(0.5, 1.0)
+    )
+
+
+def _save(fig, path: Path) -> None:
+    """PNG for the README, vector PDF for papers."""
+    fig.savefig(path, dpi=160)
+    fig.savefig(path.with_suffix(".pdf"))
+    plt.close(fig)
+
+
+COLUMN_TITLES = {
+    "morph_rate": "Morphing rate",
+    "aileron": "Aileron failure",
+    "delay": "Command delay",
+}
 
 
 def stress_tests(sweeps: dict, names: list[str], path: Path) -> None:
-    fig, axes = plt.subplots(2, 3, figsize=(10.5, 5.6), sharex="col")
+    fig, axes = plt.subplots(2, 3, figsize=(10.5, 6.2), sharex="col")
     for col, (key, sweep) in enumerate(sweeps.items()):
+        axes[0, col].set_title(COLUMN_TITLES.get(key, key), loc="left")
+        axes[0, col].set_yscale("log")
         values = [r["value"] for r in sweep["rows"]]
         if key == "morph_rate":
             x = np.arange(len(values))
@@ -99,12 +119,11 @@ def stress_tests(sweeps: dict, names: list[str], path: Path) -> None:
         if key == "aileron":
             axes[1, col].invert_xaxis()
         axes[1, col].set_ylim(-5, 105)
-    axes[0, 0].set_ylabel("Roll-tracking RMS error (deg)\nsuccessful runs, 95 % CI")
-    axes[1, 0].set_ylabel("Runs without loss of control (%)")
+    axes[0, 0].set_ylabel("Roll RMS error (deg, log)")
+    axes[1, 0].set_ylabel("Runs in control (%)")
     _legend(fig, names)
-    fig.tight_layout(rect=(0, 0, 1, 0.93))
-    fig.savefig(path, dpi=160)
-    plt.close(fig)
+    fig.tight_layout(rect=(0, 0, 1, 0.89))
+    _save(fig, path)
 
 
 def example_rollout(setup, ctrls: dict, scen_batch, path: Path) -> None:
@@ -143,9 +162,8 @@ def example_rollout(setup, ctrls: dict, scen_batch, path: Path) -> None:
         loc="left",
     )
     _legend(fig, list(ctrls))
-    fig.tight_layout(rect=(0, 0, 1, 0.95))
-    fig.savefig(path, dpi=160)
-    plt.close(fig)
+    fig.tight_layout(rect=(0, 0, 1, 0.91))
+    _save(fig, path)
 
 
 def learning_curves(policy_dir: Path, path: Path, lqr_return: float | None = None) -> None:
@@ -183,5 +201,4 @@ def learning_curves(policy_dir: Path, path: Path, lqr_return: float | None = Non
     if names:
         _legend(fig, names)
     fig.tight_layout(rect=(0, 0, 1, 0.9))
-    fig.savefig(path, dpi=160)
-    plt.close(fig)
+    _save(fig, path)

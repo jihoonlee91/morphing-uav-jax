@@ -28,6 +28,10 @@ from morphjax.sim import DT
 
 ROOT = Path(__file__).resolve().parents[1]
 STEPS = 750  # 15 s
+# Saved per scenario (shape: seeds x scenarios) so that paired differences and
+# seed-level bootstrap intervals can be computed outside this script.
+RAW_FIELDS = ("roll_rmse_deg", "failed", "cmd_activity", "max_beta_deg", "rms_eta_a")
+SCENARIO_FIELDS = ("v_kt", "h", "morph_aero", "inertia", "aileron_effect", "delay", "noise")
 
 # Table conditions. "Fast morphing" = symmetric-span steps between far-apart
 # targets every 2.5 s, limited only by the 0.5 Hz morphing actuator.
@@ -63,7 +67,7 @@ def scenarios(n: int, seed: int, **kw):
 def controllers(setup, policy_dir: Path, max_seeds: int | None = None):
     """name -> list of (longitudinal schedule, lateral fn); several entries = seeds."""
     out = {}
-    for name in pipeline.MODEL_BASED:
+    for name in [n for n in ("fixed", "gs", "gs_hg", "lpv") if n in setup.schedules]:
         s = setup.schedules[name]
         out[name] = [(s, lambda xw, pc, ig, s=s: lateral_law(s, xw, pc, ig))]
     lon = setup.schedules["gs"]
@@ -93,7 +97,7 @@ def main() -> None:
         args.n, args.n_sweep = 4, 2
 
     t0 = time.time()
-    setup = pipeline.build(pipeline.load_weights(args.weights), verbose=True)
+    setup = pipeline.build_for_evaluation(args.weights, verbose=True)
     ctrls = controllers(setup, args.policies, max_seeds=1 if args.quick else None)
     runners = {
         name: [batch_rollout(setup.plant, lon, lat) for lon, lat in entries]
@@ -101,17 +105,25 @@ def main() -> None:
     }
     print(f"controllers: {', '.join(f'{k} x{len(v)}' for k, v in runners.items())}")
 
-    def run(scen) -> dict[str, Metrics]:
-        return {
-            name: pooled([scenario_metrics(f(scen), scen) for f in fns])
-            for name, fns in runners.items()
-        }
+    raw: dict[str, np.ndarray] = {}  # per-scenario metrics, saved to per_scenario.npz
+
+    def run(scen, tag: str) -> dict[str, Metrics]:
+        """Pooled metrics per controller; per-seed arrays go to ``raw`` under ``tag``."""
+        out = {}
+        for name, fns in runners.items():
+            per_seed = [scenario_metrics(f(scen), scen) for f in fns]
+            for field in RAW_FIELDS:
+                raw[f"{tag}/{name}/{field}"] = np.stack([getattr(m, field) for m in per_seed])
+            out[name] = pooled(per_seed)
+        for field in SCENARIO_FIELDS:
+            raw[f"{tag}/_scenario/{field}"] = np.asarray(getattr(scen, field))
+        return out
 
     table: dict[str, dict] = {}
     raw_example = None
     for i, (cond, (label, kw)) in enumerate(CONDITIONS.items()):
         scen = scenarios(args.n, seed=1000 + i, **dict(kw))
-        res = run(scen)
+        res = run(scen, f"table/{cond}")
         table[cond] = {"label": label, **{k: summarize(m) for k, m in res.items()}}
         print(f"[{time.time() - t0:6.0f}s] {label:24s} " + "  ".join(
             f"{k}: {v['roll_rmse_deg']:.2f} deg / {100 * v['success_rate']:.0f}%"
@@ -125,7 +137,8 @@ def main() -> None:
         rows = []
         for v in values:
             scen = scenarios(args.n_sweep, seed=2000 + 10 * j, **make_kw(v))
-            rows.append({"value": v, **{k: summarize(m) for k, m in run(scen).items()}})
+            res = run(scen, f"sweep/{sweep}/{len(rows)}")
+            rows.append({"value": v, **{k: summarize(m) for k, m in res.items()}})
         sweeps[sweep] = {"label": label, "rows": rows}
         print(f"[{time.time() - t0:6.0f}s] sweep {sweep} done")
 
@@ -154,7 +167,7 @@ def main() -> None:
         "lqr_weights": setup.weights._asdict(),
         "linear_delay_margin_ms": {
             name: 1000 * DT * design.max_stable_delay(setup.grid, setup.lat_gains[name], DT)
-            for name in pipeline.MODEL_BASED
+            for name in setup.lat_gains
         },
         "lpv": {"status": setup.lpv.status, "lyapunov_margin": setup.lpv.lyapunov_margin,
                 "cost_bound": setup.lpv.cost_bound},
@@ -167,6 +180,7 @@ def main() -> None:
         json.dumps(_finite(payload), indent=1, default=_json, allow_nan=False), encoding="utf-8"
     )
     (args.out / "results.md").write_text(markdown_table(table), encoding="utf-8")
+    np.savez_compressed(args.out / "per_scenario.npz", **raw)
     print(markdown_table(table))
 
     if not args.quick:
@@ -175,7 +189,9 @@ def main() -> None:
         fig_dir = args.out / "figures"
         fig_dir.mkdir(exist_ok=True)
         stress_tests(sweeps, list(runners), fig_dir / "stress_tests.png")
-        example_rollout(setup, ctrls, raw_example, fig_dir / "example_rollout.png")
+        shown = ("gs", "lpv", "ppo", "ppo_dr", "diffsim", "diffsim_dr")
+        example = {k: ctrls[k] for k in shown if k in ctrls}
+        example_rollout(setup, example, raw_example, fig_dir / "example_rollout.png")
         learning_curves(args.policies, fig_dir / "learning_curve.png", train_return.get("gs"))
     print(f"done in {time.time() - t0:.0f}s")
 

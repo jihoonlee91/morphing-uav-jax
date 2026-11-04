@@ -218,6 +218,9 @@ def gae(batch: Batch, last_val, gamma: float, lam: float):
 def ppo_loss(params, cfg: PPOConfig, obs, act, logp_old, adv, ret, mask):
     logp = log_prob(params, obs, act)
     ratio = jnp.exp(logp - logp_old)
+    # The mean is masked but the std is not: steps after a departure (whose
+    # advantages are ~0) slightly shrink the std. Kept as-is so the committed
+    # policies stay reproducible; a masked std is the cleaner choice.
     adv = (adv - jnp.sum(adv * mask) / jnp.sum(mask)) / (jnp.std(adv) + 1e-8)
     pg = -jnp.minimum(ratio * adv, jnp.clip(ratio, 1 - cfg.clip, 1 + cfg.clip) * adv)
     vf = (value(params, obs) - ret) ** 2
