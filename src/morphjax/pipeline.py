@@ -26,6 +26,7 @@ LABELS = {
     "residual_dr": "LPV + residual PPO (DR)",
     "residual_proj": "LPV + residual, Lyapunov-projected",
     "residual_proj_trained": "LPV + residual, projected in training",
+    "residual_safe": "LPV + residual, projected with error margin",
 }
 # Learned controllers: name -> (training method, variant); files are
 # results/policies/<method>_<variant>_seed<k>.npz
@@ -39,11 +40,20 @@ LEARNED = {
     "residual_proj": ("residual", "dr"),
     # Residuals trained with the projection inside the PPO loop.
     "residual_proj_trained": ("residual_proj", "dr"),
+    # The same trained policies, projected with an interpolation-error margin.
+    "residual_safe": ("residual_proj", "dr"),
 }
 # Learned controllers that are residuals on top of a model-based law.
-RESIDUAL_BASE = {"residual_dr": "lpv", "residual_proj": "lpv", "residual_proj_trained": "lpv"}
+RESIDUAL_BASE = {
+    "residual_dr": "lpv",
+    "residual_proj": "lpv",
+    "residual_proj_trained": "lpv",
+    "residual_safe": "lpv",
+}
 # Residuals passed through the Lyapunov projection of morphjax.safety.
-PROJECTED = ("residual_proj", "residual_proj_trained")
+PROJECTED = ("residual_proj", "residual_proj_trained", "residual_safe")
+# Of those, the ones projected with the interpolation-error margin.
+MARGINED = ("residual_safe",)
 
 
 class Setup(NamedTuple):

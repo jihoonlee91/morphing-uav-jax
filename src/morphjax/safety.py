@@ -25,12 +25,14 @@ checks the condition on the *true* linearization instead.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from functools import partial
 from typing import NamedTuple
 
 import jax
 import jax.numpy as jnp
 import numpy as np
+import scipy.linalg
 
 from morphjax import design
 from morphjax.control import Schedule
@@ -48,6 +50,9 @@ class SafetyFilter(NamedTuple):
     xs: jnp.ndarray  # state scales (normalized = physical / xs)
     us: jnp.ndarray  # input scales
     decay: float  # lambda of the LPV synthesis
+    # Relative interpolation-error margin gamma (see estimate_margin): the
+    # half-space is tightened to a'du <= (1 - gamma) b. 0 = plain projection.
+    margin: float = 0.0
 
 
 def make_safety_filter(setup: Setup) -> SafetyFilter:
@@ -89,10 +94,15 @@ def halfspace(f: SafetyFilter, rho, dx: jnp.ndarray):
 
 
 def project(f: SafetyFilter, rho, dx: jnp.ndarray, du: jnp.ndarray) -> jnp.ndarray:
-    """Residual ``du`` (physical units, already clipped) projected onto the half-space."""
+    """Residual ``du`` (physical units, already clipped) projected onto the half-space.
+
+    With ``f.margin = gamma > 0`` the half-space is ``a' du <= (1 - gamma) b``,
+    which keeps the decrease on the true model whenever the interpolation
+    error satisfies the relative bound of :func:`estimate_margin`.
+    """
     a, b = halfspace(f, rho, dx)
     du_n = du / f.us
-    excess = a @ du_n - b
+    excess = a @ du_n - (1.0 - f.margin) * b
     # Not jnp.maximum: its gradient splits ties, and the boundary is reached at x = 0.
     step = jnp.where(excess > 0.0, excess, 0.0) / (a @ a + 1e-12)
     return (du_n - step * a) * f.us
@@ -103,46 +113,122 @@ def make_projected_residual_lateral(lon: Schedule, params: Params, base: Schedul
     return make_policy_lateral(lon, params, base, residual_filter=partial(project, f))
 
 
+def make_safe_residual_lateral(lon: Schedule, params: Params, base: Schedule, f: SafetyFilter):
+    """LPV law + residual policy, projected with the interpolation-error margin."""
+    return make_policy_lateral(lon, params, base, residual_filter=partial(project, f))
+
+
+def _relative_error(f: SafetyFilter, grid: design.DesignGrid) -> tuple[np.ndarray, np.ndarray]:
+    """Per point: the relative error gamma and the B mismatch, on an arbitrary grid.
+
+    ``gamma = lambda_max(M_true - M_int, N)`` with ``N = -(M_int + 2 lambda P)``
+    (a generalized eigenvalue), so that ``x'(M_true - M_int) x <= gamma x' N x``
+    for every ``x``. ``|P (B_true - B_int)|`` is returned to confirm that the
+    input matrix carries no interpolation error (commands drive first-order
+    actuators, so ``B`` is the same everywhere).
+    """
+    xs, us, p = np.asarray(f.xs), np.asarray(f.us), np.asarray(f.p)
+    pts = np.stack(np.meshgrid(grid.v_syn, grid.alt, grid.eta_s, indexing="ij"), axis=-1)
+    gamma = np.zeros(grid.residual.shape)
+    b_err = np.zeros(grid.residual.shape)
+    for idx in np.ndindex(*grid.residual.shape):
+        a_t, b_t = design._normalize(*design.lateral_model(grid.A[idx], grid.B[idx]), xs, us)
+        rho = tuple(jnp.asarray(v) for v in pts[idx])
+        a_i = np.asarray(interp(f.a_n, *rho)).reshape(8, 8)
+        b_i = np.asarray(interp(f.b_n, *rho)).reshape(8, 3)
+        k_i = np.asarray(interp(f.k_n, *rho)).reshape(3, 8)
+        acl_t, acl_i = a_t + b_t @ k_i, a_i + b_i @ k_i
+        m_i = acl_i.T @ p + p @ acl_i
+        dm = (acl_t.T @ p + p @ acl_t) - m_i
+        gamma[idx] = float(
+            scipy.linalg.eigh(dm, -(m_i + 2.0 * f.decay * p), eigvals_only=True).max()
+        )
+        b_err[idx] = np.linalg.norm(p @ (b_t - b_i), 2)
+    return gamma, b_err
+
+
+def estimate_margin(
+    setup: Setup, f: SafetyFilter, per_axis: int = 10, seed: int = 0, factor: float = 1.5
+) -> tuple[SafetyFilter, dict]:
+    """Bound the interpolation error on random flight conditions; return the margined filter.
+
+    The bound comes from ``per_axis**3`` random conditions, on a random
+    tensor grid independent of the 325-point grid the result is checked on.
+    It is multiplied by ``factor``, because a sampled maximum underestimates
+    the supremum over the continuous envelope.
+    """
+    rng = np.random.default_rng(seed)
+    axes = (
+        np.sort(rng.uniform(60.0, 120.0, per_axis)),
+        np.sort(rng.uniform(0.0, 10000.0, per_axis)),
+        np.sort(rng.uniform(-25.0, 0.0, per_axis)),
+    )
+    gamma, b_err = _relative_error(f, design.build_grid(setup.plant, *axes))
+    margin = factor * max(float(gamma.max()), 0.0)
+    if margin >= 1.0:
+        raise RuntimeError(f"interpolation error too large for a margin: gamma = {margin:.3f}")
+    info = {
+        "estimation_points": int(gamma.size),
+        "seed": seed,
+        "factor": factor,
+        "max_gamma": float(gamma.max()),
+        "margin": margin,
+        "max_input_matrix_error": float(b_err.max()),
+    }
+    return f._replace(margin=margin), info
+
+
+Filter = Callable[[SafetyFilter, tuple, jnp.ndarray, jnp.ndarray], jnp.ndarray]
+
+
 def sampled_decrease(
     f: SafetyFilter,
     dense: design.DesignGrid,
     lpv_gains: np.ndarray,
+    filters: dict[str, Filter | None],
     samples: int = 4096,
     seed: int = 0,
-) -> dict[str, np.ndarray]:
-    """Check ``V-dot`` after filtering on the *true* linearization at each dense point.
+) -> dict[str, dict[str, np.ndarray]]:
+    """Check ``V-dot`` on the *true* linearization at each dense point.
 
-    For random states and random (box-clipped) residuals, the filter projects
-    using its interpolated model; ``V-dot`` is then evaluated with the true
-    frozen model ``(A, B)`` at that point and the interpolated LPV gain. Returns
-    per-point fractions where ``V-dot <= -2 lambda V`` and ``V-dot < 0`` hold,
-    and the same for the unfiltered residual.
+    For random states (directions uniform on the sphere, sizes log-uniform
+    over 1e-3..10, since a residual offends most near trim) and random box
+    residuals, each filter acts with its interpolated model; ``V-dot`` is then
+    evaluated with the true frozen model at that point and the interpolated
+    LPV gain. ``filters`` maps a name to a filter, or to ``None`` for the
+    unfiltered residual; the name ``"lpv"`` means no residual at all. Returns
+    per-point fractions of samples where ``V-dot <= -2 lambda V`` ("decay")
+    and ``V-dot < 0`` ("neg") hold.
     """
     rng = np.random.default_rng(seed)
     shp = dense.residual.shape
     pts = np.stack(np.meshgrid(dense.v_syn, dense.alt, dense.eta_s, indexing="ij"), axis=-1)
     xs, us, p = np.asarray(f.xs), np.asarray(f.us), np.asarray(f.p)
-    out = {k: np.zeros(shp) for k in ("filtered_decay", "filtered_neg", "raw_decay", "raw_neg")}
-    proj = jax.jit(jax.vmap(project, in_axes=(None, None, 0, 0)))
+    out = {n: {"decay": np.zeros(shp), "neg": np.zeros(shp)} for n in filters}
+    jitted = {
+        n: jax.jit(jax.vmap(fn, in_axes=(None, None, 0, 0)))
+        for n, fn in filters.items()
+        if fn is not None
+    }
     box = np.asarray(RESIDUAL_SCALE)
     for idx in np.ndindex(*shp):
-        a_true, b_true = design._normalize(
-            *design.lateral_model(dense.A[idx], dense.B[idx]), xs, us
-        )
-        k_n = np.diag(1.0 / us) @ lpv_gains[idx] @ np.diag(xs)
-        acl = a_true + b_true @ k_n
-        # Directions uniform on the sphere, sizes log-uniform over four decades:
-        # a residual offends most near the trim point, where b ~ |x|^2 is small.
+        a_t, b_t = design._normalize(*design.lateral_model(dense.A[idx], dense.B[idx]), xs, us)
+        acl = a_t + b_t @ (np.diag(1.0 / us) @ lpv_gains[idx] @ np.diag(xs))
         direction = rng.normal(size=(samples, 8))
         direction /= np.linalg.norm(direction, axis=1, keepdims=True)
         x_n = direction * 10.0 ** rng.uniform(-3.0, 1.0, size=(samples, 1))
         du = rng.uniform(-1.0, 1.0, size=(samples, 3)) * box
         rho = tuple(jnp.asarray(v) for v in pts[idx])
-        du_f = np.asarray(proj(f, rho, jnp.asarray(x_n * xs), jnp.asarray(du)))
         v = np.einsum("ni,ij,nj->n", x_n, p, x_n)
         base = np.einsum("ni,ij,nj->n", x_n, acl.T @ p + p @ acl, x_n)
-        for tag, d in (("filtered", du_f), ("raw", du)):
-            vdot = base + 2.0 * np.einsum("ni,ij,jk,nk->n", x_n, p, b_true, d / us)
-            out[f"{tag}_decay"][idx] = np.mean(vdot <= -2.0 * f.decay * v + 1e-9)
-            out[f"{tag}_neg"][idx] = np.mean(vdot < 0.0)
+        for name, fn in filters.items():
+            if name == "lpv":
+                d = np.zeros_like(du)
+            elif fn is None:
+                d = du
+            else:
+                d = np.asarray(jitted[name](f, rho, jnp.asarray(x_n * xs), jnp.asarray(du)))
+            vdot = base + 2.0 * np.einsum("ni,ij,jk,nk->n", x_n, p, b_t, d / us)
+            out[name]["decay"][idx] = np.mean(vdot <= -2.0 * f.decay * v + 1e-9)
+            out[name]["neg"][idx] = np.mean(vdot < 0.0)
     return out

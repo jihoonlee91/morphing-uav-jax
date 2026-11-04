@@ -3,7 +3,13 @@ import jax.numpy as jnp
 import numpy as np
 
 from morphjax.rl import RESIDUAL_SCALE
-from morphjax.safety import halfspace, make_safety_filter, project, sampled_decrease
+from morphjax.safety import (
+    _relative_error,
+    halfspace,
+    make_safety_filter,
+    project,
+    sampled_decrease,
+)
 from morphjax.verify import dense_grid, interpolate_gains
 
 
@@ -34,6 +40,21 @@ def test_filtered_residual_keeps_the_decrease_on_the_true_model(setup):
     axes = (np.array([90.0]), np.array([5000.0]), np.array([-12.5]))  # a design point
     dense, _ = dense_grid(setup, axes)
     gains = interpolate_gains(setup.grid, setup.lat_gains["lpv"], dense)
-    out = sampled_decrease(f, dense, gains, samples=512)
-    assert out["filtered_decay"].min() == 1.0
-    assert out["raw_decay"].min() < 1.0  # without the filter some residuals break it
+    out = sampled_decrease(f, dense, gains, {"proj": project, "raw": None}, samples=512)
+    assert out["proj"]["decay"].min() == 1.0
+    assert out["raw"]["decay"].min() < 1.0  # without the filter some residuals break it
+
+
+def test_margin_makes_the_decrease_hold_off_grid(setup):
+    # Off the design grid the plain projection can fail on the true model; the
+    # margin covers the interpolation error there (B carries none: it is the
+    # actuator input matrix, identical at every flight condition).
+    f = make_safety_filter(setup)
+    f_safe = f._replace(margin=0.35)
+    axes = (np.array([65.0]), np.array([2500.0]), np.array([-18.75]))  # a cell centre
+    dense, _ = dense_grid(setup, axes)
+    gamma, b_err = _relative_error(f, dense)
+    assert gamma.max() < f_safe.margin and b_err.max() < 1e-9
+    gains = interpolate_gains(setup.grid, setup.lat_gains["lpv"], dense)
+    out = sampled_decrease(f_safe, dense, gains, {"safe": project}, samples=512)
+    assert out["safe"]["decay"].min() == 1.0

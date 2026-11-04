@@ -18,7 +18,13 @@ import numpy as np
 
 from morphjax import pipeline
 from morphjax.rl import RESIDUAL_SCALE, PPOConfig, load_params
-from morphjax.safety import make_safety_filter, sampled_decrease
+from morphjax.safety import (
+    _relative_error,
+    estimate_margin,
+    make_safety_filter,
+    project,
+    sampled_decrease,
+)
 from morphjax.verify import check_gains, dense_grid, interpolate_gains, policy_gains, summarize
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -75,32 +81,51 @@ def main() -> None:
             "certified": sum(r["certified"] for r in rows),
         }
 
-    # The projected residual: the filtered law is not differentiable at trim when
-    # the residual is nonzero there, so check the certificate condition directly on
-    # the true linearization at every point, for random states and residuals.
+    # Residual variants: the projected laws are not differentiable at trim when the
+    # residual is nonzero there, so the certificate condition is checked directly on
+    # the true linearization at every point, for random states and box residuals.
+    # The check exercises the filter, not a particular policy, so residual_proj and
+    # residual_proj_trained (same filter) share one result.
     filt = make_safety_filter(setup)
-    dec = sampled_decrease(
-        filt, dense, interpolate_gains(setup.grid, setup.lat_gains["lpv"], dense)
-    )
-    for k, v in dec.items():
-        points[f"residual_proj/{k}"] = v
-    holds = dec["filtered_decay"] >= 1.0
-    pooled["residual_proj"] = {
-        "seeds": None,  # the check covers any residual in the box, not a particular policy
-        "points": int(holds.size),
-        "stable": int((dec["filtered_neg"] >= 1.0).sum()),
-        "worst_real_eig": None,
-        "min_delay_ms": None,
-        "certified": int(holds.sum()),
+    filt_safe, margin_info = estimate_margin(setup, filt)
+    lpv_dense = interpolate_gains(setup.grid, setup.lat_gains["lpv"], dense)
+    dec = sampled_decrease(filt, dense, lpv_dense, {"lpv": None, "residual_dr": None,
+                                                    "residual_proj": project})  # fmt: skip
+    dec |= sampled_decrease(filt_safe, dense, lpv_dense, {"residual_safe": project})
+    dec["residual_proj_trained"] = dec["residual_proj"]
+    gamma, _ = _relative_error(filt, dense)
+    proven = gamma <= filt_safe.margin
+    sampled = {}
+    for name, d in dec.items():
+        for k, v in d.items():
+            points[f"sampled/{name}/{k}"] = v
+        sampled[name] = {
+            "points": int(d["decay"].size),
+            "decay_holds_for_all_samples": int((d["decay"] >= 1.0).sum()),
+            "negative_for_all_samples": int((d["neg"] >= 1.0).sum()),
+            "worst_share_decay": float(d["decay"].min()),
+            "worst_share_negative": float(d["neg"].min()),
+        }
+    points["sampled/residual_safe/gamma"] = gamma
+    out["sampled_decrease"] = {
         "samples_per_point": 4096,
-        "min_fraction_decay_holds": float(dec["filtered_decay"].min()),
-        "unfiltered_points_decay_always_holds": int((dec["raw_decay"] >= 1.0).sum()),
-        "unfiltered_min_fraction_decay_holds": float(dec["raw_decay"].min()),
-        "note": (
-            "certified = V-dot <= -2*lambda*V held for every sampled state and residual on the "
-            "true frozen linearization; stable = V-dot < 0 for every sample. Not a delay check."
-        ),
+        "state_norm": "log-uniform 1e-3..10 (normalized), directions uniform",
+        "residuals": "uniform in the +/-20 % box",
+        "condition": "decay: V-dot <= -2*lambda*V (lambda = 0.1); negative: V-dot < 0",
+        "rows": sampled,
+        "margin": margin_info | {"points_where_margin_covers_gamma": int(proven.sum())},
     }
+    for name in ("residual_proj", "residual_proj_trained", "residual_safe"):
+        s = sampled[name]
+        pooled[name] = {
+            "seeds": None,  # a property of the filter for any residual in the box
+            "points": s["points"],
+            "stable": s["negative_for_all_samples"],
+            "worst_real_eig": None,  # not linearizable at trim
+            "min_delay_ms": None,  # the guarantee assumes no delay; see the delay sweep
+            "certified": s["decay_holds_for_all_samples"],
+        }
+    pooled["residual_safe"]["certified_for_all_states"] = int(proven.sum())
     out["learned_policies_pooled"] = pooled
 
     (ROOT / "results" / "verification.json").write_text(json.dumps(out, indent=1), encoding="utf-8")
