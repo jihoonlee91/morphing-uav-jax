@@ -1,0 +1,44 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it and the Sensors 2023 paper it re-implements."
+title: "morphing-flight-jax: Differentiable span-morphing UAV model with LPV and reinforcement-learning controllers"
+type: software
+version: 0.1.0
+license: MIT
+authors:
+  - family-names: Lee
+    given-names: Jihoon
+    orcid: "https://orcid.org/0000-0001-5327-824X"
+repository-code: "https://github.com/jihoonlee91/morphing-flight-jax"
+keywords:
+  - JAX
+  - reinforcement learning
+  - PPO
+  - LPV control
+  - flight control
+  - morphing aircraft
+  - NASA GTM
+preferred-citation:
+  type: article
+  title: "Self-Scheduled LPV Control of Asymmetric Variable-Span Morphing UAV"
+  authors:
+    - family-names: Lee
+      given-names: Jihoon
+      orcid: "https://orcid.org/0000-0001-5327-824X"
+    - family-names: Kim
+      given-names: Seong-Hun
+    - family-names: Lee
+      given-names: Hanna
+    - family-names: Kim
+      given-names: Youdan
+  journal: "Sensors"
+  volume: 23
+  issue: 6
+  start: 3075
+  year: 2023
+  doi: "10.3390/s23063075"
+references:
+  - type: software
+    title: "GTM_DesignSim: NASA Generic Transport Model design simulation"
+    authors:
+      - name: "NASA Langley Research Center"
+    repository-code: "https://github.com/nasa/GTM_DesignSim"

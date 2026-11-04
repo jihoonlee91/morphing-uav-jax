@@ -1,0 +1,165 @@
+"""Figures for the README (matplotlib, static PNG).
+
+Colors follow a fixed categorical order (one hue per controller, never
+reassigned), with marker shape as a second channel so identity never depends
+on color alone. The numbers behind every panel are in ``results/metrics.json``.
+"""
+
+from __future__ import annotations
+
+import json
+import math
+from pathlib import Path
+
+import jax
+import jax.numpy as jnp
+import matplotlib
+
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+import numpy as np
+
+from morphjax import pipeline
+from morphjax.dynamics import W
+from morphjax.sim import DT, rollout
+
+SURFACE, INK, INK2, MUTED, GRID, AXIS = (
+    "#fcfcfb",
+    "#0b0b0b",
+    "#52514e",
+    "#898781",
+    "#e1e0d9",
+    "#c3c2b7",
+)
+COLORS = {
+    "fixed": "#2a78d6",
+    "gs": "#eb6834",
+    "lpv": "#1baf7a",
+    "ppo": "#eda100",
+    "ppo_dr": "#e87ba4",
+}
+MARKERS = {"fixed": "o", "gs": "s", "lpv": "D", "ppo": "^", "ppo_dr": "v"}
+
+plt.rcParams.update({
+    "figure.facecolor": SURFACE, "axes.facecolor": SURFACE, "savefig.facecolor": SURFACE,
+    "axes.edgecolor": AXIS, "axes.labelcolor": INK2, "axes.titlecolor": INK,
+    "xtick.color": MUTED, "ytick.color": MUTED, "text.color": INK,
+    "axes.grid": True, "grid.color": GRID, "grid.linewidth": 0.6,
+    "axes.spines.top": False, "axes.spines.right": False,
+    "font.family": ["Segoe UI", "DejaVu Sans", "sans-serif"], "font.size": 9,
+    "axes.titlesize": 10, "axes.titleweight": "bold", "legend.frameon": False,
+    "lines.linewidth": 1.6, "lines.markersize": 5,
+})  # fmt: skip
+
+
+def _legend(fig, names):
+    handles = [
+        plt.Line2D([], [], color=COLORS[n], marker=MARKERS[n], label=pipeline.LABELS[n])
+        for n in names
+    ]
+    fig.legend(handles=handles, loc="upper center", ncol=len(names), bbox_to_anchor=(0.5, 1.0))
+
+
+def stress_tests(sweeps: dict, names: list[str], path: Path) -> None:
+    fig, axes = plt.subplots(2, 3, figsize=(10.5, 5.6), sharex="col")
+    for col, (key, sweep) in enumerate(sweeps.items()):
+        values = [r["value"] for r in sweep["rows"]]
+        if key == "morph_rate":
+            x = np.arange(len(values))
+            ticks = [
+                "0" if v == 0 else ("step" if not math.isfinite(v) else f"{v:g}") for v in values
+            ]
+        elif key == "delay":
+            x = np.asarray(values) * DT * 1000
+            ticks = [f"{v:g}" for v in x]
+        else:
+            x = np.asarray(values) * 100
+            ticks = [f"{v:g}" for v in x]
+        for name in names:
+            rmse = [r[name]["roll_rmse_deg"] for r in sweep["rows"]]
+            lo = [r[name]["roll_rmse_ci"][0] for r in sweep["rows"]]
+            hi = [r[name]["roll_rmse_ci"][1] for r in sweep["rows"]]
+            succ = [100 * r[name]["success_rate"] for r in sweep["rows"]]
+            kw = dict(color=COLORS[name], marker=MARKERS[name])
+            axes[0, col].plot(x, rmse, **kw)
+            axes[0, col].fill_between(x, lo, hi, color=COLORS[name], alpha=0.12, linewidth=0)
+            axes[1, col].plot(x, succ, **kw)
+        axes[1, col].set_xticks(x, ticks)
+        axes[1, col].set_xlabel(sweep["label"])
+        if key == "aileron":
+            axes[1, col].invert_xaxis()
+        axes[1, col].set_ylim(-5, 105)
+    axes[0, 0].set_ylabel("Roll-tracking RMS error (deg)\nsuccessful runs, 95 % CI")
+    axes[1, 0].set_ylabel("Runs without loss of control (%)")
+    _legend(fig, names)
+    fig.tight_layout(rect=(0, 0, 1, 0.93))
+    fig.savefig(path, dpi=160)
+    plt.close(fig)
+
+
+def example_rollout(setup, ctrls: dict, scen_batch, path: Path) -> None:
+    """Time history of one degraded-aileron scenario for every controller."""
+    eff = np.asarray(scen_batch.aileron_effect)
+    i = int(np.argmin(np.abs(eff - 0.1)))
+    scen = jax.tree_util.tree_map(lambda x: x[i], scen_batch)
+    t = np.arange(len(scen.phi_cmd)) * DT
+    fig, axes = plt.subplots(3, 1, figsize=(8.5, 6.4), sharex=True)
+    axes[0].plot(t, np.rad2deg(scen.phi_cmd), color=INK2, linestyle="--", linewidth=1.2,
+                 label="reference")  # fmt: skip
+    for name, entries in ctrls.items():
+        lon, lat = entries[0]
+        tr = jax.jit(lambda s, lon=lon, lat=lat: rollout(setup.plant, lon, lat, s))(scen)
+        xw = np.asarray(tr.xw)
+        failed = np.asarray(tr.failed)
+        end = int(np.argmax(failed)) if failed.any() else len(t)
+        kw = dict(color=COLORS[name], linewidth=1.4)
+        axes[0].plot(t[:end], np.rad2deg(xw[:end, W.PHI]), **kw)
+        axes[1].plot(t[:end], xw[:end, W.ETA_A], **kw)
+        axes[2].plot(t[:end], np.rad2deg(xw[:end, W.BETA]), **kw)
+        if end < len(t):
+            axes[0].plot(t[end - 1], np.rad2deg(xw[end - 1, W.PHI]), "x", color=COLORS[name],
+                         markersize=8, mew=2)  # fmt: skip
+    eta_s = np.asarray(jnp.asarray(scen.eta_s_cmd))
+    axes[1].plot(t, eta_s, color=MUTED, linewidth=1.0, linestyle=":")
+    axes[1].text(0.01, 0.04, "dotted: symmetric-span command η_s", transform=axes[1].transAxes,
+                 color=MUTED, fontsize=8)  # fmt: skip
+    axes[0].set_ylabel("Roll angle (deg)")
+    axes[1].set_ylabel("Asymmetric span η_a (%)")
+    axes[2].set_ylabel("Sideslip (deg)")
+    axes[2].set_xlabel("Time (s)")
+    axes[0].set_title(
+        f"Aileron at {100 * float(scen.aileron_effect):.0f} % effectiveness, "
+        f"fast symmetric morphing, {float(scen.v_kt):.0f} kt, {float(scen.h):,.0f} ft",
+        loc="left",
+    )
+    _legend(fig, list(ctrls))
+    fig.tight_layout(rect=(0, 0, 1, 0.95))
+    fig.savefig(path, dpi=160)
+    plt.close(fig)
+
+
+def learning_curves(policy_dir: Path, path: Path) -> None:
+    fig, ax = plt.subplots(figsize=(6.5, 3.4))
+    names = []
+    for variant, name in (("nominal", "ppo"), ("dr", "ppo_dr")):
+        runs = sorted(policy_dir.glob(f"ppo_{variant}_seed*.json"))
+        if not runs:
+            continue
+        names.append(name)
+        curves = []
+        for f in runs:
+            hist = json.loads(f.read_text(encoding="utf-8"))["history"]
+            steps = np.array([h["env_steps"] for h in hist]) / 1e6
+            ret = np.array([h["return"] for h in hist])
+            curves.append(ret)
+            ax.plot(steps, ret, color=COLORS[name], alpha=0.3, linewidth=0.8)
+        n = min(len(c) for c in curves)
+        ax.plot(steps[:n], np.mean([c[:n] for c in curves], axis=0), color=COLORS[name])
+    ax.set_xlabel("Environment steps (millions)")
+    ax.set_ylabel("Episode return (max 500)")
+    ax.set_title("PPO training: thin lines are seeds, thick line is the mean", loc="left")
+    if names:
+        _legend(fig, names)
+    fig.tight_layout(rect=(0, 0, 1, 0.9))
+    fig.savefig(path, dpi=160)
+    plt.close(fig)

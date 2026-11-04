@@ -1,0 +1,54 @@
+[project]
+name = "morphing-flight-jax"
+version = "0.1.0"
+description = "Differentiable JAX model of an asymmetric span-morphing UAV, with gain-scheduled, LPV, and reinforcement-learning controllers evaluated under fast morphing and distribution shift."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Jihoon Lee" }]
+requires-python = ">=3.11"
+keywords = ["jax", "flight-control", "reinforcement-learning", "lpv", "morphing-aircraft", "ppo"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering",
+    "Intended Audience :: Science/Research",
+]
+dependencies = [
+    "jax>=0.4.30",
+    "numpy>=1.26",
+    "scipy>=1.12",
+    "optax>=0.2.2",
+    "cvxpy>=1.5",
+    "matplotlib>=3.8",
+]
+
+[project.urls]
+Repository = "https://github.com/jihoonlee91/morphing-flight-jax"
+Paper = "https://doi.org/10.3390/s23063075"
+
+[dependency-groups]
+dev = ["pytest>=8", "ruff>=0.6"]
+
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/morphjax"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "NPY", "RUF"]
+ignore = ["E741", "RUF001", "RUF002", "RUF003"]
+
+[tool.ruff.lint.flake8-bugbear]
+# Immutable (frozen dataclass / NamedTuple) defaults are safe to share.
+extend-immutable-calls = ["morphjax.airframe.Airframe", "morphjax.dynamics.Uncertainty"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+markers = ["slow: longer-running integration tests"]
