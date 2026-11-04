@@ -1,0 +1,47 @@
+{
+ "machine": {
+  "processor": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+  "logical_cpus": 20,
+  "jax": "0.12.0.1",
+  "device": "cpu"
+ },
+ "trim_and_linearize_63_points_s": {
+  "first": 0.05804929999999331,
+  "steady": 0.05644530000006398
+ },
+ "rollout": [
+  {
+   "envs": 1,
+   "seconds": 0.1090994999999566,
+   "env_steps_per_s": 4582.972424256746
+  },
+  {
+   "envs": 16,
+   "seconds": 0.18560850000005757,
+   "env_steps_per_s": 43101.47433979327
+  },
+  {
+   "envs": 64,
+   "seconds": 0.6660632999999052,
+   "env_steps_per_s": 48043.481753167536
+  },
+  {
+   "envs": 256,
+   "seconds": 2.0964548000000605,
+   "env_steps_per_s": 61055.454188659976
+  },
+  {
+   "envs": 1024,
+   "seconds": 5.8290669000000435,
+   "env_steps_per_s": 87835.67057705174
+  }
+ ],
+ "ppo_update_s": {
+  "seconds": 2.0011868999999933,
+  "env_steps": 32000
+ },
+ "diffsim_iteration_s": {
+  "seconds": 2.988911200000075,
+  "env_steps": 32000
+ }
+}

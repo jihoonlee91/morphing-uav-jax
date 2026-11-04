@@ -12,6 +12,12 @@ jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        # Oldest supported and current. Lint, type check and the evaluation
+        # smoke test run once (on 3.13); the test suite runs on both.
+        python: ["3.11", "3.13"]
     steps:
       - uses: actions/checkout@v7
 
@@ -21,8 +27,8 @@ jobs:
 
       - name: Install Python and dependencies
         run: |
-          uv python install 3.12
-          uv sync --locked
+          uv python install ${{ matrix.python }}
+          uv sync --locked --python ${{ matrix.python }}
 
       - name: Cache NASA aero database
         uses: actions/cache@v6
@@ -31,6 +37,7 @@ jobs:
           key: gtm-aero-7f34845a54bcecdd
 
       - name: Lint and type check
+        if: matrix.python == '3.13'
         run: |
           uv run ruff check .
           uv run ruff format --check .
@@ -40,4 +47,5 @@ jobs:
         run: uv run pytest
 
       - name: Evaluation smoke test
+        if: matrix.python == '3.13'
         run: uv run python scripts/evaluate.py --quick --out "$RUNNER_TEMP/eval"

@@ -1,26 +1,218 @@
 {
- "fixed": {
+ "grid": {
   "points": 325,
-  "off_grid": 262,
-  "stable": 324,
-  "worst_real_eig": 0.18967114528322188,
-  "min_delay_ms": -20.0,
-  "certified": null
+  "on_design_grid": 63
  },
- "gs": {
-  "points": 325,
-  "off_grid": 262,
-  "stable": 325,
-  "worst_real_eig": -3.2259706472606187,
-  "min_delay_ms": 60.0,
-  "certified": null
+ "designs": {
+  "fixed": {
+   "points": 325,
+   "off_grid": 262,
+   "stable": 324,
+   "worst_real_eig": 0.18967114528322188,
+   "min_delay_ms": -20.0,
+   "certified": 0,
+   "on_grid_stable": 62,
+   "on_grid_certified": 0,
+   "min_delay_ms_on_grid": -20.0
+  },
+  "gs": {
+   "points": 325,
+   "off_grid": 262,
+   "stable": 325,
+   "worst_real_eig": -3.2259706472606187,
+   "min_delay_ms": 60.0,
+   "certified": 10,
+   "on_grid_stable": 63,
+   "on_grid_certified": 0,
+   "min_delay_ms_on_grid": 60.0
+  },
+  "lpv": {
+   "points": 325,
+   "off_grid": 262,
+   "stable": 325,
+   "worst_real_eig": -2.8132204620577026,
+   "min_delay_ms": 40.0,
+   "certified": 325,
+   "on_grid_stable": 63,
+   "on_grid_certified": 63,
+   "min_delay_ms_on_grid": 40.0
+  },
+  "gs_hg": {
+   "points": 325,
+   "off_grid": 262,
+   "stable": 325,
+   "worst_real_eig": -4.2397866660620425,
+   "min_delay_ms": 0.0,
+   "certified": 0,
+   "on_grid_stable": 63,
+   "on_grid_certified": 0,
+   "min_delay_ms_on_grid": 0.0
+  }
  },
- "lpv": {
-  "points": 325,
-  "off_grid": 262,
-  "stable": 325,
-  "worst_real_eig": -2.8132204620577026,
-  "min_delay_ms": 40.0,
-  "certified": 325
+ "learned_policies_linearized": {
+  "ppo": [
+   {
+    "points": 325,
+    "off_grid": 262,
+    "stable": 262,
+    "worst_real_eig": 1.1242307744328073,
+    "min_delay_ms": -20.0,
+    "certified": 0,
+    "on_grid_stable": 49,
+    "on_grid_certified": 0,
+    "min_delay_ms_on_grid": -20.0,
+    "seed_file": "ppo_nominal_seed0.npz",
+    "points_with_saturated_trim_action": 0
+   },
+   {
+    "points": 325,
+    "off_grid": 262,
+    "stable": 322,
+    "worst_real_eig": 0.5870744527578351,
+    "min_delay_ms": -20.0,
+    "certified": 0,
+    "on_grid_stable": 62,
+    "on_grid_certified": 0,
+    "min_delay_ms_on_grid": -20.0,
+    "seed_file": "ppo_nominal_seed1.npz",
+    "points_with_saturated_trim_action": 0
+   },
+   {
+    "points": 325,
+    "off_grid": 262,
+    "stable": 319,
+    "worst_real_eig": 0.9185875654817464,
+    "min_delay_ms": -20.0,
+    "certified": 0,
+    "on_grid_stable": 60,
+    "on_grid_certified": 0,
+    "min_delay_ms_on_grid": -20.0,
+    "seed_file": "ppo_nominal_seed2.npz",
+    "points_with_saturated_trim_action": 0
+   }
+  ],
+  "ppo_dr": [
+   {
+    "points": 325,
+    "off_grid": 262,
+    "stable": 294,
+    "worst_real_eig": 0.8302833427218788,
+    "min_delay_ms": -20.0,
+    "certified": 0,
+    "on_grid_stable": 53,
+    "on_grid_certified": 0,
+    "min_delay_ms_on_grid": -20.0,
+    "seed_file": "ppo_dr_seed0.npz",
+    "points_with_saturated_trim_action": 0
+   },
+   {
+    "points": 325,
+    "off_grid": 262,
+    "stable": 223,
+    "worst_real_eig": 0.8651390286037676,
+    "min_delay_ms": -20.0,
+    "certified": 0,
+    "on_grid_stable": 40,
+    "on_grid_certified": 0,
+    "min_delay_ms_on_grid": -20.0,
+    "seed_file": "ppo_dr_seed1.npz",
+    "points_with_saturated_trim_action": 0
+   },
+   {
+    "points": 325,
+    "off_grid": 262,
+    "stable": 165,
+    "worst_real_eig": 0.718451759810893,
+    "min_delay_ms": -20.0,
+    "certified": 0,
+    "on_grid_stable": 30,
+    "on_grid_certified": 0,
+    "min_delay_ms_on_grid": -20.0,
+    "seed_file": "ppo_dr_seed2.npz",
+    "points_with_saturated_trim_action": 0
+   }
+  ],
+  "diffsim": [
+   {
+    "points": 325,
+    "off_grid": 262,
+    "stable": 325,
+    "worst_real_eig": -0.05771866284229496,
+    "min_delay_ms": -20.0,
+    "certified": 0,
+    "on_grid_stable": 63,
+    "on_grid_certified": 0,
+    "min_delay_ms_on_grid": -20.0,
+    "seed_file": "diffsim_nominal_seed0.npz",
+    "points_with_saturated_trim_action": 0
+   },
+   {
+    "points": 325,
+    "off_grid": 262,
+    "stable": 325,
+    "worst_real_eig": -0.05463202125833065,
+    "min_delay_ms": -20.0,
+    "certified": 0,
+    "on_grid_stable": 63,
+    "on_grid_certified": 0,
+    "min_delay_ms_on_grid": -20.0,
+    "seed_file": "diffsim_nominal_seed1.npz",
+    "points_with_saturated_trim_action": 0
+   },
+   {
+    "points": 325,
+    "off_grid": 262,
+    "stable": 325,
+    "worst_real_eig": -0.06317090590736564,
+    "min_delay_ms": -20.0,
+    "certified": 0,
+    "on_grid_stable": 63,
+    "on_grid_certified": 0,
+    "min_delay_ms_on_grid": -20.0,
+    "seed_file": "diffsim_nominal_seed2.npz",
+    "points_with_saturated_trim_action": 0
+   }
+  ],
+  "diffsim_dr": [
+   {
+    "points": 325,
+    "off_grid": 262,
+    "stable": 313,
+    "worst_real_eig": 0.8742884168178239,
+    "min_delay_ms": -20.0,
+    "certified": 0,
+    "on_grid_stable": 59,
+    "on_grid_certified": 0,
+    "min_delay_ms_on_grid": -20.0,
+    "seed_file": "diffsim_dr_seed0.npz",
+    "points_with_saturated_trim_action": 0
+   },
+   {
+    "points": 325,
+    "off_grid": 262,
+    "stable": 313,
+    "worst_real_eig": 0.8459256343197107,
+    "min_delay_ms": -20.0,
+    "certified": 0,
+    "on_grid_stable": 59,
+    "on_grid_certified": 0,
+    "min_delay_ms_on_grid": -20.0,
+    "seed_file": "diffsim_dr_seed1.npz",
+    "points_with_saturated_trim_action": 0
+   },
+   {
+    "points": 325,
+    "off_grid": 262,
+    "stable": 315,
+    "worst_real_eig": 0.7572104925342443,
+    "min_delay_ms": -20.0,
+    "certified": 0,
+    "on_grid_stable": 59,
+    "on_grid_certified": 0,
+    "min_delay_ms_on_grid": -20.0,
+    "seed_file": "diffsim_dr_seed2.npz",
+    "points_with_saturated_trim_action": 0
+   }
+  ]
  }
 }

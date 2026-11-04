@@ -74,6 +74,14 @@ def _legend(fig, names):
     )
 
 
+def plain_log_ticks(axis) -> None:
+    """Log-scale axis labelled with plain numbers (0.3, 1, 10) instead of 3x10^-1."""
+    from matplotlib.ticker import FuncFormatter, NullFormatter
+
+    axis.set_major_formatter(FuncFormatter(lambda v, _: f"{v:g}"))
+    axis.set_minor_formatter(NullFormatter())
+
+
 def _save(fig, path: Path) -> None:
     """PNG for the README, vector PDF for papers."""
     fig.savefig(path, dpi=160)
@@ -88,12 +96,18 @@ COLUMN_TITLES = {
 }
 
 
+def _num(v) -> float:
+    return float("nan") if v is None else float(v)
+
+
 def stress_tests(sweeps: dict, names: list[str], path: Path) -> None:
     fig, axes = plt.subplots(2, 3, figsize=(10.5, 6.2), sharex="col")
     for col, (key, sweep) in enumerate(sweeps.items()):
         axes[0, col].set_title(COLUMN_TITLES.get(key, key), loc="left")
         axes[0, col].set_yscale("log")
-        values = [r["value"] for r in sweep["rows"]]
+        plain_log_ticks(axes[0, col].yaxis)
+        # metrics.json stores the "step" morphing rate (infinity) as null.
+        values = [math.inf if r["value"] is None else r["value"] for r in sweep["rows"]]
         if key == "morph_rate":
             x = np.arange(len(values))
             ticks = [
@@ -106,9 +120,10 @@ def stress_tests(sweeps: dict, names: list[str], path: Path) -> None:
             x = np.asarray(values) * 100
             ticks = [f"{v:g}" for v in x]
         for name in names:
-            rmse = [r[name]["roll_rmse_deg"] for r in sweep["rows"]]
-            lo = [r[name]["roll_rmse_ci"][0] for r in sweep["rows"]]
-            hi = [r[name]["roll_rmse_ci"][1] for r in sweep["rows"]]
+            # metrics.json stores NaN (no successful run) as null.
+            rmse = [_num(r[name]["roll_rmse_deg"]) for r in sweep["rows"]]
+            lo = [_num(r[name]["roll_rmse_ci"][0]) for r in sweep["rows"]]
+            hi = [_num(r[name]["roll_rmse_ci"][1]) for r in sweep["rows"]]
             succ = [100 * r[name]["success_rate"] for r in sweep["rows"]]
             kw = dict(color=COLORS[name], marker=MARKERS[name])
             axes[0, col].plot(x, rmse, **kw)

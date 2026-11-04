@@ -1,6 +1,7 @@
 """How the simulator gradient grows with the differentiated horizon.
 
-    uv run python scripts/grad_horizon.py
+    uv run python scripts/grad_horizon.py              # ~6 min
+    uv run python scripts/grad_horizon.py --plot-only  # redraw from the JSON
 
 For horizons from 0.2 s to 8 s, computes the norm of d(return)/d(policy
 weights) through the closed-loop simulator, averaged over a fixed batch of
@@ -13,6 +14,7 @@ Writes ``results/grad_horizon.json`` and ``results/figures/grad_horizon.{png,pdf
 from __future__ import annotations
 
 import json
+import sys
 from functools import partial
 from pathlib import Path
 
@@ -30,6 +32,10 @@ N = 16
 
 
 def main() -> None:
+    path = ROOT / "results" / "grad_horizon.json"
+    if "--plot-only" in sys.argv:
+        plot(json.loads(path.read_text(encoding="utf-8")))
+        return
     setup = pipeline.build()
     plant, lon = setup.plant, setup.schedules["gs"]
     cfg = PPOConfig(steps=max(HORIZONS))
@@ -70,19 +76,23 @@ def main() -> None:
         print(
             label, [f"{h * DT:.1f}s: |g|={r[1]:.3g}" for h, r in zip(HORIZONS, rows, strict=True)]
         )
-    path = ROOT / "results" / "grad_horizon.json"
     path.write_text(json.dumps(out, indent=1), encoding="utf-8")
+    plot(out)
 
-    from figures import COLORS, INK2, _save, plt
+
+def plot(out: dict) -> None:
+    from figures import COLORS, INK2, _save, plain_log_ticks, plt
 
     fig, ax = plt.subplots(figsize=(6.2, 3.4))
-    secs = np.asarray(HORIZONS) * DT
+    secs = np.asarray(out["horizons_steps"]) * out["dt"]
     for (label, rows), color in zip(
         out["policies"].items(), [INK2, COLORS["diffsim"]], strict=False
     ):
         ax.plot(secs, rows["grad_norm"], marker="o", color=color, label=label)
     ax.set_xscale("log")
     ax.set_yscale("log")
+    ax.set_xticks(secs, [f"{s:g}" for s in secs])
+    plain_log_ticks(ax.yaxis)
     ax.set_xlabel("Differentiated horizon (s, log)")
     ax.set_ylabel("|d return / d weights| (log)")
     ax.set_title("Simulator gradient vs. horizon (training uses 2 s windows)", loc="left")
