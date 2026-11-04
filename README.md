@@ -71,6 +71,7 @@ paired comparisons. Learned rows pool 3 training seeds, giving 768 runs per cell
 | LPV + residual PPO (±20 %, domain rand.) | 0.95° | 0.91° | 1.02° | 0.98° | 3.52° |
 | …residual Lyapunov-projected at run time | 1.16° | 1.13° | 1.15° | 1.19° | 3.48° |
 | …projected inside training too | 1.15° | 1.12° | 1.13° | 1.18° | 3.41° |
+| …projected with a model-error margin | 1.12° | 1.08° | 1.06° | 1.15° | 3.33° |
 
 † Lost control in some runs: 5.1 % for the no-margin LQR, 0.3 % for each marked learned
 policy. All other cells keep control in 100 % of runs. The 95 % bootstrap intervals are within about ±10 % of
@@ -115,12 +116,23 @@ stored as `null` in the sweeps. Sideslip and actuator activity are in
      the condition exactly on the scheduled model for any network output. It closes about a
      third of the gap (1.50° → 1.15°) and holds at 60 ms (1.14°). It still fails at 80 ms and with no aileron,
      because the certificate is for the nominal model without delay.
-   - **Model mismatch.** On the *true* linearization between design points, the projected law
-     keeps the decrease for every sampled state only at the 63 design points; at the worst
-     off-grid point, only 72 % of samples hold. A correction that is nonzero at trim is
-     projected onto the constraint boundary with zero slack, so any model mismatch tips it
-     over. Certifying it robustly needs a correction that vanishes at trim, plus a margin in
-     the projection.
+   - **Model mismatch, and the fix.** On the *true* linearization between design points, the
+     plain projection keeps the decrease for every sampled state only at the 63 design points
+     (72 % of samples at the worst off-grid point). A correction that is nonzero at trim lands
+     on the constraint boundary with zero slack, so interpolation error tips it over.
+     - **Where the error lives.** The input matrix carries none (commands drive first-order
+       actuators, so it is the same everywhere), so the error enters only through the state
+       matrix and is quadratic in the state.
+     - **A relative margin.** Tightening the half-space by the relative error, the generalized
+       eigenvalue γ of the model mismatch against the certificate's own margin, restores an
+       exact guarantee. γ is bounded on 1,000 random flight conditions with a 1.5 safety
+       factor, so the margin is 0.21.
+     - **Result.** The decrease then holds for every sampled state and residual at all 325
+       points, and provably for all states at the 322 points where the margin covers the
+       measured γ. Accuracy is unchanged: 1.12° nominal, and 1.06° under noise plus 40 ms
+       delay.
+     - **Limits.** It inherits the certificate's assumptions: no delay beyond what the LPV
+       design tolerates (11° at 80 ms) and a healthy aileron.
 
    ![Residual policies](results/figures/residual_filter.png)
 

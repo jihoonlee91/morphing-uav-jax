@@ -26,7 +26,7 @@ def main() -> None:
     fig_dir = results / "figures"
     names = [k for k in PLOTTED if k in metrics["table"]["nominal"]]
     stress_tests(metrics["sweeps"], names, fig_dir / "stress_tests.png")
-    residual = [k for k in ("lpv", "residual_dr", "residual_proj", "residual_proj_trained")
+    residual = [k for k in ("lpv", "residual_dr", "residual_proj_trained", "residual_safe")
                 if k in metrics["table"]["nominal"]]  # fmt: skip
     if len(residual) > 2:
         stress_tests(metrics["sweeps"], residual, fig_dir / "residual_filter.png")

@@ -256,6 +256,58 @@
    }
   ]
  },
+ "sampled_decrease": {
+  "samples_per_point": 4096,
+  "state_norm": "log-uniform 1e-3..10 (normalized), directions uniform",
+  "residuals": "uniform in the +/-20 % box",
+  "condition": "decay: V-dot <= -2*lambda*V (lambda = 0.1); negative: V-dot < 0",
+  "rows": {
+   "lpv": {
+    "points": 325,
+    "decay_holds_for_all_samples": 325,
+    "negative_for_all_samples": 325,
+    "worst_share_decay": 1.0,
+    "worst_share_negative": 1.0
+   },
+   "residual_dr": {
+    "points": 325,
+    "decay_holds_for_all_samples": 0,
+    "negative_for_all_samples": 0,
+    "worst_share_decay": 0.683837890625,
+    "worst_share_negative": 0.684326171875
+   },
+   "residual_proj": {
+    "points": 325,
+    "decay_holds_for_all_samples": 63,
+    "negative_for_all_samples": 267,
+    "worst_share_decay": 0.7216796875,
+    "worst_share_negative": 0.861328125
+   },
+   "residual_safe": {
+    "points": 325,
+    "decay_holds_for_all_samples": 325,
+    "negative_for_all_samples": 325,
+    "worst_share_decay": 1.0,
+    "worst_share_negative": 1.0
+   },
+   "residual_proj_trained": {
+    "points": 325,
+    "decay_holds_for_all_samples": 63,
+    "negative_for_all_samples": 267,
+    "worst_share_decay": 0.7216796875,
+    "worst_share_negative": 0.861328125
+   }
+  },
+  "margin": {
+   "estimation_points": 1000,
+   "seed": 0,
+   "factor": 1.5,
+   "max_gamma": 0.14053464455244824,
+   "margin": 0.21080196682867236,
+   "max_input_matrix_error": 3.0849210008790615e-13,
+   "points_where_margin_covers_gamma": 322
+  }
+ },
  "learned_policies_pooled": {
   "ppo": {
    "seeds": 3,
@@ -303,12 +355,24 @@
    "stable": 267,
    "worst_real_eig": null,
    "min_delay_ms": null,
-   "certified": 63,
-   "samples_per_point": 4096,
-   "min_fraction_decay_holds": 0.7216796875,
-   "unfiltered_points_decay_always_holds": 0,
-   "unfiltered_min_fraction_decay_holds": 0.683837890625,
-   "note": "certified = V-dot <= -2*lambda*V held for every sampled state and residual on the true frozen linearization; stable = V-dot < 0 for every sample. Not a delay check."
+   "certified": 63
+  },
+  "residual_proj_trained": {
+   "seeds": null,
+   "points": 325,
+   "stable": 267,
+   "worst_real_eig": null,
+   "min_delay_ms": null,
+   "certified": 63
+  },
+  "residual_safe": {
+   "seeds": null,
+   "points": 325,
+   "stable": 325,
+   "worst_real_eig": null,
+   "min_delay_ms": null,
+   "certified": 325,
+   "certified_for_all_states": 322
   }
  }
 }

@@ -48,6 +48,7 @@ COLORS = {
     # told apart by line style and marker rather than a ninth hue.
     "residual_proj": INK2,
     "residual_proj_trained": INK2,
+    "residual_safe": INK,
 }
 LINESTYLES = {"residual_proj_trained": "--"}
 PLOTTED = ("gs", "gs_hg", "lpv", "ppo", "ppo_dr", "diffsim", "diffsim_dr", "residual_dr")
@@ -63,6 +64,7 @@ MARKERS = {
     "residual_dr": "*",
     "residual_proj": "P",
     "residual_proj_trained": "X",
+    "residual_safe": "o",
 }
 
 plt.rcParams.update({
