@@ -69,6 +69,8 @@ paired comparisons. Learned rows pool 3 training seeds, giving 768 runs per cell
 | **Diff-sim policy** | **0.23°** | **0.22°** | 9.86° | **0.23°** | **1.73°**† |
 | **Diff-sim + domain randomization** | 0.42° | 0.41° | **0.51°** | 0.42° | 2.00° |
 | LPV + residual PPO (±20 %, domain rand.) | 0.95° | 0.91° | 1.02° | 0.98° | 3.52° |
+| …residual Lyapunov-projected at run time | 1.16° | 1.13° | 1.15° | 1.19° | 3.48° |
+| …projected inside training too | 1.15° | 1.12° | 1.13° | 1.18° | 3.41° |
 
 † Lost control in some runs: 5.1 % for the no-margin LQR, 0.3 % for each marked learned
 policy. All other cells keep control in 100 % of runs. The 95 % bootstrap intervals are within about ±10 % of
@@ -101,18 +103,26 @@ stored as `null` in the sweeps. Sideslip and actuator activity are in
 6. **Certification is a tax that pays out at the edges.** The LPV design is about 40 % less
    accurate than the tuned LQR in nominal flight. With no aileron at all, it is the most accurate
    design (3.6° vs 4.1–12° for the others).
-7. **A bounded residual on the certified law is only half a fix.** In this design, PPO with
-   domain randomization learns a correction of at most 20 % of each actuator range on top of the
-   LPV law. It closes about half of the nominal gap to PPO (1.50° → 0.95°) and keeps the LPV's
-   robustness up to 60 ms of delay. It is not free:
-   - its commands are busier (0.48 vs 0.17 for the LPV law);
-   - it is worse than the LPV law with no aileron (6.5° vs 3.6°) and at 80 ms of delay (11° vs
-     2.4°);
-   - its linearization is frozen-unstable at 26–33 % of in-envelope trim points, so the LPV
-     certificate no longer holds.
+7. **A learned correction on top of the certified law: bounding it is not enough, and
+   projecting it is not free.** In this design, PPO with domain randomization learns a
+   correction of at most 20 % of each actuator range on top of the LPV law.
+   - **Bounded only.** It closes about half of the nominal gap to PPO (1.50° → 0.95°) and holds
+     up to 60 ms of delay. But its commands are busier (0.48 vs 0.17 for the LPV law), it is
+     worse than the LPV law with no aileron (6.5° vs 3.6°) and at 80 ms (11° vs 2.4°), and its
+     linearization is frozen-unstable at 26–33 % of in-envelope trim points.
+   - **Projected.** [`safety.py`](src/morphjax/safety.py) projects the correction onto the LPV
+     Lyapunov-decrease condition, either at run time or inside training as well. This restores
+     the condition exactly on the scheduled model for any network output. It closes about a
+     third of the gap (1.50° → 1.15°) and holds at 60 ms (1.14°). It still fails at 80 ms and with no aileron,
+     because the certificate is for the nominal model without delay.
+   - **Model mismatch.** On the *true* linearization between design points, the projected law
+     keeps the decrease for every sampled state only at the 63 design points; at the worst
+     off-grid point, only 72 % of samples hold. A correction that is nonzero at trim is
+     projected onto the constraint boundary with zero slack, so any model mismatch tips it
+     over. Certifying it robustly needs a correction that vanishes at trim, plus a margin in
+     the projection.
 
-   Keeping the guarantee needs a residual that is itself constrained (a safety filter), not
-   just bounded.
+   ![Residual policies](results/figures/residual_filter.png)
 
 ## Why gradients through the simulator work here
 
@@ -179,7 +189,7 @@ CPU only (20 logical cores, JAX 0.12), timed after compilation ([`results/benchm
 | **Aircraft model** ([`aero.py`](src/morphjax/aero.py), [`airframe.py`](src/morphjax/airframe.py), [`dynamics.py`](src/morphjax/dynamics.py)) | 6-DOF rigid body with the NASA GTM-T2 aerodynamic tables: basic airframe, elevator, ailerons, mirrored rudder, and rate damping with Kalviste rotary-balance blending. Adds the paper's span-morphing mass and aerodynamic model, first-order actuators (5 Hz surfaces, 0.5 Hz morphing), and an engine map. |
 | **Trim and linearization** ([`trim.py`](src/morphjax/trim.py)) | Damped Newton trim on exact autodiff Jacobians (residual about 1e-15) and `jax.jacfwd` linear models, replacing Simulink `trim`/`linmod`. |
 | **Model-based control** ([`design.py`](src/morphjax/design.py), [`control.py`](src/morphjax/control.py)) | LQR, fixed and gain-scheduled, tuned on the learners' reward under a delay-margin requirement. Guaranteed-cost LPV state feedback with a common Lyapunov matrix, solved as LMIs with CVXPY/Clarabel and re-verified after the solve. |
-| **Learning** ([`rl.py`](src/morphjax/rl.py), [`diffsim.py`](src/morphjax/diffsim.py)) | PPO from scratch in JAX (no RL library) and gradient-based policy optimization through the simulator. Both use the same network and interface. |
+| **Learning** ([`rl.py`](src/morphjax/rl.py), [`diffsim.py`](src/morphjax/diffsim.py), [`safety.py`](src/morphjax/safety.py)) | PPO from scratch in JAX (no RL library) and gradient-based policy optimization through the simulator. Both use the same network and interface. Residual policies on top of the LPV law, with an optional Lyapunov projection. |
 | **Evaluation and audit** ([`evaluation.py`](src/morphjax/evaluation.py), [`verify.py`](src/morphjax/verify.py)) | Paired scenarios, bootstrap intervals, stress sweeps, and an actuator-activity metric, so chattering cannot hide behind a good RMS error. Linear checks of every controller, including linearized policies. |
 | **Tests** ([`tests/`](tests)) | Interpolation against SciPy, and mass properties against numbers in the paper. Jacobians and the simulator gradient against finite differences. Closed-loop stability at every design point, the LMI certificate, determinism, GAE, and this README's snippet. Pyright runs in CI on Python 3.11 and 3.13. |
 
@@ -260,7 +270,7 @@ Morphing is quasi-static, as in the paper.
 
 ```
 src/morphjax/   data interp aero airframe atmosphere dynamics trim design control sim
-                scenarios rl diffsim evaluation verify pipeline
+                scenarios rl diffsim safety evaluation verify pipeline
 scripts/        tune_lqr train_policy evaluate verify_designs grad_horizon benchmark
                 make_figures figures
 examples/       quickstart.py

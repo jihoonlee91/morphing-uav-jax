@@ -255,5 +255,60 @@
     "points_with_saturated_trim_action": 0
    }
   ]
+ },
+ "learned_policies_pooled": {
+  "ppo": {
+   "seeds": 3,
+   "points": 975,
+   "stable": 903,
+   "worst_real_eig": 1.1242307744328073,
+   "min_delay_ms": -20.0,
+   "certified": 0
+  },
+  "ppo_dr": {
+   "seeds": 3,
+   "points": 975,
+   "stable": 682,
+   "worst_real_eig": 0.8651390286037676,
+   "min_delay_ms": -20.0,
+   "certified": 0
+  },
+  "diffsim": {
+   "seeds": 3,
+   "points": 975,
+   "stable": 975,
+   "worst_real_eig": -0.05463202125833065,
+   "min_delay_ms": -20.0,
+   "certified": 0
+  },
+  "diffsim_dr": {
+   "seeds": 3,
+   "points": 975,
+   "stable": 941,
+   "worst_real_eig": 0.8742884168178239,
+   "min_delay_ms": -20.0,
+   "certified": 0
+  },
+  "residual_dr": {
+   "seeds": 3,
+   "points": 975,
+   "stable": 664,
+   "worst_real_eig": 0.14332610387022374,
+   "min_delay_ms": -20.0,
+   "certified": 0
+  },
+  "residual_proj": {
+   "seeds": null,
+   "points": 325,
+   "stable": 267,
+   "worst_real_eig": null,
+   "min_delay_ms": null,
+   "certified": 63,
+   "samples_per_point": 4096,
+   "min_fraction_decay_holds": 0.7216796875,
+   "unfiltered_points_decay_always_holds": 0,
+   "unfiltered_min_fraction_decay_holds": 0.683837890625,
+   "note": "certified = V-dot <= -2*lambda*V held for every sampled state and residual on the true frozen linearization; stable = V-dot < 0 for every sample. Not a delay check."
+  }
  }
 }

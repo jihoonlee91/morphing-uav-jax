@@ -44,7 +44,12 @@ COLORS = {
     # out of the line charts (it tracks the gain-scheduled LQR everywhere) and
     # its blue goes to the residual policy there.
     "residual_dr": "#2a78d6",
+    # Shown only in the separate residual figure, next to LPV and residual_dr;
+    # told apart by line style and marker rather than a ninth hue.
+    "residual_proj": INK2,
+    "residual_proj_trained": INK2,
 }
+LINESTYLES = {"residual_proj_trained": "--"}
 PLOTTED = ("gs", "gs_hg", "lpv", "ppo", "ppo_dr", "diffsim", "diffsim_dr", "residual_dr")
 MARKERS = {
     "fixed": "o",
@@ -56,6 +61,8 @@ MARKERS = {
     "diffsim_dr": "X",
     "gs_hg": "h",
     "residual_dr": "*",
+    "residual_proj": "P",
+    "residual_proj_trained": "X",
 }
 
 plt.rcParams.update({
@@ -72,7 +79,14 @@ plt.rcParams.update({
 
 def _legend(fig, names):
     handles = [
-        plt.Line2D([], [], color=COLORS[n], marker=MARKERS[n], label=pipeline.LABELS[n])
+        plt.Line2D(
+            [],
+            [],
+            color=COLORS[n],
+            marker=MARKERS[n],
+            linestyle=LINESTYLES.get(n, "-"),
+            label=pipeline.LABELS[n],
+        )
         for n in names
     ]
     fig.legend(
@@ -133,7 +147,7 @@ def stress_tests(sweeps: dict, names: list[str], path: Path) -> None:
             lo = [_num(r[name]["roll_rmse_ci"][0]) for r in sweep["rows"]]
             hi = [_num(r[name]["roll_rmse_ci"][1]) for r in sweep["rows"]]
             succ = [100 * r[name]["success_rate"] for r in sweep["rows"]]
-            kw = dict(color=COLORS[name], marker=MARKERS[name])
+            kw = dict(color=COLORS[name], marker=MARKERS[name], linestyle=LINESTYLES.get(name, "-"))
             axes[0, col].plot(x, rmse, **kw)
             axes[0, col].fill_between(x, lo, hi, color=COLORS[name], alpha=0.12, linewidth=0)
             axes[1, col].plot(x, succ, **kw)

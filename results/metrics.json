@@ -9,7 +9,9 @@
    "ppo_dr": 493.5735355711079,
    "diffsim": 495.8580820991299,
    "diffsim_dr": 494.3062159550187,
-   "residual_dr": 487.7547604969056
+   "residual_dr": 487.7547604969056,
+   "residual_proj": 484.2778053376135,
+   "residual_proj_trained": 484.70766705895704
   },
   "steps": 750,
   "dt": 0.02,
@@ -24,7 +26,9 @@
    "ppo_dr": 3,
    "diffsim": 3,
    "diffsim_dr": 3,
-   "residual_dr": 3
+   "residual_dr": 3,
+   "residual_proj": 3,
+   "residual_proj_trained": 3
   },
   "lqr_weights": {
    "phi": 0.125,
@@ -45,7 +49,7 @@
    "cost_bound": 1923.8942753541858
   },
   "max_trim_residual": 4.46274888719354e-15,
-  "wall_seconds": 2210.446711540222
+  "wall_seconds": 3047.248215198517
  },
  "table": {
   "nominal": {
@@ -211,6 +215,42 @@
     "rms_aileron_deg": 3.509998617451343,
     "rms_eta_a": 3.3016364068809367,
     "cmd_activity": 0.45080827893203046
+   },
+   "residual_proj": {
+    "n": 768,
+    "success_rate": 1.0,
+    "success_ci": [
+     1.0,
+     1.0
+    ],
+    "roll_rmse_deg": 1.1645254369430889,
+    "roll_rmse_ci": [
+     1.1338003766535154,
+     1.1968909947413202
+    ],
+    "max_beta_deg_p95": 0.6954651985969936,
+    "max_alt_dev_ft_p95": 0.5565261484584709,
+    "rms_aileron_deg": 2.564573400665841,
+    "rms_eta_a": 2.219297195557244,
+    "cmd_activity": 0.5927390987421756
+   },
+   "residual_proj_trained": {
+    "n": 768,
+    "success_rate": 1.0,
+    "success_ci": [
+     1.0,
+     1.0
+    ],
+    "roll_rmse_deg": 1.1547762077576351,
+    "roll_rmse_ci": [
+     1.1239025403576488,
+     1.187594763671921
+    ],
+    "max_beta_deg_p95": 0.6257296310095913,
+    "max_alt_dev_ft_p95": 0.48216145039132235,
+    "rms_aileron_deg": 2.475648705358759,
+    "rms_eta_a": 2.0815423461625415,
+    "cmd_activity": 0.5106044367010439
    }
   },
   "fast_morph": {
@@ -376,6 +416,42 @@
     "rms_aileron_deg": 3.3509680429893933,
     "rms_eta_a": 3.270535998118079,
     "cmd_activity": 0.4751095650119796
+   },
+   "residual_proj": {
+    "n": 768,
+    "success_rate": 1.0,
+    "success_ci": [
+     1.0,
+     1.0
+    ],
+    "roll_rmse_deg": 1.1302747146236567,
+    "roll_rmse_ci": [
+     1.0999733516198111,
+     1.1591617225326651
+    ],
+    "max_beta_deg_p95": 0.7050339402823712,
+    "max_alt_dev_ft_p95": 0.650164908767374,
+    "rms_aileron_deg": 2.4556815345904153,
+    "rms_eta_a": 2.194638855578597,
+    "cmd_activity": 0.6026873043462406
+   },
+   "residual_proj_trained": {
+    "n": 768,
+    "success_rate": 1.0,
+    "success_ci": [
+     1.0,
+     1.0
+    ],
+    "roll_rmse_deg": 1.118465926113276,
+    "roll_rmse_ci": [
+     1.0886717145628821,
+     1.1477820541479247
+    ],
+    "max_beta_deg_p95": 0.6139086917451122,
+    "max_alt_dev_ft_p95": 0.5968219807153218,
+    "rms_aileron_deg": 2.3722088153389165,
+    "rms_eta_a": 2.0572939322213526,
+    "cmd_activity": 0.5188435426474859
    }
   },
   "noise_delay": {
@@ -541,6 +617,42 @@
     "rms_aileron_deg": 3.408768738787146,
     "rms_eta_a": 3.2848627925962313,
     "cmd_activity": 9.068781164141283
+   },
+   "residual_proj": {
+    "n": 768,
+    "success_rate": 1.0,
+    "success_ci": [
+     1.0,
+     1.0
+    ],
+    "roll_rmse_deg": 1.1475357861978874,
+    "roll_rmse_ci": [
+     1.1161275558022996,
+     1.179847493983964
+    ],
+    "max_beta_deg_p95": 0.7978576310459033,
+    "max_alt_dev_ft_p95": 2.847325288241359,
+    "rms_aileron_deg": 2.590331750856573,
+    "rms_eta_a": 2.309072418231094,
+    "cmd_activity": 8.798282747857163
+   },
+   "residual_proj_trained": {
+    "n": 768,
+    "success_rate": 1.0,
+    "success_ci": [
+     1.0,
+     1.0
+    ],
+    "roll_rmse_deg": 1.1253127492654846,
+    "roll_rmse_ci": [
+     1.0931661124618735,
+     1.1573566346280173
+    ],
+    "max_beta_deg_p95": 0.7133843018469825,
+    "max_alt_dev_ft_p95": 2.832793208526391,
+    "rms_aileron_deg": 2.4818904554056425,
+    "rms_eta_a": 2.1167386790015983,
+    "cmd_activity": 8.781121965865056
    }
   },
   "model_error": {
@@ -706,6 +818,42 @@
     "rms_aileron_deg": 3.4073493183073698,
     "rms_eta_a": 3.32505224257847,
     "cmd_activity": 0.5094678827841017
+   },
+   "residual_proj": {
+    "n": 768,
+    "success_rate": 1.0,
+    "success_ci": [
+     1.0,
+     1.0
+    ],
+    "roll_rmse_deg": 1.1909119174816178,
+    "roll_rmse_ci": [
+     1.1576441869802563,
+     1.2238386906645677
+    ],
+    "max_beta_deg_p95": 0.7354963007196633,
+    "max_alt_dev_ft_p95": 0.683956321315668,
+    "rms_aileron_deg": 2.5866286240500793,
+    "rms_eta_a": 2.4659368722121777,
+    "cmd_activity": 0.6119977261474127
+   },
+   "residual_proj_trained": {
+    "n": 768,
+    "success_rate": 1.0,
+    "success_ci": [
+     1.0,
+     1.0
+    ],
+    "roll_rmse_deg": 1.1784284497395388,
+    "roll_rmse_ci": [
+     1.145802228456938,
+     1.211165314458111
+    ],
+    "max_beta_deg_p95": 0.6361852670999197,
+    "max_alt_dev_ft_p95": 0.6327620644924763,
+    "rms_aileron_deg": 2.4790999283502617,
+    "rms_eta_a": 2.2768172657896977,
+    "cmd_activity": 0.5282362542756311
    }
   },
   "aileron_fail": {
@@ -871,6 +1019,42 @@
     "rms_aileron_deg": 8.007501309038618,
     "rms_eta_a": 2.0193437254451188,
     "cmd_activity": 0.8815223178477387
+   },
+   "residual_proj": {
+    "n": 768,
+    "success_rate": 1.0,
+    "success_ci": [
+     1.0,
+     1.0
+    ],
+    "roll_rmse_deg": 3.4761849135801115,
+    "roll_rmse_ci": [
+     3.337126274139266,
+     3.6202363504852815
+    ],
+    "max_beta_deg_p95": 1.5795606122142989,
+    "max_alt_dev_ft_p95": 1.314584626549208,
+    "rms_aileron_deg": 7.717912102516743,
+    "rms_eta_a": 1.9385881977679738,
+    "cmd_activity": 0.89677805032816
+   },
+   "residual_proj_trained": {
+    "n": 768,
+    "success_rate": 1.0,
+    "success_ci": [
+     1.0,
+     1.0
+    ],
+    "roll_rmse_deg": 3.4140941197674137,
+    "roll_rmse_ci": [
+     3.2853185007587453,
+     3.550489110571195
+    ],
+    "max_beta_deg_p95": 1.4020309244537537,
+    "max_alt_dev_ft_p95": 1.1458964440714108,
+    "rms_aileron_deg": 6.709052432223714,
+    "rms_eta_a": 1.899754318832553,
+    "cmd_activity": 0.8062478260288439
    }
   }
  },
@@ -1041,6 +1225,42 @@
       "rms_aileron_deg": 3.3402226933348635,
       "rms_eta_a": 3.3402506775003054,
       "cmd_activity": 0.4431236849063456
+     },
+     "residual_proj": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.103999517363336,
+      "roll_rmse_ci": [
+       1.0609957389488331,
+       1.149134491960232
+      ],
+      "max_beta_deg_p95": 0.692828321896632,
+      "max_alt_dev_ft_p95": 0.5452206659924741,
+      "rms_aileron_deg": 2.4410052259929933,
+      "rms_eta_a": 2.242880384701849,
+      "cmd_activity": 0.572883215221509
+     },
+     "residual_proj_trained": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.093442783425213,
+      "roll_rmse_ci": [
+       1.0504425631997265,
+       1.1386131871561156
+      ],
+      "max_beta_deg_p95": 0.5988091200947403,
+      "max_alt_dev_ft_p95": 0.45434374940236905,
+      "rms_aileron_deg": 2.3563245013672645,
+      "rms_eta_a": 2.1032514264275766,
+      "cmd_activity": 0.4994470912328784
      }
     },
     {
@@ -1206,6 +1426,42 @@
       "rms_aileron_deg": 3.428694678236534,
       "rms_eta_a": 3.479514552480325,
       "cmd_activity": 0.42230534117763296
+     },
+     "residual_proj": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.093355789486416,
+      "roll_rmse_ci": [
+       1.0508488799000273,
+       1.1385477721305832
+      ],
+      "max_beta_deg_p95": 0.6760666239080587,
+      "max_alt_dev_ft_p95": 0.5499691948046915,
+      "rms_aileron_deg": 2.4277995125887357,
+      "rms_eta_a": 2.2405741508868577,
+      "cmd_activity": 0.5506527480726041
+     },
+     "residual_proj_trained": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.0863518144908308,
+      "roll_rmse_ci": [
+       1.0437067203618173,
+       1.1312585059092128
+      ],
+      "max_beta_deg_p95": 0.5876268848698625,
+      "max_alt_dev_ft_p95": 0.45406114889181026,
+      "rms_aileron_deg": 2.3612543313003225,
+      "rms_eta_a": 2.119860841074214,
+      "cmd_activity": 0.48011527545351057
      }
     },
     {
@@ -1371,6 +1627,42 @@
       "rms_aileron_deg": 3.441302562009449,
       "rms_eta_a": 3.4950526967161295,
       "cmd_activity": 0.41828810388075205
+     },
+     "residual_proj": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.0919217399082006,
+      "roll_rmse_ci": [
+       1.0491587601188557,
+       1.1370458446393386
+      ],
+      "max_beta_deg_p95": 0.6538523136637208,
+      "max_alt_dev_ft_p95": 0.5539735600258607,
+      "rms_aileron_deg": 2.428497565941489,
+      "rms_eta_a": 2.23919813579141,
+      "cmd_activity": 0.5477698029670699
+     },
+     "residual_proj_trained": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.0853037652282784,
+      "roll_rmse_ci": [
+       1.0426959094147203,
+       1.1302776693354473
+      ],
+      "max_beta_deg_p95": 0.5908344072834331,
+      "max_alt_dev_ft_p95": 0.44856441668416647,
+      "rms_aileron_deg": 2.363002938967955,
+      "rms_eta_a": 2.1196861630349932,
+      "cmd_activity": 0.477045998692416
      }
     },
     {
@@ -1536,6 +1828,42 @@
       "rms_aileron_deg": 3.4419372269862563,
       "rms_eta_a": 3.481000169467759,
       "cmd_activity": 0.4228371239676172
+     },
+     "residual_proj": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.091957291311698,
+      "roll_rmse_ci": [
+       1.0488955883591402,
+       1.1370694559342058
+      ],
+      "max_beta_deg_p95": 0.6759564868069999,
+      "max_alt_dev_ft_p95": 0.5598049881048608,
+      "rms_aileron_deg": 2.4307638713968944,
+      "rms_eta_a": 2.234596228056351,
+      "cmd_activity": 0.5475553185277963
+     },
+     "residual_proj_trained": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.0850899592108743,
+      "roll_rmse_ci": [
+       1.0423124323246744,
+       1.130383342740566
+      ],
+      "max_beta_deg_p95": 0.5904377222596393,
+      "max_alt_dev_ft_p95": 0.488837898167139,
+      "rms_aileron_deg": 2.364360108338143,
+      "rms_eta_a": 2.1139652096053196,
+      "cmd_activity": 0.47655029274707944
      }
     },
     {
@@ -1701,6 +2029,42 @@
       "rms_aileron_deg": 3.392776324980185,
       "rms_eta_a": 3.4006594443721543,
       "cmd_activity": 0.4484269776647845
+     },
+     "residual_proj": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.09537569235185,
+      "roll_rmse_ci": [
+       1.052477325122681,
+       1.140613133155363
+      ],
+      "max_beta_deg_p95": 0.6705001107169151,
+      "max_alt_dev_ft_p95": 0.6043326411823726,
+      "rms_aileron_deg": 2.4287757154752616,
+      "rms_eta_a": 2.2275230194876627,
+      "cmd_activity": 0.5709479749964598
+     },
+     "residual_proj_trained": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.0866847601103815,
+      "roll_rmse_ci": [
+       1.0436925799266592,
+       1.1315979135617407
+      ],
+      "max_beta_deg_p95": 0.5842882090349925,
+      "max_alt_dev_ft_p95": 0.5428715061016757,
+      "rms_aileron_deg": 2.3575622945604775,
+      "rms_eta_a": 2.1002799780141603,
+      "cmd_activity": 0.49568985460173076
      }
     },
     {
@@ -1866,6 +2230,42 @@
       "rms_aileron_deg": 3.35360505215667,
       "rms_eta_a": 3.333979276545445,
       "cmd_activity": 0.4612485595949966
+     },
+     "residual_proj": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.1017047403691527,
+      "roll_rmse_ci": [
+       1.0580951553175755,
+       1.1478086292312883
+      ],
+      "max_beta_deg_p95": 0.6657369282500976,
+      "max_alt_dev_ft_p95": 0.6783071458540915,
+      "rms_aileron_deg": 2.4369430072347638,
+      "rms_eta_a": 2.2294291969535323,
+      "cmd_activity": 0.5845298473831803
+     },
+     "residual_proj_trained": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.0911951766493562,
+      "roll_rmse_ci": [
+       1.0475531167251406,
+       1.1366583198728442
+      ],
+      "max_beta_deg_p95": 0.583316666973824,
+      "max_alt_dev_ft_p95": 0.5930317222508675,
+      "rms_aileron_deg": 2.3583627016789843,
+      "rms_eta_a": 2.094365739982998,
+      "cmd_activity": 0.5058481916235756
      }
     },
     {
@@ -2031,6 +2431,42 @@
       "rms_aileron_deg": 3.3440524712620423,
       "rms_eta_a": 3.3160386281784557,
       "cmd_activity": 0.4669436373593774
+     },
+     "residual_proj": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.1049539003628712,
+      "roll_rmse_ci": [
+       1.0610639220342102,
+       1.1514065618129277
+      ],
+      "max_beta_deg_p95": 0.6647258499476653,
+      "max_alt_dev_ft_p95": 0.6816084643897736,
+      "rms_aileron_deg": 2.442607142223043,
+      "rms_eta_a": 2.230893373979893,
+      "cmd_activity": 0.5888344301855261
+     },
+     "residual_proj_trained": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.0936081470903127,
+      "roll_rmse_ci": [
+       1.0498048948767578,
+       1.1393696055568208
+      ],
+      "max_beta_deg_p95": 0.583562233930044,
+      "max_alt_dev_ft_p95": 0.6000602447806158,
+      "rms_aileron_deg": 2.36068061976122,
+      "rms_eta_a": 2.0920764145042763,
+      "cmd_activity": 0.509001013095177
      }
     },
     {
@@ -2196,6 +2632,42 @@
       "rms_aileron_deg": 3.332017697754915,
       "rms_eta_a": 3.2962808753167163,
       "cmd_activity": 0.4690161072434731
+     },
+     "residual_proj": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.1077449000117667,
+      "roll_rmse_ci": [
+       1.0634797391302628,
+       1.154212778811616
+      ],
+      "max_beta_deg_p95": 0.6631736353886598,
+      "max_alt_dev_ft_p95": 0.6725527478160529,
+      "rms_aileron_deg": 2.446673932218887,
+      "rms_eta_a": 2.232192266826813,
+      "cmd_activity": 0.5912092761745713
+     },
+     "residual_proj_trained": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.0954336810214482,
+      "roll_rmse_ci": [
+       1.0517140674082064,
+       1.1416094027525583
+      ],
+      "max_beta_deg_p95": 0.5819980176014166,
+      "max_alt_dev_ft_p95": 0.6071459560742368,
+      "rms_aileron_deg": 2.361312178043008,
+      "rms_eta_a": 2.090144071031165,
+      "cmd_activity": 0.5109122279163664
      }
     }
    ]
@@ -2366,6 +2838,42 @@
       "rms_aileron_deg": 3.3682240687488605,
       "rms_eta_a": 3.322135928230233,
       "cmd_activity": 0.4652084582848371
+     },
+     "residual_proj": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.1221814576718323,
+      "roll_rmse_ci": [
+       1.0785184313026466,
+       1.1666823185441784
+      ],
+      "max_beta_deg_p95": 0.7194030094437248,
+      "max_alt_dev_ft_p95": 0.6031230431948301,
+      "rms_aileron_deg": 2.4457822113263923,
+      "rms_eta_a": 2.212520871890041,
+      "cmd_activity": 0.6026819232223727
+     },
+     "residual_proj_trained": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.110143557607098,
+      "roll_rmse_ci": [
+       1.067076390297911,
+       1.1548514891277368
+      ],
+      "max_beta_deg_p95": 0.6417370111661252,
+      "max_alt_dev_ft_p95": 0.5609610867398713,
+      "rms_aileron_deg": 2.3588362447654827,
+      "rms_eta_a": 2.064216327332131,
+      "cmd_activity": 0.5209800532238384
      }
     },
     {
@@ -2531,6 +3039,42 @@
       "rms_aileron_deg": 3.947404200714337,
       "rms_eta_a": 2.992805139751136,
       "cmd_activity": 0.4397083925970902
+     },
+     "residual_proj": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.158820680964271,
+      "roll_rmse_ci": [
+       1.1153624458509963,
+       1.2039402514278665
+      ],
+      "max_beta_deg_p95": 0.6229807195434929,
+      "max_alt_dev_ft_p95": 0.6435725984716896,
+      "rms_aileron_deg": 2.7227344075703144,
+      "rms_eta_a": 1.8243517468235204,
+      "cmd_activity": 0.5588166642075684
+     },
+     "residual_proj_trained": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.1756169930858011,
+      "roll_rmse_ci": [
+       1.1312012191993188,
+       1.2219832486267483
+      ],
+      "max_beta_deg_p95": 0.5114879649933204,
+      "max_alt_dev_ft_p95": 0.5886168079805428,
+      "rms_aileron_deg": 2.659071808056581,
+      "rms_eta_a": 1.7621166292019879,
+      "cmd_activity": 0.48988881435848075
      }
     },
     {
@@ -2696,6 +3240,42 @@
       "rms_aileron_deg": 4.842913674058951,
       "rms_eta_a": 2.5948062820095465,
       "cmd_activity": 0.4799556900599988
+     },
+     "residual_proj": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.3948741466412349,
+      "roll_rmse_ci": [
+       1.3426764392249193,
+       1.449897564923826
+      ],
+      "max_beta_deg_p95": 0.7691953302423841,
+      "max_alt_dev_ft_p95": 0.6961693073339115,
+      "rms_aileron_deg": 3.671088344330233,
+      "rms_eta_a": 1.7413813245625693,
+      "cmd_activity": 0.5657511455649398
+     },
+     "residual_proj_trained": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.4554260447469096,
+      "roll_rmse_ci": [
+       1.4023039140003877,
+       1.511947830735104
+      ],
+      "max_beta_deg_p95": 0.5836386935068455,
+      "max_alt_dev_ft_p95": 0.6569075095388768,
+      "rms_aileron_deg": 3.5371321972607714,
+      "rms_eta_a": 1.7207355485224014,
+      "cmd_activity": 0.503308158026758
      }
     },
     {
@@ -2861,6 +3441,42 @@
       "rms_aileron_deg": 6.0103812899148314,
       "rms_eta_a": 2.1524108008681124,
       "cmd_activity": 0.6216169892169723
+     },
+     "residual_proj": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 2.0493949090468875,
+      "roll_rmse_ci": [
+       1.972844104048572,
+       2.1338768937531656
+      ],
+      "max_beta_deg_p95": 1.144003694142705,
+      "max_alt_dev_ft_p95": 0.8756623912017855,
+      "rms_aileron_deg": 5.534041775649091,
+      "rms_eta_a": 1.9232093071639558,
+      "cmd_activity": 0.658079664314402
+     },
+     "residual_proj_trained": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 2.114152985915234,
+      "roll_rmse_ci": [
+       2.0369094239436354,
+       2.1986728245274225
+      ],
+      "max_beta_deg_p95": 0.8679344104364306,
+      "max_alt_dev_ft_p95": 0.7664210021024758,
+      "rms_aileron_deg": 4.875319341582831,
+      "rms_eta_a": 1.808539062781293,
+      "cmd_activity": 0.591017750790983
      }
     },
     {
@@ -3026,6 +3642,42 @@
       "rms_aileron_deg": 8.045847647230856,
       "rms_eta_a": 1.9824862025001337,
       "cmd_activity": 0.8759192214567836
+     },
+     "residual_proj": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 3.3699210393872954,
+      "roll_rmse_ci": [
+       3.227547589260129,
+       3.5182389076185268
+      ],
+      "max_beta_deg_p95": 1.4914268588899322,
+      "max_alt_dev_ft_p95": 1.3374803564093098,
+      "rms_aileron_deg": 7.778229477395946,
+      "rms_eta_a": 1.92213620174083,
+      "cmd_activity": 0.894814533566127
+     },
+     "residual_proj_trained": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 3.2970013210872184,
+      "roll_rmse_ci": [
+       3.161241725410704,
+       3.438260004780307
+      ],
+      "max_beta_deg_p95": 1.1996264653273478,
+      "max_alt_dev_ft_p95": 1.2386308554828702,
+      "rms_aileron_deg": 6.666748191768662,
+      "rms_eta_a": 1.8996062946581163,
+      "cmd_activity": 0.7947648077802268
      }
     },
     {
@@ -3191,6 +3843,42 @@
       "rms_aileron_deg": 12.27695722736158,
       "rms_eta_a": 2.4223951653458973,
       "cmd_activity": 1.3571420735977633
+     },
+     "residual_proj": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 6.430960817823956,
+      "roll_rmse_ci": [
+       6.124305544775723,
+       6.740197749545098
+      ],
+      "max_beta_deg_p95": 2.020408000527982,
+      "max_alt_dev_ft_p95": 1.9025745550740791,
+      "rms_aileron_deg": 12.072471247185254,
+      "rms_eta_a": 2.4062190151817884,
+      "cmd_activity": 1.3509432021262242
+     },
+     "residual_proj_trained": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 6.173380157498556,
+      "roll_rmse_ci": [
+       5.868540529386092,
+       6.476921059303322
+      ],
+      "max_beta_deg_p95": 1.8148339387888246,
+      "max_alt_dev_ft_p95": 1.8055681496780378,
+      "rms_aileron_deg": 10.814463631881429,
+      "rms_eta_a": 2.4140420935330837,
+      "cmd_activity": 1.24867326793057
      }
     }
    ]
@@ -3361,6 +4049,42 @@
       "rms_aileron_deg": 3.297659666381994,
       "rms_eta_a": 3.408109254582031,
       "cmd_activity": 0.4852064032353646
+     },
+     "residual_proj": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.1432136583734633,
+      "roll_rmse_ci": [
+       1.0990082920565762,
+       1.1878145773112152
+      ],
+      "max_beta_deg_p95": 0.5741060843128104,
+      "max_alt_dev_ft_p95": 0.6877187181053386,
+      "rms_aileron_deg": 2.40242937108014,
+      "rms_eta_a": 2.263643568801936,
+      "cmd_activity": 0.6093115997448569
+     },
+     "residual_proj_trained": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.132631213959573,
+      "roll_rmse_ci": [
+       1.088259139950036,
+       1.1768445890967114
+      ],
+      "max_beta_deg_p95": 0.5140050701969737,
+      "max_alt_dev_ft_p95": 0.6193104355941838,
+      "rms_aileron_deg": 2.3368126194626506,
+      "rms_eta_a": 2.1319933399317956,
+      "cmd_activity": 0.5265965139250294
      }
     },
     {
@@ -3526,6 +4250,42 @@
       "rms_aileron_deg": 3.288940220025861,
       "rms_eta_a": 3.3827738026370846,
       "cmd_activity": 0.5993999518794575
+     },
+     "residual_proj": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.1572354127984004,
+      "roll_rmse_ci": [
+       1.111658839443435,
+       1.202671681821827
+      ],
+      "max_beta_deg_p95": 0.606866518448687,
+      "max_alt_dev_ft_p95": 0.6945304873150686,
+      "rms_aileron_deg": 2.3845962585835028,
+      "rms_eta_a": 2.217924422976307,
+      "cmd_activity": 0.7901816535219292
+     },
+     "residual_proj_trained": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.1496485937977303,
+      "roll_rmse_ci": [
+       1.1037564701427351,
+       1.1951428351945668
+      ],
+      "max_beta_deg_p95": 0.5443545047016791,
+      "max_alt_dev_ft_p95": 0.62023083119152,
+      "rms_aileron_deg": 2.32801205354169,
+      "rms_eta_a": 2.1009915847701843,
+      "cmd_activity": 0.6731333938058172
      }
     },
     {
@@ -3691,6 +4451,42 @@
       "rms_aileron_deg": 3.265287961329926,
       "rms_eta_a": 3.308921946813081,
       "cmd_activity": 2.419021079161477
+     },
+     "residual_proj": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.1315323101594987,
+      "roll_rmse_ci": [
+       1.0853490155774466,
+       1.1774446591511245
+      ],
+      "max_beta_deg_p95": 0.6378940920921966,
+      "max_alt_dev_ft_p95": 2.517927412423944,
+      "rms_aileron_deg": 2.408293252392259,
+      "rms_eta_a": 2.224643457477351,
+      "cmd_activity": 2.337896553051194
+     },
+     "residual_proj_trained": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.1255493316061036,
+      "roll_rmse_ci": [
+       1.080096180191685,
+       1.170733288735136
+      ],
+      "max_beta_deg_p95": 0.5618063305826738,
+      "max_alt_dev_ft_p95": 2.527558970651187,
+      "rms_aileron_deg": 2.360897323149771,
+      "rms_eta_a": 2.1103107280516613,
+      "cmd_activity": 2.2702468460789307
      }
     },
     {
@@ -3856,6 +4652,42 @@
       "rms_aileron_deg": 3.4987838687294186,
       "rms_eta_a": 2.887180800399402,
       "cmd_activity": 8.737031612823358
+     },
+     "residual_proj": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.3694490133779815,
+      "roll_rmse_ci": [
+       1.2856774985161439,
+       1.4465295354045293
+      ],
+      "max_beta_deg_p95": 1.3980507420793116,
+      "max_alt_dev_ft_p95": 6.736437613008592,
+      "rms_aileron_deg": 3.1963762100486175,
+      "rms_eta_a": 2.55512426967128,
+      "cmd_activity": 8.265873460953067
+     },
+     "residual_proj_trained": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.1429247817168482,
+      "roll_rmse_ci": [
+       1.0950669784143394,
+       1.189421917429689
+      ],
+      "max_beta_deg_p95": 0.8491408150036676,
+      "max_alt_dev_ft_p95": 6.677504591231865,
+      "rms_aileron_deg": 2.6893608445880113,
+      "rms_eta_a": 2.300151660721026,
+      "cmd_activity": 8.52998128251833
      }
     },
     {
@@ -4021,6 +4853,42 @@
       "rms_aileron_deg": 14.477741253329137,
       "rms_eta_a": 3.5350621996719744,
       "cmd_activity": 9.723256233009778
+     },
+     "residual_proj": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 10.782934723146932,
+      "roll_rmse_ci": [
+       10.491823029339795,
+       11.093773994036896
+      ],
+      "max_beta_deg_p95": 4.841321367734661,
+      "max_alt_dev_ft_p95": 9.142570242583629,
+      "rms_aileron_deg": 14.213126249477872,
+      "rms_eta_a": 3.504710474914481,
+      "cmd_activity": 9.672627032470503
+     },
+     "residual_proj_trained": {
+      "n": 384,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 10.898528261815697,
+      "roll_rmse_ci": [
+       10.579066843268338,
+       11.227075377966141
+      ],
+      "max_beta_deg_p95": 4.668215328223738,
+      "max_alt_dev_ft_p95": 9.202449114330214,
+      "rms_aileron_deg": 14.206683370809742,
+      "rms_eta_a": 3.4923037554103544,
+      "cmd_activity": 9.740350992421291
      }
     }
    ]
