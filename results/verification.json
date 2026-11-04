@@ -290,6 +290,13 @@
     "worst_share_decay": 1.0,
     "worst_share_negative": 1.0
    },
+   "residual_safe2": {
+    "points": 325,
+    "decay_holds_for_all_samples": 325,
+    "negative_for_all_samples": 325,
+    "worst_share_decay": 1.0,
+    "worst_share_negative": 1.0
+   },
    "residual_proj_trained": {
     "points": 325,
     "decay_holds_for_all_samples": 63,
@@ -306,7 +313,17 @@
    "margin": 0.21080196682867236,
    "max_input_matrix_error": 3.0849210008790615e-13,
    "points_where_margin_covers_gamma": 322
-  }
+  },
+  "margin_residual_safe2": {
+   "estimation_points": 1000,
+   "seed": 0,
+   "factor": 2.0,
+   "max_gamma": 0.14053464455244824,
+   "margin": 0.2810692891048965,
+   "max_input_matrix_error": 3.0849210008790615e-13,
+   "points_where_margin_covers_gamma": 325
+  },
+  "max_gamma_on_check_grid": 0.22302547548183016
  },
  "learned_policies_pooled": {
   "ppo": {
@@ -373,6 +390,15 @@
    "min_delay_ms": null,
    "certified": 325,
    "certified_for_all_states": 322
+  },
+  "residual_safe2": {
+   "seeds": null,
+   "points": 325,
+   "stable": 325,
+   "worst_real_eig": null,
+   "min_delay_ms": null,
+   "certified": 325,
+   "certified_for_all_states": 325
   }
  }
 }

@@ -72,6 +72,7 @@ paired comparisons. Learned rows pool 3 training seeds, giving 768 runs per cell
 | …residual Lyapunov-projected at run time | 1.16° | 1.13° | 1.15° | 1.19° | 3.48° |
 | …projected inside training too | 1.15° | 1.12° | 1.13° | 1.18° | 3.41° |
 | …projected with a model-error margin | 1.12° | 1.08° | 1.06° | 1.15° | 3.33° |
+| …with a 2× margin (proven at every checked point) | 1.13° | 1.09° | 1.07° | 1.15° | 3.29° |
 
 † Lost control in some runs: 5.1 % for the no-margin LQR, 0.3 % for each marked learned
 policy. All other cells keep control in 100 % of runs. The 95 % bootstrap intervals are within about ±10 % of
@@ -131,6 +132,9 @@ stored as `null` in the sweeps. Sideslip and actuator activity are in
        points, and provably for all states at the 322 points where the margin covers the
        measured γ. Accuracy is unchanged: 1.12° nominal, and 1.06° under noise plus 40 ms
        delay.
+     - **A 2× margin.** With a safety factor of 2 instead (margin 0.28, above the largest γ of
+       0.22 on the check grid), it is proven for all states at all 325 points. The cost is
+       0.01° of nominal accuracy.
      - **Limits.** It inherits the certificate's assumptions: no delay beyond what the LPV
        design tolerates (11° at 80 ms) and a healthy aileron.
 

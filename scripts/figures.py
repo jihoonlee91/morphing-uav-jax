@@ -49,7 +49,11 @@ COLORS = {
     "residual_proj": INK2,
     "residual_proj_trained": INK2,
     "residual_safe": INK,
+    "residual_safe2": INK,
 }
+# Learning curves: only the methods that were trained (the projected residuals reuse
+# the residual policies, so they have no curves of their own).
+TRAINED = ("ppo", "ppo_dr", "diffsim", "diffsim_dr")
 LINESTYLES = {"residual_proj_trained": "--"}
 PLOTTED = ("gs", "gs_hg", "lpv", "ppo", "ppo_dr", "diffsim", "diffsim_dr", "residual_dr")
 MARKERS = {
@@ -65,6 +69,7 @@ MARKERS = {
     "residual_proj": "P",
     "residual_proj_trained": "X",
     "residual_safe": "o",
+    "residual_safe2": "o",
 }
 
 plt.rcParams.update({
@@ -109,7 +114,8 @@ def plain_log_ticks(axis) -> None:
 def _save(fig, path: Path) -> None:
     """PNG for the README, vector PDF for papers."""
     fig.savefig(path, dpi=160)
-    fig.savefig(path.with_suffix(".pdf"))
+    # No creation date, so regenerating an unchanged figure gives an identical file.
+    fig.savefig(path.with_suffix(".pdf"), metadata={"CreationDate": None})
     plt.close(fig)
 
 
@@ -209,7 +215,8 @@ def learning_curves(policy_dir: Path, path: Path, lqr_return: float | None = Non
     """Training return against simulated environment steps (log scale)."""
     fig, ax = plt.subplots(figsize=(7.5, 3.8))
     names = []
-    for name, (method, variant) in pipeline.LEARNED.items():
+    for name in TRAINED:
+        method, variant = pipeline.LEARNED[name]
         runs = sorted(policy_dir.glob(f"{method}_{variant}_seed*.json"))
         if not runs:
             continue

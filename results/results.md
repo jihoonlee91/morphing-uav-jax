@@ -12,6 +12,7 @@
 | LPV + residual, Lyapunov-projected | 1.16° · 100.0% | 1.13° · 100.0% | 1.15° · 100.0% | 1.19° · 100.0% | 3.48° · 100.0% |
 | LPV + residual, projected in training | 1.15° · 100.0% | 1.12° · 100.0% | 1.13° · 100.0% | 1.18° · 100.0% | 3.41° · 100.0% |
 | LPV + residual, projected with error margin | 1.12° · 100.0% | 1.08° · 100.0% | 1.06° · 100.0% | 1.15° · 100.0% | 3.33° · 100.0% |
+| LPV + residual, projected with 2x error margin | 1.13° · 100.0% | 1.09° · 100.0% | 1.07° · 100.0% | 1.15° · 100.0% | 3.29° · 100.0% |
 
 Cells: roll-tracking RMS error over successful runs · share of runs without loss of control. 95 % bootstrap intervals are in `metrics.json`.
 
@@ -29,5 +30,6 @@ Cells: roll-tracking RMS error over successful runs · share of runs without los
 | LPV + residual, Lyapunov-projected | 0.71° | 0.60 /s | 2.19 % |
 | LPV + residual, projected in training | 0.61° | 0.52 /s | 2.06 % |
 | LPV + residual, projected with error margin | 0.64° | 0.72 /s | 1.23 % |
+| LPV + residual, projected with 2x error margin | 0.66° | 0.83 /s | 1.09 % |
 
 Command activity: mean |du/dt| of aileron, rudder and asymmetric-span commands, each divided by its position limit (higher = busier actuators).
