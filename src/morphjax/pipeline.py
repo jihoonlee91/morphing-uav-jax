@@ -27,6 +27,7 @@ LABELS = {
     "residual_proj": "LPV + residual, Lyapunov-projected",
     "residual_proj_trained": "LPV + residual, projected in training",
     "residual_safe": "LPV + residual, projected with error margin",
+    "residual_safe2": "LPV + residual, projected with 2x error margin",
 }
 # Learned controllers: name -> (training method, variant); files are
 # results/policies/<method>_<variant>_seed<k>.npz
@@ -42,6 +43,7 @@ LEARNED = {
     "residual_proj_trained": ("residual_proj", "dr"),
     # The same trained policies, projected with an interpolation-error margin.
     "residual_safe": ("residual_proj", "dr"),
+    "residual_safe2": ("residual_proj", "dr"),
 }
 # Learned controllers that are residuals on top of a model-based law.
 RESIDUAL_BASE = {
@@ -49,11 +51,13 @@ RESIDUAL_BASE = {
     "residual_proj": "lpv",
     "residual_proj_trained": "lpv",
     "residual_safe": "lpv",
+    "residual_safe2": "lpv",
 }
 # Residuals passed through the Lyapunov projection of morphjax.safety.
-PROJECTED = ("residual_proj", "residual_proj_trained", "residual_safe")
-# Of those, the ones projected with the interpolation-error margin.
-MARGINED = ("residual_safe",)
+PROJECTED = ("residual_proj", "residual_proj_trained", "residual_safe", "residual_safe2")
+# Of those, the ones projected with an interpolation-error margin, and its safety
+# factor on the worst relative error seen on 1,000 random flight conditions.
+MARGINED = {"residual_safe": 1.5, "residual_safe2": 2.0}
 
 
 class Setup(NamedTuple):

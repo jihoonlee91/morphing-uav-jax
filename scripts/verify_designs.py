@@ -87,14 +87,20 @@ def main() -> None:
     # The check exercises the filter, not a particular policy, so residual_proj and
     # residual_proj_trained (same filter) share one result.
     filt = make_safety_filter(setup)
-    filt_safe, margin_info = estimate_margin(setup, filt)
+    filt_safe, margin_info = estimate_margin(setup, filt, factor=pipeline.MARGINED["residual_safe"])
+    filt_safe2, margin_info2 = estimate_margin(
+        setup, filt, factor=pipeline.MARGINED["residual_safe2"]
+    )
     lpv_dense = interpolate_gains(setup.grid, setup.lat_gains["lpv"], dense)
     dec = sampled_decrease(filt, dense, lpv_dense, {"lpv": None, "residual_dr": None,
                                                     "residual_proj": project})  # fmt: skip
     dec |= sampled_decrease(filt_safe, dense, lpv_dense, {"residual_safe": project})
+    # Same seed, so residual_safe2 sees exactly the samples residual_safe saw.
+    dec |= sampled_decrease(filt_safe2, dense, lpv_dense, {"residual_safe2": project})
     dec["residual_proj_trained"] = dec["residual_proj"]
     gamma, _ = _relative_error(filt, dense)
     proven = gamma <= filt_safe.margin
+    proven2 = gamma <= filt_safe2.margin
     sampled = {}
     for name, d in dec.items():
         for k, v in d.items():
@@ -114,8 +120,11 @@ def main() -> None:
         "condition": "decay: V-dot <= -2*lambda*V (lambda = 0.1); negative: V-dot < 0",
         "rows": sampled,
         "margin": margin_info | {"points_where_margin_covers_gamma": int(proven.sum())},
+        "margin_residual_safe2": margin_info2
+        | {"points_where_margin_covers_gamma": int(proven2.sum())},
+        "max_gamma_on_check_grid": float(gamma.max()),
     }
-    for name in ("residual_proj", "residual_proj_trained", "residual_safe"):
+    for name in ("residual_proj", "residual_proj_trained", "residual_safe", "residual_safe2"):
         s = sampled[name]
         pooled[name] = {
             "seeds": None,  # a property of the filter for any residual in the box
@@ -126,6 +135,7 @@ def main() -> None:
             "certified": s["decay_holds_for_all_samples"],
         }
     pooled["residual_safe"]["certified_for_all_states"] = int(proven.sum())
+    pooled["residual_safe2"]["certified_for_all_states"] = int(proven2.sum())
     out["learned_policies_pooled"] = pooled
 
     (ROOT / "results" / "verification.json").write_text(json.dumps(out, indent=1), encoding="utf-8")

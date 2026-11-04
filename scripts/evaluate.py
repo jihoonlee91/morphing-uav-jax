@@ -73,7 +73,7 @@ def controllers(setup, policy_dir: Path, max_seeds: int | None = None):
         out[name] = [(s, lambda xw, pc, ig, s=s: lateral_law(s, xw, pc, ig))]
     lon = setup.schedules["gs"]
     filt = make_safety_filter(setup)
-    filt_safe, _ = estimate_margin(setup, filt)
+    margined = {n: estimate_margin(setup, filt, factor=k)[0] for n, k in pipeline.MARGINED.items()}
     for name, (method, variant) in pipeline.LEARNED.items():
         files = sorted(policy_dir.glob(f"{method}_{variant}_seed*.npz"))[:max_seeds]
         if files:
@@ -83,7 +83,7 @@ def controllers(setup, policy_dir: Path, max_seeds: int | None = None):
                 else None
             )
             if name in pipeline.PROJECTED:
-                fl = filt_safe if name in pipeline.MARGINED else filt
+                fl = margined.get(name, filt)
                 out[name] = [
                     (
                         lon,
