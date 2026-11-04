@@ -1,5 +1,5 @@
 [project]
-name = "morphing-flight-jax"
+name = "morphing-uav-jax"
 version = "0.1.0"
 description = "Differentiable JAX model of an asymmetric span-morphing UAV, with gain-scheduled, LPV, and reinforcement-learning controllers evaluated under fast morphing and distribution shift."
 readme = "README.md"
@@ -23,7 +23,7 @@ dependencies = [
 ]
 
 [project.urls]
-Repository = "https://github.com/jihoonlee91/morphing-flight-jax"
+Repository = "https://github.com/jihoonlee91/morphing-uav-jax"
 Paper = "https://doi.org/10.3390/s23063075"
 
 [dependency-groups]

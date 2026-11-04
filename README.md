@@ -1,6 +1,6 @@
-# morphing-flight-jax
+# morphing-uav-jax
 
-[![CI](https://github.com/jihoonlee91/morphing-flight-jax/actions/workflows/ci.yml/badge.svg)](https://github.com/jihoonlee91/morphing-flight-jax/actions/workflows/ci.yml)
+[![CI](https://github.com/jihoonlee91/morphing-uav-jax/actions/workflows/ci.yml/badge.svg)](https://github.com/jihoonlee91/morphing-uav-jax/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Paper](https://img.shields.io/badge/paper-Sensors%202023-informational)](https://doi.org/10.3390/s23063075)
 
@@ -12,7 +12,7 @@ command delay, and aileron failure.
 The aircraft model and the LPV design come from my paper
 [*Self-Scheduled LPV Control of Asymmetric Variable-Span Morphing UAV*](https://doi.org/10.3390/s23063075)
 (Sensors, 2023), originally in MATLAB/Simulink
-([`gtm-lpv-control`](https://github.com/jihoonlee91/gtm-lpv-control)). This repository ports it to
+([`morphing-uav-lpv-control`](https://github.com/jihoonlee91/morphing-uav-lpv-control)). This repository ports it to
 JAX and asks a question the paper did not: on the same aircraft, what does a learned controller
 buy, and what does it cost?
 

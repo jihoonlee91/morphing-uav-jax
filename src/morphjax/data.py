@@ -35,7 +35,7 @@ def cache_dir() -> Path:
     env = os.environ.get("MORPHJAX_DATA")
     if env:
         return Path(env)
-    return Path.home() / ".cache" / "morphing-flight-jax"
+    return Path.home() / ".cache" / "morphing-uav-jax"
 
 
 def _sha256(path: Path) -> str:
@@ -53,7 +53,7 @@ def fetch_aero_database(force: bool = False) -> Path:
         return target
     target.parent.mkdir(parents=True, exist_ok=True)
     tmp = target.with_suffix(".part")
-    req = urllib.request.Request(AERO_URL, headers={"User-Agent": "morphing-flight-jax"})
+    req = urllib.request.Request(AERO_URL, headers={"User-Agent": "morphing-uav-jax"})
     with urllib.request.urlopen(req, timeout=60) as resp, tmp.open("wb") as out:
         out.write(resp.read())
     digest = _sha256(tmp)

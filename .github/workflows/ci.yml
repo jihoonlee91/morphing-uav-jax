@@ -27,7 +27,7 @@ jobs:
       - name: Cache NASA aero database
         uses: actions/cache@v6
         with:
-          path: ~/.cache/morphing-flight-jax
+          path: ~/.cache/morphing-uav-jax
           key: gtm-aero-7f34845a54bcecdd
 
       - name: Lint
