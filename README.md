@@ -207,7 +207,7 @@ CPU only (20 logical cores, JAX 0.12), timed after compilation ([`results/benchm
 | **Model-based control** ([`design.py`](src/morphjax/design.py), [`control.py`](src/morphjax/control.py)) | LQR, fixed and gain-scheduled, tuned on the learners' reward under a delay-margin requirement. Guaranteed-cost LPV state feedback with a common Lyapunov matrix, solved as LMIs with CVXPY/Clarabel and re-verified after the solve. |
 | **Learning** ([`rl.py`](src/morphjax/rl.py), [`diffsim.py`](src/morphjax/diffsim.py), [`safety.py`](src/morphjax/safety.py)) | PPO from scratch in JAX (no RL library) and gradient-based policy optimization through the simulator. Both use the same network and interface. Residual policies on top of the LPV law, with an optional Lyapunov projection. |
 | **Evaluation and audit** ([`evaluation.py`](src/morphjax/evaluation.py), [`verify.py`](src/morphjax/verify.py)) | Paired scenarios, bootstrap intervals, stress sweeps, and an actuator-activity metric, so chattering cannot hide behind a good RMS error. Linear checks of every controller, including linearized policies. |
-| **Tests** ([`tests/`](tests)) | Interpolation against SciPy, and mass properties against numbers in the paper. Jacobians and the simulator gradient against finite differences. Closed-loop stability at every design point, the LMI certificate, determinism, GAE, and this README's snippet. Pyright runs in CI on Python 3.11 and 3.13. |
+| **Tests** ([`tests/`](tests)) | Interpolation against SciPy, and mass properties against numbers in the paper. Jacobians and the simulator gradient against finite differences. Closed-loop stability at every design point, the LMI certificate, determinism, GAE, and this README's snippet. CI runs the tests on Python 3.11 and 3.13, plus ruff, pyright, and an evaluation smoke test. |
 
 ## Reproduce
 
@@ -228,8 +228,10 @@ uv run python scripts/benchmark.py
 ```
 
 Trained policies (`results/policies/*.npz`, with learning curves in the matching `.json`) are
-committed, so `evaluate.py` reproduces every number without retraining. Methods are `ppo` and
-`diffsim`, variants are `nominal` and `dr`, and seeds are 0–2.
+committed, so `evaluate.py` reproduces every number without retraining. Methods are `ppo`,
+`diffsim`, `residual` (PPO on top of the LPV law), and `residual_proj` (the same, projected inside
+training); variants are `nominal` and `dr`, and seeds are 0–2. `verify_designs.py` writes the
+linear audit and the sampled Lyapunov-decrease check of the projected residuals.
 `scripts/make_figures.py` redraws the figures (PNG and PDF) from `results/`.
 
 ## Design notes
@@ -290,7 +292,7 @@ src/morphjax/   data interp aero airframe atmosphere dynamics trim design contro
 scripts/        tune_lqr train_policy evaluate verify_designs grad_horizon benchmark
                 make_figures figures
 examples/       quickstart.py
-tests/          one file per module, plus the README snippet
+tests/          unit tests by module, plus the README snippet
 results/        metrics.json per_scenario.npz results.md verification.json lqr_weights.json
                 benchmark.json grad_horizon.json figures/ (PNG + PDF) policies/
 ```

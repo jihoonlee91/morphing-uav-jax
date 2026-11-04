@@ -13,6 +13,7 @@ keywords:
   - JAX
   - reinforcement learning
   - PPO
+  - differentiable simulation
   - LPV control
   - flight control
   - morphing aircraft
