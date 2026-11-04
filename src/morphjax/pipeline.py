@@ -20,6 +20,16 @@ LABELS = {
     "lpv": "LPV (common Lyapunov)",
     "ppo": "PPO",
     "ppo_dr": "PPO + domain rand.",
+    "diffsim": "Diff-sim policy",
+    "diffsim_dr": "Diff-sim + domain rand.",
+}
+# Learned controllers: name -> (training method, variant); files are
+# results/policies/<method>_<variant>_seed<k>.npz
+LEARNED = {
+    "ppo": ("ppo", "nominal"),
+    "ppo_dr": ("ppo", "dr"),
+    "diffsim": ("diffsim", "nominal"),
+    "diffsim_dr": ("diffsim", "dr"),
 }
 
 

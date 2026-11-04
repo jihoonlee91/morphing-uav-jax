@@ -90,7 +90,7 @@ def _inertia_matrix(ixx, iyy, izz, ixz, iyz, ixy) -> jnp.ndarray:
     )
 
 
-def _steiner(m: jnp.ndarray, r: jnp.ndarray) -> jnp.ndarray:
+def _steiner(m: float | jnp.ndarray, r: jnp.ndarray) -> jnp.ndarray:
     """Parallel-axis term ``-m [r]x^2 = m (|r|^2 I - r r^T)``."""
     return m * (jnp.dot(r, r) * jnp.eye(3) - jnp.outer(r, r))
 

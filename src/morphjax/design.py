@@ -88,9 +88,9 @@ class DesignGrid(NamedTuple):
     residual: np.ndarray
 
 
-def build_grid(plant: Plant) -> DesignGrid:
-    """Trim and linearize at all 63 design points."""
-    vs, hs, es = np.meshgrid(V_SYN, ALT, ETA_S, indexing="ij")
+def build_grid(plant: Plant, v_syn=V_SYN, alt=ALT, eta_s=ETA_S) -> DesignGrid:
+    """Trim and linearize on a scheduling grid (default: the paper's 63 points)."""
+    vs, hs, es = np.meshgrid(v_syn, alt, eta_s, indexing="ij")
     vt = synthetic_to_true(vs, hs)
 
     def one(v, h, e):
@@ -102,9 +102,9 @@ def build_grid(plant: Plant) -> DesignGrid:
     xw, cmd, A, B, res = jax.vmap(one)(*flat)
     shape = vs.shape
     return DesignGrid(
-        np.asarray(V_SYN),
-        np.asarray(ALT),
-        np.asarray(ETA_S),
+        np.asarray(v_syn, dtype=float),
+        np.asarray(alt, dtype=float),
+        np.asarray(eta_s, dtype=float),
         np.asarray(xw).reshape(*shape, -1),
         np.asarray(cmd).reshape(*shape, -1),
         np.asarray(A).reshape(*shape, *A.shape[1:]),
@@ -269,7 +269,10 @@ def lateral_gains_lpv(
     n, m = 8, 3
     X = cp.Variable((n, n), symmetric=True)
     Z = cp.Variable((n, n), symmetric=True)
-    cons = [X >> 1e-6 * np.eye(n), cp.bmat([[Z, np.eye(n)], [np.eye(n), X]]) >> 0]
+    cons: list[cp.Constraint] = [
+        X >> 1e-6 * np.eye(n),
+        cp.bmat([[Z, np.eye(n)], [np.eye(n), X]]) >> 0,
+    ]
     Ys = {}
     for idx in _grid_iter(grid.residual.shape):
         a, b = _normalize(*lateral_model(grid.A[idx], grid.B[idx]), xs, us)
@@ -305,4 +308,4 @@ def lateral_gains_lpv(
         worst = max(worst, float(np.linalg.eigvalsh(acl.T @ Xinv + Xinv @ acl).max()))
     if worst >= 0:
         raise RuntimeError(f"common Lyapunov certificate does not hold (max eig {worst:.3g})")
-    return LPVResult(out, Xv, prob.status, float(prob.value), worst)
+    return LPVResult(out, Xv, str(prob.status), float(np.asarray(prob.value)), worst)

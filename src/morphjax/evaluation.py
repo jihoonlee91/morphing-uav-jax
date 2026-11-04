@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import NamedTuple
+from typing import Any, NamedTuple
 
 import jax
 import jax.numpy as jnp
@@ -71,7 +71,7 @@ def bootstrap_ci(x: np.ndarray, stat=np.mean, n: int = 2000, seed: int = 0, leve
     return float(stat(x)), float(lo), float(hi)
 
 
-def summarize(m: Metrics) -> dict[str, float]:
+def summarize(m: Metrics) -> dict[str, Any]:
     rmse, lo, hi = bootstrap_ci(m.roll_rmse_deg)
     succ, slo, shi = bootstrap_ci((~m.failed).astype(float))
     ok = ~m.failed

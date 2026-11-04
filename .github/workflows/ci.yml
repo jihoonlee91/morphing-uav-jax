@@ -30,10 +30,11 @@ jobs:
           path: ~/.cache/morphing-uav-jax
           key: gtm-aero-7f34845a54bcecdd
 
-      - name: Lint
+      - name: Lint and type check
         run: |
           uv run ruff check .
           uv run ruff format --check .
+          uv run pyright
 
       - name: Tests
         run: uv run pytest

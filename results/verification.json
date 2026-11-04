@@ -1,0 +1,26 @@
+{
+ "fixed": {
+  "points": 325,
+  "off_grid": 262,
+  "stable": 324,
+  "worst_real_eig": 0.18967114528322188,
+  "min_delay_ms": -20.0,
+  "certified": null
+ },
+ "gs": {
+  "points": 325,
+  "off_grid": 262,
+  "stable": 325,
+  "worst_real_eig": -3.2259706472606187,
+  "min_delay_ms": 60.0,
+  "certified": null
+ },
+ "lpv": {
+  "points": 325,
+  "off_grid": 262,
+  "stable": 325,
+  "worst_real_eig": -2.8132204620577026,
+  "min_delay_ms": 40.0,
+  "certified": 325
+ }
+}

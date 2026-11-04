@@ -37,8 +37,18 @@ COLORS = {
     "lpv": "#1baf7a",
     "ppo": "#eda100",
     "ppo_dr": "#e87ba4",
+    "diffsim": "#008300",
+    "diffsim_dr": "#6250d6",
 }
-MARKERS = {"fixed": "o", "gs": "s", "lpv": "D", "ppo": "^", "ppo_dr": "v"}
+MARKERS = {
+    "fixed": "o",
+    "gs": "s",
+    "lpv": "D",
+    "ppo": "^",
+    "ppo_dr": "v",
+    "diffsim": "P",
+    "diffsim_dr": "X",
+}
 
 plt.rcParams.update({
     "figure.facecolor": SURFACE, "axes.facecolor": SURFACE, "savefig.facecolor": SURFACE,
@@ -138,26 +148,38 @@ def example_rollout(setup, ctrls: dict, scen_batch, path: Path) -> None:
     plt.close(fig)
 
 
-def learning_curves(policy_dir: Path, path: Path) -> None:
-    fig, ax = plt.subplots(figsize=(6.5, 3.4))
+def learning_curves(policy_dir: Path, path: Path, lqr_return: float | None = None) -> None:
+    """Training return against simulated environment steps (log scale)."""
+    fig, ax = plt.subplots(figsize=(7.5, 3.8))
     names = []
-    for variant, name in (("nominal", "ppo"), ("dr", "ppo_dr")):
-        runs = sorted(policy_dir.glob(f"ppo_{variant}_seed*.json"))
+    for name, (method, variant) in pipeline.LEARNED.items():
+        runs = sorted(policy_dir.glob(f"{method}_{variant}_seed*.json"))
         if not runs:
             continue
         names.append(name)
-        curves = []
+        curves, steps = [], np.array([])
         for f in runs:
             hist = json.loads(f.read_text(encoding="utf-8"))["history"]
             steps = np.array([h["env_steps"] for h in hist]) / 1e6
             ret = np.array([h["return"] for h in hist])
             curves.append(ret)
-            ax.plot(steps, ret, color=COLORS[name], alpha=0.3, linewidth=0.8)
+            ax.plot(steps, ret, color=COLORS[name], alpha=0.25, linewidth=0.8)
         n = min(len(c) for c in curves)
         ax.plot(steps[:n], np.mean([c[:n] for c in curves], axis=0), color=COLORS[name])
-    ax.set_xlabel("Environment steps (millions)")
+    if lqr_return is not None:
+        ax.axhline(lqr_return, color=COLORS["gs"], linestyle="--", linewidth=1.2)
+        ax.annotate(
+            f"tuned gain-scheduled LQR ({lqr_return:.0f})", (0.035, lqr_return),
+            xytext=(2, -11), textcoords="offset points", color=INK2, fontsize=8,
+        )  # fmt: skip
+    ax.set_xscale("log")
+    ax.set_ylim(440, 500)
+    ax.set_xlabel("Simulated environment steps (millions, log scale)")
     ax.set_ylabel("Episode return (max 500)")
-    ax.set_title("PPO training: thin lines are seeds, thick line is the mean", loc="left")
+    ax.set_title(
+        "Training return: thin lines are seeds, thick lines the mean (PPO includes exploration)",
+        loc="left",
+    )
     if names:
         _legend(fig, names)
     fig.tight_layout(rect=(0, 0, 1, 0.9))

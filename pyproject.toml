@@ -17,7 +17,7 @@ dependencies = [
     "jax>=0.4.30",
     "numpy>=1.26",
     "scipy>=1.12",
-    "optax>=0.2.2",
+    "optax>=0.2.5",
     "cvxpy>=1.5",
     "matplotlib>=3.8",
 ]
@@ -27,7 +27,11 @@ Repository = "https://github.com/jihoonlee91/morphing-uav-jax"
 Paper = "https://doi.org/10.3390/s23063075"
 
 [dependency-groups]
-dev = ["pytest>=8", "ruff>=0.6"]
+dev = [
+    "pyright[nodejs]>=1.1.380",
+    "pytest>=8",
+    "ruff>=0.6",
+]
 
 [build-system]
 requires = ["hatchling>=1.24"]
@@ -52,3 +56,9 @@ extend-immutable-calls = ["morphjax.airframe.Airframe", "morphjax.dynamics.Uncer
 testpaths = ["tests"]
 addopts = "-q"
 markers = ["slow: longer-running integration tests"]
+
+[tool.pyright]
+include = ["src"]
+pythonVersion = "3.11"
+typeCheckingMode = "standard"
+

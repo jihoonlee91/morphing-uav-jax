@@ -16,7 +16,7 @@ import math
 import time
 from collections.abc import Callable
 from functools import partial
-from typing import Any, NamedTuple
+from typing import Any, NamedTuple, cast
 
 import jax
 import jax.numpy as jnp
@@ -257,7 +257,7 @@ def make_train(plant: Plant, lon: Schedule, cfg: PPOConfig):
                 data = jax.tree_util.tree_map(lambda x: x[idx], flat)
                 (_, aux), grads = jax.value_and_grad(ppo_loss, has_aux=True)(params, cfg, *data)
                 upd, opt_state = tx.update(grads, opt_state, params)
-                return (optax.apply_updates(params, upd), opt_state), aux
+                return (cast(Params, optax.apply_updates(params, upd)), opt_state), aux
 
             return jax.lax.scan(minibatch, (params, opt_state), perm)
 

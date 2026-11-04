@@ -67,8 +67,8 @@ def controllers(setup, policy_dir: Path, max_seeds: int | None = None):
         s = setup.schedules[name]
         out[name] = [(s, lambda xw, pc, ig, s=s: lateral_law(s, xw, pc, ig))]
     lon = setup.schedules["gs"]
-    for variant, name in (("nominal", "ppo"), ("dr", "ppo_dr")):
-        files = sorted(policy_dir.glob(f"ppo_{variant}_seed*.npz"))[:max_seeds]
+    for name, (method, variant) in pipeline.LEARNED.items():
+        files = sorted(policy_dir.glob(f"{method}_{variant}_seed*.npz"))[:max_seeds]
         if files:
             out[name] = [
                 (lon, make_policy_lateral(lon, load_params(f, PPOConfig()))) for f in files
@@ -176,7 +176,7 @@ def main() -> None:
         fig_dir.mkdir(exist_ok=True)
         stress_tests(sweeps, list(runners), fig_dir / "stress_tests.png")
         example_rollout(setup, ctrls, raw_example, fig_dir / "example_rollout.png")
-        learning_curves(args.policies, fig_dir / "learning_curve.png")
+        learning_curves(args.policies, fig_dir / "learning_curve.png", train_return.get("gs"))
     print(f"done in {time.time() - t0:.0f}s")
 
 
