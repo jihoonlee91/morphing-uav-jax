@@ -88,3 +88,21 @@ def test_history_policy_sees_the_pending_command_and_runs_delayed(setup, tmp_pat
     save_params(tmp_path / "old.npz", init_params(jax.random.PRNGKey(0), PPOConfig()))
     (tmp_path / "old.json").write_text(json.dumps({"config": {"hidden": 128}}))
     assert tuple(load_policy(tmp_path / "old.npz")[1].act_scale) == LEGACY_ACT_SCALE
+
+
+def test_cleanrl_style_update_normalizes_and_trains(setup, tmp_path):
+    from morphjax.rl import CLEANRL, load_policy
+
+    cfg = PPOConfig(num_envs=4, steps=40, updates=1, **{**CLEANRL, "minibatches": 2, "epochs": 1})
+    init_state, update = make_train(setup.plant, setup.schedules["gs"], cfg)
+    params, opt = init_state(jax.random.PRNGKey(0))
+    new, _, stats = update(params, opt, jax.random.PRNGKey(1))
+    assert all(np.isfinite(float(v)) for v in stats.values())
+    assert float(new["obs_norm"]["count"]) > 1.0 and float(new["ret_norm"]["count"]) > 1.0
+    assert not np.allclose(new["pi"][0]["w"], params["pi"][0]["w"])
+    import json
+
+    save_params(tmp_path / "c.npz", new)
+    (tmp_path / "c.json").write_text(json.dumps({"config": cfg._asdict()}))
+    back, _ = load_policy(tmp_path / "c.npz")
+    np.testing.assert_array_equal(back["obs_norm"]["mean"], new["obs_norm"]["mean"])

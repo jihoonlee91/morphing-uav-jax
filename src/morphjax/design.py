@@ -251,6 +251,7 @@ def lateral_gains_lpv(
     decay: float = 0.1,
     radius: float = 30.0,
     solver: str = "CLARABEL",
+    disk: bool = True,
 ) -> LPVResult:
     """Guaranteed-cost LPV state feedback with a common Lyapunov matrix.
 
@@ -265,6 +266,7 @@ def lateral_gains_lpv(
     A disk constraint ``[[-r X, A X + B Y], [*, -r X]] <= 0`` keeps every
     frozen-point closed-loop pole inside ``|s| < radius`` so the design does
     not outrun the 5 Hz surface actuators or the 50 Hz control loop.
+    ``disk=False`` drops it (an ablation of the revision).
     """
     xs, us = (weights or LatWeights()).scales()
     n, m = 8, 3
@@ -288,9 +290,10 @@ def lateral_gains_lpv(
             ]
         )
         cons.append(0.5 * (blk + blk.T) << 0)
-        acl = a @ X + b @ Y
-        disk = cp.bmat([[-radius * X, acl], [acl.T, -radius * X]])
-        cons.append(0.5 * (disk + disk.T) << 0)
+        if disk:
+            acl = a @ X + b @ Y
+            dsk = cp.bmat([[-radius * X, acl], [acl.T, -radius * X]])
+            cons.append(0.5 * (dsk + dsk.T) << 0)
     prob = cp.Problem(cp.Minimize(cp.trace(Z)), cons)
     prob.solve(solver=solver)
     if X.value is None:
@@ -310,3 +313,50 @@ def lateral_gains_lpv(
     if worst >= 0:
         raise RuntimeError(f"common Lyapunov certificate does not hold (max eig {worst:.3g})")
     return LPVResult(out, Xv, str(prob.status), float(np.asarray(prob.value)), worst, decay)
+
+
+def lateral_gains_lpv_pointwise(
+    grid: DesignGrid,
+    weights: LatWeights | None = None,
+    decay: float = 0.1,
+    radius: float = 30.0,
+    solver: str = "CLARABEL",
+) -> tuple[np.ndarray, np.ndarray, list[str]]:
+    """Ablation: the LMIs of :func:`lateral_gains_lpv` with a separate ``X_i`` per point.
+
+    Same decay rate, pole disk and ``trace(Z_i)`` objective, but no common
+    Lyapunov matrix, so the problem decouples into one SDP per design point
+    (a pointwise guaranteed-cost design, i.e. what the common ``P`` adds).
+    Returns ``(gains, X per point, solver status per point)``.
+    """
+    xs, us = (weights or LatWeights()).scales()
+    n, m = 8, 3
+    out = np.zeros((*grid.residual.shape, m, n))
+    xs_out = np.zeros((*grid.residual.shape, n, n))
+    statuses = []
+    for idx in _grid_iter(grid.residual.shape):
+        a, b = _normalize(*lateral_model(grid.A[idx], grid.B[idx]), xs, us)
+        X = cp.Variable((n, n), symmetric=True)
+        Z = cp.Variable((n, n), symmetric=True)
+        Y = cp.Variable((m, n))
+        lyap = a @ X + X @ a.T + b @ Y + Y.T @ b.T + 2 * decay * X
+        blk = cp.bmat([[lyap, X, Y.T], [X, -np.eye(n), np.zeros((n, m))],
+                       [Y, np.zeros((m, n)), -np.eye(m)]])  # fmt: skip
+        acl = a @ X + b @ Y
+        dsk = cp.bmat([[-radius * X, acl], [acl.T, -radius * X]])
+        cons: list[cp.Constraint] = [
+            X >> 1e-6 * np.eye(n),
+            cp.bmat([[Z, np.eye(n)], [np.eye(n), X]]) >> 0,
+            0.5 * (blk + blk.T) << 0,
+            0.5 * (dsk + dsk.T) << 0,
+        ]
+        prob = cp.Problem(cp.Minimize(cp.trace(Z)), cons)
+        prob.solve(solver=solver)
+        if X.value is None or Y.value is None:
+            raise RuntimeError(f"pointwise LPV synthesis failed at {idx}: {prob.status}")
+        Xv = 0.5 * (X.value + X.value.T)
+        kn = Y.value @ np.linalg.inv(Xv)
+        out[idx] = np.diag(us) @ kn @ np.diag(1.0 / xs)
+        xs_out[idx] = Xv
+        statuses.append(str(prob.status))
+    return out, xs_out, statuses

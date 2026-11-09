@@ -28,6 +28,14 @@ LABELS = {
     "residual_proj_trained": "LPV + residual, projected in training",
     "residual_safe": "LPV + residual, projected with error margin",
     "residual_safe2": "LPV + residual, projected with 2x error margin",
+    "ppo_lat": "PPO, trained with 20 ms delay",
+    "diffsim_lat": "Diff-sim, trained with 20 ms delay",
+    "ppo_clean": "PPO, CleanRL-style settings",
+    "gs_wide": "Gain-scheduled LQR, wide grid",
+    "gs_hg_wide": "Gain-sched. LQR, no margin, wide grid",
+    "gs_dr": "Gain-scheduled LQR tuned on DR",
+    "lpv_pw": "LPV, pointwise Lyapunov (ablation)",
+    "lpv_nodisk": "LPV, no pole disk (ablation)",
 }
 # Learned controllers: name -> (training method, variant); files are
 # results/policies/<method>_<variant>_seed<k>.npz
@@ -44,6 +52,11 @@ LEARNED = {
     # The same trained policies, projected with an interpolation-error margin.
     "residual_safe": ("residual_proj", "dr"),
     "residual_safe2": ("residual_proj", "dr"),
+    # Revision: trained with a fixed 20 ms delay, pending command observed.
+    "ppo_lat": ("ppo", "lat"),
+    "diffsim_lat": ("diffsim", "lat"),
+    # Revision: PPO with CleanRL-style settings (rl.CLEANRL), nominal model.
+    "ppo_clean": ("ppo_clean", "nominal"),
 }
 # Learned controllers that are residuals on top of a model-based law.
 RESIDUAL_BASE = {
@@ -67,6 +80,9 @@ class Setup(NamedTuple):
     lpv: design.LPVResult
     weights: design.LatWeights
     lat_gains: dict  # lateral design name -> (7, 3, 3, 3, 8) gain table
+    # Revision: Lyapunov matrices of the LPV ablations ("lpv_nodisk": common X,
+    # "lpv_pw": one X per design point), in the LPV design's normalized coordinates.
+    lyapunov: dict | None = None
 
 
 def load_weights(path: Path | None, key: str = "weights") -> design.LatWeights:
@@ -124,3 +140,47 @@ def build_for_evaluation(weights_path: Path, verbose: bool = False) -> Setup:
     if Path(weights_path).exists():
         extra["gs_hg"] = load_weights(weights_path, "unconstrained_best")
     return build(load_weights(weights_path), extra_gs=extra, verbose=verbose)
+
+
+# Revision rows (results/tmlr): LQR designs from the bracketed search of
+# scripts/tune_lqr_wide.py and the two LPV ablations.
+WIDE_LQR = ("gs_wide", "gs_hg_wide", "gs_dr")
+LPV_ABLATIONS = ("lpv_pw", "lpv_nodisk")
+
+
+def build_revision(weights_path: Path, wide_path: Path | None, verbose: bool = False) -> Setup:
+    """The evaluated set of the revision.
+
+    The original designs keep the committed weights (``results/lqr_weights.json``),
+    so the LPV law, the residual base and the safety filter are unchanged. Added:
+    ``gs_wide`` / ``gs_hg_wide`` / ``gs_dr`` (if ``wide_path`` exists) and the LPV
+    ablations ``lpv_pw`` (pointwise ``X_i``) and ``lpv_nodisk`` (common ``X``, no
+    pole-disk constraint), both with the same weights, decay rate and objective.
+    """
+    extra = {}
+    if Path(weights_path).exists():
+        extra["gs_hg"] = load_weights(weights_path, "unconstrained_best")
+    if wide_path is not None and Path(wide_path).exists():
+        for name in WIDE_LQR:
+            extra[name] = load_weights(wide_path, name)
+    setup = build(load_weights(weights_path), extra_gs=extra, verbose=verbose)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        nodisk = design.lateral_gains_lpv(setup.grid, setup.weights, disk=False)
+        pw_gains, pw_x, pw_status = design.lateral_gains_lpv_pointwise(setup.grid, setup.weights)
+    k_lon = design.longitudinal_gains(setup.grid)
+    for name, g in (("lpv_nodisk", nodisk.gains), ("lpv_pw", pw_gains)):
+        setup.lat_gains[name] = g
+        setup.schedules[name] = make_schedule(setup.grid, k_lon, g)
+    if verbose:
+        print(f"LPV no-disk {nodisk.status} (margin {nodisk.lyapunov_margin:.3f}); "
+              f"pointwise statuses {sorted(set(pw_status))}")  # fmt: skip
+    return setup._replace(
+        lyapunov={
+            "lpv": setup.lpv.X,
+            "lpv_nodisk": nodisk.X,
+            "lpv_pw": pw_x,
+            "lpv_nodisk_info": nodisk._replace(gains=None, X=None)._asdict(),
+            "lpv_pw_status": pw_status,
+        }
+    )

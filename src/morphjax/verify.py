@@ -23,6 +23,7 @@ from typing import NamedTuple
 import jax
 import jax.numpy as jnp
 import numpy as np
+import scipy.linalg
 from scipy.interpolate import RegularGridInterpolator
 
 from morphjax import design
@@ -162,3 +163,70 @@ def check_designs(setup: Setup, axes=DENSE) -> dict[str, DesignCheck]:
         name: summarize(check_gains(setup, dense, interpolate_gains(setup.grid, g, dense)), on_grid)
         for name, g in setup.lat_gains.items()
     }
+
+
+# ----------------------------------------------------------------------------- revision
+# Linearization at the closed-loop equilibrium, and policies that observe their
+# pending command (rl.PPOConfig.history = 1).
+
+
+def policy_command_full(
+    params: Params,
+    dx: jnp.ndarray,
+    u_prev: jnp.ndarray,
+    rho: jnp.ndarray,
+    scale: jnp.ndarray,
+    history: int = 0,
+    clip: bool = True,
+) -> jnp.ndarray:
+    """Policy command deviation from trim for state ``dx`` and previous command ``u_prev``.
+
+    ``u_prev`` (deviation from trim, physical units) is observed only when
+    ``history > 0`` (it is then the pending command under one sample of delay).
+    With ``clip`` the action is clipped to [-1, 1] as in simulation.
+    """
+    v_syn, h, eta_s = rho
+    raw = jnp.concatenate([dx, jnp.array([eta_s, v_syn, h, dx[3]])])
+    obs = (raw - OBS_SHIFT) / OBS_SCALE
+    if history > 0:
+        obs = jnp.concatenate([obs, jnp.tile(u_prev / scale, history)])
+    act = policy_mean(params, obs)
+    return scale * (jnp.clip(act, -1.0, 1.0) if clip else act)
+
+
+def spectral_radius_hist(a, b, kx, ku, dt: float, delay_steps: int) -> float:
+    """Spectral radius of ``u_k = Kx x_k + Ku u_{k-1}``, applied ``d`` samples late (ZOH).
+
+    State ``[x_k, u_{k-1}, ..., u_{k-D}]`` with ``D = max(d, 1)``. With ``Ku = 0`` and
+    ``d >= 1`` this is :func:`morphjax.design.delayed_spectral_radius`.
+    """
+    n, m = b.shape
+    ad = scipy.linalg.expm(a * dt)
+    blk = np.zeros((n + m, n + m))
+    blk[:n, :n], blk[:n, n:] = a, b
+    bd = scipy.linalg.expm(blk * dt)[:n, n:]
+    d = delay_steps
+    big_d = max(d, 1)
+    size = n + big_d * m
+    big = np.zeros((size, size))
+    big[:n, :n] = ad
+    if d == 0:  # u_k acts now
+        big[:n, :n] += bd @ kx
+        big[:n, n : n + m] += bd @ ku
+    else:
+        big[:n, n + (d - 1) * m : n + d * m] = bd  # u_{k-d}: slot d
+    big[n : n + m, :n] = kx  # new slot 1 = u_k
+    big[n : n + m, n : n + m] = ku
+    for j in range(1, big_d):
+        big[n + j * m : n + (j + 1) * m, n + (j - 1) * m : n + j * m] = np.eye(m)
+    return float(np.abs(np.linalg.eigvals(big)).max())
+
+
+def max_delay_hist(a, b, kx, ku, dt: float, max_steps: int = 4) -> int:
+    """Largest delay (samples) tolerated; -1 if unstable without delay."""
+    best = -1
+    for d in range(max_steps + 1):
+        if spectral_radius_hist(a, b, kx, ku, dt, d) >= 1.0:
+            break
+        best = d
+    return best

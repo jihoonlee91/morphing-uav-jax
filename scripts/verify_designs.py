@@ -10,6 +10,7 @@ linearized with jax.jacfwd at each trim point (see morphjax.verify). Writes
 
 from __future__ import annotations
 
+import argparse
 import json
 import time
 from pathlib import Path
@@ -32,6 +33,10 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def main() -> None:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--policies", type=Path, default=ROOT / "results" / "policies")
+    ap.add_argument("--out", type=Path, default=ROOT / "results")
+    args = ap.parse_args()
     t0 = time.time()
     setup = pipeline.build_for_evaluation(ROOT / "results" / "lqr_weights.json")
     dense, on_grid = dense_grid(setup)
@@ -53,8 +58,10 @@ def main() -> None:
     for name, (method, variant) in pipeline.LEARNED.items():
         if name in pipeline.PROJECTED:
             continue  # not linearizable at trim; checked by sampling below
-        for f in sorted((ROOT / "results" / "policies").glob(f"{method}_{variant}_seed*.npz")):
+        for f in sorted(args.policies.glob(f"{method}_{variant}_seed*.npz")):
             params, pcfg = load_policy(f)
+            if pcfg.history:
+                continue  # observes its pending command: see scripts/audit_revision.py
             if name in pipeline.RESIDUAL_BASE:
                 # Residual policies act on top of the base law: K = K_base + K_residual.
                 base = setup.lat_gains[pipeline.RESIDUAL_BASE[name]]
@@ -139,8 +146,9 @@ def main() -> None:
     pooled["residual_safe2"]["certified_for_all_states"] = int(proven2.sum())
     out["learned_policies_pooled"] = pooled
 
-    (ROOT / "results" / "verification.json").write_text(json.dumps(out, indent=1), encoding="utf-8")
-    np.savez_compressed(ROOT / "results" / "verification_points.npz", **points)
+    args.out.mkdir(parents=True, exist_ok=True)
+    (args.out / "verification.json").write_text(json.dumps(out, indent=1), encoding="utf-8")
+    np.savez_compressed(args.out / "verification_points.npz", **points)
 
     print(f"{'controller':12s} {'stable':>9s} {'min delay':>10s} {'LPV-certified':>14s}")
     rows = list(designs.items()) + [

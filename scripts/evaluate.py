@@ -14,6 +14,7 @@ import argparse
 import json
 import math
 import time
+from functools import partial
 from pathlib import Path
 
 import jax
@@ -22,13 +23,21 @@ import numpy as np
 from morphjax import design, pipeline
 from morphjax.control import lateral_law
 from morphjax.evaluation import Metrics, batch_rollout, scenario_metrics, summarize
-from morphjax.rl import PPOConfig, load_policy, make_policy_lateral, training_scenario
+from morphjax.rl import (
+    ACT_LIMITS,
+    LEGACY_ACT_SCALE,
+    PPOConfig,
+    load_policy,
+    make_policy_lateral,
+    training_scenario,
+)
 from morphjax.safety import estimate_margin, make_projected_residual_lateral, make_safety_filter
 from morphjax.scenarios import sample_scenario
-from morphjax.sim import DT
+from morphjax.sim import DT, rollout
 
 ROOT = Path(__file__).resolve().parents[1]
 STEPS = 750  # 15 s
+HELDOUT_SEED, HELDOUT_N = 1007, 256  # held-out training-distribution returns (revision)
 # Saved per scenario (shape: seeds x scenarios) so that paired differences and
 # seed-level bootstrap intervals can be computed outside this script.
 RAW_FIELDS = ("roll_rmse_deg", "failed", "cmd_activity", "max_beta_deg", "rms_eta_a")
@@ -65,41 +74,62 @@ def scenarios(n: int, seed: int, **kw):
     return jax.vmap(lambda k: sample_scenario(k, STEPS, rate, **kw))(keys)
 
 
+MODEL_BASED_ROWS = ("fixed", "gs", "gs_hg", "lpv", *pipeline.WIDE_LQR, *pipeline.LPV_ABLATIONS)
+
+
 def controllers(setup, policy_dir: Path, max_seeds: int | None = None):
-    """name -> list of (longitudinal schedule, lateral fn); several entries = seeds."""
+    """name -> (longitudinal schedule, [lateral fn per seed], runner factory or None).
+
+    For learned controllers the factory maps a parameter tree to a lateral law, so
+    that one compiled rollout serves every seed (parameters are a traced input).
+    """
     out = {}
-    for name in [n for n in ("fixed", "gs", "gs_hg", "lpv") if n in setup.schedules]:
+    for name in [n for n in MODEL_BASED_ROWS if n in setup.schedules]:
         s = setup.schedules[name]
-        out[name] = [(s, lambda xw, pc, ig, s=s: lateral_law(s, xw, pc, ig))]
+        out[name] = (s, [lambda xw, pc, ig, s=s: lateral_law(s, xw, pc, ig)], None, None)
     lon = setup.schedules["gs"]
     filt = make_safety_filter(setup)
     margined = {n: estimate_margin(setup, filt, factor=k)[0] for n, k in pipeline.MARGINED.items()}
     for name, (method, variant) in pipeline.LEARNED.items():
         files = sorted(policy_dir.glob(f"{method}_{variant}_seed*.npz"))[:max_seeds]
-        if files:
-            base = (
-                setup.schedules[pipeline.RESIDUAL_BASE[name]]
-                if name in pipeline.RESIDUAL_BASE
-                else None
-            )
-            if name in pipeline.PROJECTED:
-                fl = margined.get(name, filt)
-                out[name] = [
-                    (
-                        lon,
-                        make_projected_residual_lateral(lon, load_policy(f)[0], base, fl),
-                    )
-                    for f in files
-                ]
-            else:
-                out[name] = [
-                    (lon, make_policy_lateral(lon, *_with_cfg(load_policy(f)), base)) for f in files
-                ]
+        if not files:
+            continue
+        base = (
+            setup.schedules[pipeline.RESIDUAL_BASE[name]]
+            if name in pipeline.RESIDUAL_BASE
+            else None
+        )
+        loaded = [load_policy(f) for f in files]
+        pcfg = loaded[0][1]
+        assert all(c == pcfg for _, c in loaded), f"{name}: seeds differ in interface"
+        if name in pipeline.PROJECTED:
+            fl = margined.get(name, filt)
+
+            def factory(p, fl=fl, base=base):
+                return make_projected_residual_lateral(lon, p, base, fl)
+        else:
+
+            def factory(p, base=base, pcfg=pcfg):
+                return make_policy_lateral(lon, p, base, cfg=pcfg)
+
+        out[name] = (lon, [factory(p) for p, _ in loaded], factory, [p for p, _ in loaded])
     return out
 
 
-def _with_cfg(loaded):
-    return loaded[0], None, None, loaded[1]
+def make_runners(setup, ctrls) -> dict[str, list]:
+    """name -> [jitted batch rollout per seed]; learned seeds share one compilation."""
+    runners = {}
+    for name, (lon, lats, factory, params) in ctrls.items():
+        if factory is None:
+            runners[name] = [batch_rollout(setup.plant, lon, lat) for lat in lats]
+            continue
+
+        def one(p, s, lon=lon, factory=factory):
+            return rollout(setup.plant, lon, factory(p), s)
+
+        run = jax.jit(jax.vmap(one, in_axes=(None, 0)))
+        runners[name] = [partial(run, p) for p in params]
+    return runners
 
 
 def pooled(metrics: list[Metrics]) -> Metrics:
@@ -114,17 +144,25 @@ def main() -> None:
     ap.add_argument("--policies", type=Path, default=ROOT / "results" / "policies")
     ap.add_argument("--weights", type=Path, default=ROOT / "results" / "lqr_weights.json")
     ap.add_argument("--out", type=Path, default=ROOT / "results")
+    ap.add_argument(
+        "--revision",
+        action="store_true",
+        help="revision set (results/tmlr): LPV ablations, wide-grid and DR-tuned LQRs, "
+        "actuator-limit action scale in the returns, held-out returns",
+    )
+    ap.add_argument("--wide", type=Path, default=ROOT / "results" / "tmlr" / "lqr_wide.json")
+    ap.add_argument("--no-figures", action="store_true")
     args = ap.parse_args()
     if args.quick:
         args.n, args.n_sweep = 4, 2
 
     t0 = time.time()
-    setup = pipeline.build_for_evaluation(args.weights, verbose=True)
+    if args.revision:
+        setup = pipeline.build_revision(args.weights, args.wide, verbose=True)
+    else:
+        setup = pipeline.build_for_evaluation(args.weights, verbose=True)
     ctrls = controllers(setup, args.policies, max_seeds=1 if args.quick else None)
-    runners = {
-        name: [batch_rollout(setup.plant, lon, lat) for lon, lat in entries]
-        for name, entries in ctrls.items()
-    }
+    runners = make_runners(setup, ctrls)
     print(f"controllers: {', '.join(f'{k} x{len(v)}' for k, v in runners.items())}")
 
     raw: dict[str, np.ndarray] = {}  # per-scenario metrics, saved to per_scenario.npz
@@ -165,22 +203,40 @@ def main() -> None:
         print(f"[{time.time() - t0:6.0f}s] sweep {sweep} done")
 
     # Mean PPO-reward return on the LQR tuning scenarios (PPO training distribution),
-    # scored exactly as scripts/tune_lqr.py scores LQR candidates.
-    train_return = {}
+    # scored exactly as scripts/tune_lqr.py scores LQR candidates. The revision scores
+    # with the actuator-limit action scale and adds held-out scenario sets (nominal and
+    # domain-randomized training distributions) that no design or policy was chosen on.
+    train_return, train_return_seeds, heldout_return = {}, {}, {}
     if not args.quick:
         from tune_lqr import SEED as TUNE_SEED
         from tune_lqr import N as TUNE_N
         from tune_lqr import episode_return
 
-        cfg = PPOConfig()
-        keys = jax.random.split(jax.random.PRNGKey(TUNE_SEED), TUNE_N)
-        tscen = jax.vmap(lambda k: training_scenario(k, cfg))(keys)
-        for name, fns in runners.items():
-            train_return[name] = float(np.mean([episode_return(f(tscen), tscen) for f in fns]))
+        scale = ACT_LIMITS if args.revision else LEGACY_ACT_SCALE
+
+        def returns(cfg, seed, n):
+            keys = jax.random.split(jax.random.PRNGKey(seed), n)
+            sc = jax.vmap(lambda k: training_scenario(k, cfg))(keys)
+            return {name: [float(np.mean(episode_return(f(sc), sc, scale))) for f in fns]
+                    for name, fns in runners.items()}  # fmt: skip
+
+        train_return_seeds = returns(PPOConfig(), TUNE_SEED, TUNE_N)
+        train_return = {k: float(np.mean(v)) for k, v in train_return_seeds.items()}
         print("training-distribution return:", {k: round(v, 2) for k, v in train_return.items()})
+        if args.revision:
+            for dist, dr in (("nominal", False), ("dr", True)):
+                per_seed = returns(PPOConfig(domain_randomization=dr), HELDOUT_SEED, HELDOUT_N)
+                heldout_return[dist] = {
+                    k: {"mean": float(np.mean(v)), "per_seed": v} for k, v in per_seed.items()
+                }
 
     meta = {
         "training_distribution_return": train_return,
+        "training_distribution_return_per_seed": train_return_seeds,
+        "heldout_return": heldout_return,
+        "heldout_scenarios": {"seed": HELDOUT_SEED, "n": HELDOUT_N} if args.revision else None,
+        "action_scale_for_returns": ACT_LIMITS if args.revision else LEGACY_ACT_SCALE,
+        "policy_dir": str(args.policies),
         "steps": STEPS,
         "dt": DT,
         "n_per_condition": args.n,
@@ -205,14 +261,14 @@ def main() -> None:
     np.savez_compressed(args.out / "per_scenario.npz", **raw)
     print(markdown_table(table))
 
-    if not args.quick:
+    if not args.quick and not args.no_figures:
         from figures import PLOTTED, example_rollout, learning_curves, stress_tests
 
         fig_dir = args.out / "figures"
         fig_dir.mkdir(exist_ok=True)
         stress_tests(sweeps, [n for n in PLOTTED if n in runners], fig_dir / "stress_tests.png")
         shown = ("gs", "lpv", "ppo", "ppo_dr", "diffsim", "diffsim_dr", "residual_dr")
-        example = {k: ctrls[k] for k in shown if k in ctrls}
+        example = {k: [(ctrls[k][0], lat) for lat in ctrls[k][1]] for k in shown if k in ctrls}
         example_rollout(setup, example, raw_example, fig_dir / "example_rollout.png")
         learning_curves(args.policies, fig_dir / "learning_curve.png", train_return.get("gs"))
     print(f"done in {time.time() - t0:.0f}s")

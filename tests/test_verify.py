@@ -28,3 +28,18 @@ def test_policy_gain_is_the_local_slope_of_the_command(setup):
     np.testing.assert_allclose(slope, gains[0, 0, 0][:, 1], rtol=1e-5, atol=1e-8)
     checks = check_gains(setup, dense, gains)
     assert checks.max_real_eig.shape == (2, 1, 1)
+
+
+def test_history_delay_check_reduces_to_the_plain_one():
+    from morphjax.design import delayed_spectral_radius
+    from morphjax.verify import spectral_radius_hist
+
+    rng = np.random.default_rng(0)
+    a = rng.normal(size=(8, 8)) * 0.3 - np.eye(8)
+    b, k = rng.normal(size=(8, 3)), rng.normal(size=(3, 8)) * 0.1
+    for d in range(5):
+        np.testing.assert_allclose(
+            spectral_radius_hist(a, b, k, np.zeros((3, 3)), 0.02, d),
+            delayed_spectral_radius(a, b, k, 0.02, d),
+            rtol=1e-12,
+        )

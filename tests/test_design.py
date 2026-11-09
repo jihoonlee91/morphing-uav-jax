@@ -56,3 +56,16 @@ def test_fixed_gain_is_the_nominal_design(setup):
     fixed, gs = design.lateral_gains_fixed(g), design.lateral_gains_gs(g)
     idx = design.nominal_index(g)
     np.testing.assert_allclose(fixed[0, 0, 0], gs[idx])
+
+
+def test_lpv_ablations_stabilize(plant):
+    from morphjax import design
+
+    grid = design.build_grid(plant, (80.0, 100.0), (5000.0,), (-12.5,))
+    gains, xs, status = design.lateral_gains_lpv_pointwise(grid)
+    assert set(status) == {"optimal"} and xs.shape == (2, 1, 1, 8, 8)
+    nodisk = design.lateral_gains_lpv(grid, disk=False)
+    for g in (gains, nodisk.gains):
+        for idx in np.ndindex(2, 1, 1):
+            a, b = design.lateral_model(grid.A[idx], grid.B[idx])
+            assert np.real(np.linalg.eigvals(a + b @ g[idx])).max() < 0

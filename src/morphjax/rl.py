@@ -78,6 +78,22 @@ class PPOConfig(NamedTuple):
     # training distribution, every ``eval_every`` updates (0 = off).
     eval_every: int = 10
     eval_envs: int = 64
+    # CleanRL/SB3-style options, all off by default (the paper's PPO). See CLEANRL.
+    obs_norm: bool = False  # running mean/var observation normalization (clip 10)
+    reward_norm: bool = False  # scale rewards by the std of the discounted return (clip 10)
+    split_clip: bool = False  # separate global-norm clipping for policy and value nets
+    vf_clip: bool = False  # clipped value loss
+    lr_final_frac: float = 0.1  # linear learning-rate decay to this fraction
+
+
+# CleanRL ppo_continuous_action defaults applied to this task (the "PPO sanity" variant):
+# observation and reward normalization, separately clipped policy/value gradients,
+# clipped value loss, initial log-std 0, 10 epochs x 32 minibatches, learning rate
+# annealed to 0. Network, reward, scenarios, batch size and action range are unchanged.
+CLEANRL = dict(
+    obs_norm=True, reward_norm=True, split_clip=True, vf_clip=True, lr_final_frac=0.0,
+    init_log_std=0.0, epochs=10, minibatches=32,
+)  # fmt: skip
 
 
 EVAL_SEED = 424242  # held-out evaluation batch during training (disjoint from training keys)
@@ -99,13 +115,19 @@ def init_params(key: jax.Array, cfg: PPOConfig) -> Params:
     k = jax.random.split(key, 6)
     h = cfg.hidden
     n = obs_dim(cfg)
-    return {
+    params = {
         "pi": [_dense(k[0], n, h, math.sqrt(2)), _dense(k[1], h, h, math.sqrt(2)),
                _dense(k[2], h, ACT_DIM, 0.01)],
         "v": [_dense(k[3], n, h, math.sqrt(2)), _dense(k[4], h, h, math.sqrt(2)),
               _dense(k[5], h, 1, 1.0)],
         "log_std": jnp.full(ACT_DIM, cfg.init_log_std),
     }  # fmt: skip
+    if getattr(cfg, "obs_norm", False):
+        # Running statistics, not trained: part of the saved policy, frozen at deployment.
+        params["obs_norm"] = {"mean": jnp.zeros(n), "var": jnp.ones(n), "count": jnp.array(1e-4)}
+    if getattr(cfg, "reward_norm", False):
+        params["ret_norm"] = {"mean": jnp.zeros(()), "var": jnp.ones(()), "count": jnp.array(1e-4)}
+    return params
 
 
 def _mlp(layers, x):
@@ -114,12 +136,32 @@ def _mlp(layers, x):
     return x @ layers[-1]["w"] + layers[-1]["b"]
 
 
+def _normalize_obs(params: Params, obs: jnp.ndarray) -> jnp.ndarray:
+    if "obs_norm" not in params:
+        return obs
+    st = jax.lax.stop_gradient(params["obs_norm"])
+    return jnp.clip((obs - st["mean"]) / jnp.sqrt(st["var"] + 1e-8), -10.0, 10.0)
+
+
 def policy_mean(params: Params, obs: jnp.ndarray) -> jnp.ndarray:
-    return _mlp(params["pi"], obs)
+    return _mlp(params["pi"], _normalize_obs(params, obs))
 
 
 def value(params: Params, obs: jnp.ndarray) -> jnp.ndarray:
-    return _mlp(params["v"], obs)[..., 0]
+    return _mlp(params["v"], _normalize_obs(params, obs))[..., 0]
+
+
+def _update_moments(st: dict, x: jnp.ndarray, w: jnp.ndarray) -> dict:
+    """Parallel (Chan et al.) update of running mean/var with weighted samples ``x``."""
+    n = jnp.sum(w)
+    wx = w.reshape(w.shape + (1,) * (x.ndim - w.ndim))
+    mean_b = jnp.sum(wx * x, axis=tuple(range(w.ndim))) / jnp.maximum(n, 1.0)
+    var_b = jnp.sum(wx * (x - mean_b) ** 2, axis=tuple(range(w.ndim))) / jnp.maximum(n, 1.0)
+    tot = st["count"] + n
+    delta = mean_b - st["mean"]
+    mean = st["mean"] + delta * n / tot
+    m2 = st["var"] * st["count"] + var_b * n + delta**2 * st["count"] * n / tot
+    return {"mean": mean, "var": m2 / tot, "count": tot}
 
 
 def log_prob(params: Params, obs, act):
@@ -437,7 +479,7 @@ def collect(
         )
     )(carry, scen)
     last_val = jnp.where(carry.failed, 0.0, value(params, final_obs))
-    return Batch(*out), last_val
+    return Batch(*out), last_val, final_obs, carry.failed
 
 
 def gae(batch: Batch, last_val, gamma: float, lam: float):
@@ -455,7 +497,7 @@ def gae(batch: Batch, last_val, gamma: float, lam: float):
     return adv, adv + batch.val
 
 
-def ppo_loss(params, cfg: PPOConfig, obs, act, logp_old, adv, ret, mask):
+def ppo_loss(params, cfg: PPOConfig, obs, act, logp_old, adv, ret, mask, val_old=None):
     logp = log_prob(params, obs, act)
     ratio = jnp.exp(logp - logp_old)
     # The mean is masked but the std is not: steps after a departure (whose
@@ -463,11 +505,18 @@ def ppo_loss(params, cfg: PPOConfig, obs, act, logp_old, adv, ret, mask):
     # policies stay reproducible; a masked std is the cleaner choice.
     adv = (adv - jnp.sum(adv * mask) / jnp.sum(mask)) / (jnp.std(adv) + 1e-8)
     pg = -jnp.minimum(ratio * adv, jnp.clip(ratio, 1 - cfg.clip, 1 + cfg.clip) * adv)
-    vf = (value(params, obs) - ret) ** 2
+    v = value(params, obs)
+    vf = (v - ret) ** 2
+    if cfg.vf_clip and val_old is not None:  # CleanRL: 0.5 * max(unclipped, clipped)
+        v_clip = val_old + jnp.clip(v - val_old, -cfg.clip, cfg.clip)
+        vf = jnp.maximum(vf, (v_clip - ret) ** 2)
     ent = jnp.sum(params["log_std"] + 0.5 * jnp.log(2 * jnp.pi * jnp.e))
     n = jnp.maximum(jnp.sum(mask), 1.0)
     loss = jnp.sum((pg + cfg.vf_coef * vf) * mask) / n - cfg.ent_coef * ent
     return loss, (jnp.sum(pg * mask) / n, jnp.sum(vf * mask) / n)
+
+
+_LABEL = {"pi": "pi", "log_std": "pi", "v": "v"}
 
 
 def make_train(
@@ -478,8 +527,30 @@ def make_train(
     residual_filter: ResidualFilter | None = None,
 ):
     """Return ``(init_state, update)``; ``update`` is one jitted PPO iteration."""
-    sched = optax.linear_schedule(cfg.lr, cfg.lr * 0.1, cfg.updates * cfg.epochs * cfg.minibatches)
-    tx = optax.chain(optax.clip_by_global_norm(cfg.max_grad_norm), optax.adam(sched, eps=1e-5))
+    sched = optax.linear_schedule(
+        cfg.lr, cfg.lr * cfg.lr_final_frac, cfg.updates * cfg.epochs * cfg.minibatches
+    )
+    if cfg.split_clip:
+        # Policy (mean and log-std) and value nets clipped and stepped separately;
+        # normalization statistics are not trained.
+        def labels(params):
+            return {k: jax.tree_util.tree_map(lambda _, k=k: _LABEL.get(k, "frozen"), v)
+                    for k, v in params.items()}  # fmt: skip
+
+        tx = optax.multi_transform(
+            {
+                "pi": optax.chain(
+                    optax.clip_by_global_norm(cfg.max_grad_norm), optax.adam(sched, eps=1e-5)
+                ),
+                "v": optax.chain(
+                    optax.clip_by_global_norm(cfg.max_grad_norm), optax.adam(sched, eps=1e-5)
+                ),
+                "frozen": optax.set_to_zero(),
+            },
+            labels,
+        )
+    else:
+        tx = optax.chain(optax.clip_by_global_norm(cfg.max_grad_norm), optax.adam(sched, eps=1e-5))
 
     def init_state(key):
         params = init_params(key, cfg)
@@ -488,11 +559,33 @@ def make_train(
     @jax.jit
     def update(params, opt_state, key):
         k_col, k_perm = jax.random.split(key)
-        batch, last_val = collect(plant, lon, params, k_col, cfg, base, residual_filter)
+        batch, last_val, final_obs, final_failed = collect(
+            plant, lon, params, k_col, cfg, base, residual_filter
+        )
+        valid = batch.valid.astype(jnp.float64)
+        raw_rew = batch.rew
+        if cfg.obs_norm:
+            # Update the statistics with this batch, then recompute the old
+            # log-probabilities and values under them so the first ratio is 1.
+            params = {**params, "obs_norm": _update_moments(params["obs_norm"], batch.obs, valid)}
+            batch = batch._replace(
+                logp=log_prob(params, batch.obs, batch.act), val=value(params, batch.obs)
+            )
+            last_val = jnp.where(final_failed, 0.0, value(params, final_obs))
+        if cfg.reward_norm:
+            # Running discounted return per environment (gym NormalizeReward).
+            def disc(g, r):
+                g = cfg.gamma * g + r
+                return g, g
+
+            _, g = jax.lax.scan(disc, jnp.zeros(cfg.num_envs), batch.rew)
+            st = _update_moments(params["ret_norm"], g, valid)
+            params = {**params, "ret_norm": st}
+            batch = batch._replace(rew=jnp.clip(batch.rew / jnp.sqrt(st["var"] + 1e-8), -10, 10))
         adv, ret = gae(batch, last_val, cfg.gamma, cfg.lam)
         flat = jax.tree_util.tree_map(
             lambda x: x.reshape(-1, *x.shape[2:]),
-            (batch.obs, batch.act, batch.logp, adv, ret, batch.valid.astype(jnp.float64)),
+            (batch.obs, batch.act, batch.logp, adv, ret, valid, batch.val),
         )
         n = flat[0].shape[0]
         mb = n // cfg.minibatches
@@ -513,9 +606,8 @@ def make_train(
         (params, opt_state), aux = jax.lax.scan(
             epoch, (params, opt_state), jax.random.split(k_perm, cfg.epochs)
         )
-        valid = batch.valid.astype(jnp.float64)
         stats = {
-            "return": jnp.mean(jnp.sum(batch.rew * valid, axis=0)),
+            "return": jnp.mean(jnp.sum(raw_rew * valid, axis=0)),
             "survival": 1.0 - jnp.mean(jnp.any(batch.term, axis=0)),
             "pg_loss": jnp.mean(aux[0]),
             "v_loss": jnp.mean(aux[1]),
@@ -568,6 +660,8 @@ def policy_config(meta_config: dict) -> PPOConfig:
         act_scale=tuple(meta_config.get("act_scale", LEGACY_ACT_SCALE)),
         history=int(meta_config.get("history", 0)),
         delay=int(meta_config.get("delay", -1)),
+        obs_norm=bool(meta_config.get("obs_norm", False)),
+        reward_norm=bool(meta_config.get("reward_norm", False)),
     )
 
 
