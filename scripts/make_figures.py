@@ -41,7 +41,7 @@ def main() -> None:
     _, kw = CONDITIONS["aileron_fail"]
     scen = scenarios(metrics["meta"]["n_per_condition"], seed=1000 + i, **dict(kw))
     shown = ("gs", "lpv", "ppo", "ppo_dr", "diffsim", "diffsim_dr", "residual_dr")
-    example = {k: ctrls[k] for k in shown if k in ctrls}
+    example = {k: [(ctrls[k][0], lat) for lat in ctrls[k][1]] for k in shown if k in ctrls}
     example_rollout(setup, example, scen, fig_dir / "example_rollout.png")
     print(f"figures written to {fig_dir}")
 
