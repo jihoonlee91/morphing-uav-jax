@@ -1,0 +1,23 @@
+﻿{
+ "random_2000": {
+  "points": 2000,
+  "max_gamma": 0.23959333854700313,
+  "covered_by_1.5x_margin": 1999,
+  "covered_by_2x_margin": 2000
+ },
+ "offset_grid_13x5x5": {
+  "points": 325,
+  "max_gamma": 0.21254224863291843,
+  "covered_by_1.5x_margin": 324,
+  "covered_by_2x_margin": 325
+ },
+ "check_grid_325": {
+  "points": 325,
+  "max_gamma": 0.22302547548183016,
+  "covered_by_1.5x_margin": 322,
+  "covered_by_2x_margin": 325
+ },
+ "seed": 2026,
+ "wall_seconds": 629.5334136486053
+}
+done in 630s
