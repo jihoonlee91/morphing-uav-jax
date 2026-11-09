@@ -55,6 +55,10 @@ class DiffSimConfig(NamedTuple):
     act_scale: tuple[float, float, float] = ACT_LIMITS
     delay: int = -1  # fixed training delay (samples); see rl.PPOConfig
     history: int = 0  # pending commands in the observation; see rl.PPOConfig
+    rate_weight: float = 0.05  # see rl.PPOConfig (round-3 options)
+    delay_rand: int = -1
+    mask_pending: bool = False
+    linear: bool = False
     eval_every: int = 5
     eval_envs: int = 64
     # The cosine learning-rate decay spans every optimizer step (iters x windows).
@@ -69,6 +73,8 @@ def policy_interface(cfg: DiffSimConfig) -> PPOConfig:
     return PPOConfig(
         hidden=cfg.hidden, steps=cfg.episode, domain_randomization=cfg.domain_randomization,
         act_scale=cfg.act_scale, delay=cfg.delay, history=cfg.history, eval_envs=cfg.eval_envs,
+        rate_weight=cfg.rate_weight, delay_rand=cfg.delay_rand, mask_pending=cfg.mask_pending,
+        linear=cfg.linear,
     )  # fmt: skip
 
 

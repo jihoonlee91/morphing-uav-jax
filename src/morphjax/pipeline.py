@@ -36,6 +36,22 @@ LABELS = {
     "gs_dr": "Gain-scheduled LQR tuned on DR",
     "lpv_pw": "LPV, pointwise Lyapunov (ablation)",
     "lpv_nodisk": "LPV, no pole disk (ablation)",
+    "lpv_pw_nodisk": "LPV, pointwise, no pole disk (ablation)",
+    "lpv_tuned": "LPV, tuned multipliers (60 ms rule)",
+    "ppo_lat40": "PPO, trained with 40 ms delay",
+    "diffsim_lat40": "Diff-sim, trained with 40 ms delay",
+    "ppo_lat60": "PPO, trained with 60 ms delay",
+    "diffsim_lat60": "Diff-sim, trained with 60 ms delay",
+    "ppo_ddr": "PPO, delay 0-60 ms randomized",
+    "diffsim_ddr": "Diff-sim, delay 0-60 ms randomized",
+    "ppo_ddrh": "PPO, delay randomized + command buffer",
+    "diffsim_ddrh": "Diff-sim, delay randomized + command buffer",
+    "diffsim_lin": "Diff-sim, linear gain-scheduled policy",
+    "ppo_smooth": "PPO, action-rate penalty x1000",
+    "diffsim_smooth": "Diff-sim, action-rate penalty x1000",
+    "ppo_rate100": "PPO, action-rate penalty x100",
+    "ppo_ls0": "PPO, initial log-std 0",
+    "ppo_ent": "PPO, entropy coefficient 0.01",
 }
 # Learned controllers: name -> (training method, variant); files are
 # results/policies/<method>_<variant>_seed<k>.npz
@@ -57,6 +73,23 @@ LEARNED = {
     "diffsim_lat": ("diffsim", "lat"),
     # Revision: PPO with CleanRL-style settings (rl.CLEANRL), nominal model.
     "ppo_clean": ("ppo_clean", "nominal"),
+    # Round 3 (results/tmlr/r3): fixed 40 / 60 ms with pending commands observed,
+    # delay-only randomization without / with the (masked) command buffer, a learned
+    # linear gain-scheduled policy, smoothness-priced reward, PPO sensitivity.
+    "ppo_lat40": ("ppo", "lat40"),
+    "diffsim_lat40": ("diffsim", "lat40"),
+    "ppo_lat60": ("ppo", "lat60"),
+    "diffsim_lat60": ("diffsim", "lat60"),
+    "ppo_ddr": ("ppo", "ddr"),
+    "diffsim_ddr": ("diffsim", "ddr"),
+    "ppo_ddrh": ("ppo", "ddrh"),
+    "diffsim_ddrh": ("diffsim", "ddrh"),
+    "diffsim_lin": ("diffsim", "lin"),
+    "ppo_smooth": ("ppo", "smooth"),
+    "diffsim_smooth": ("diffsim", "smooth"),
+    "ppo_rate100": ("ppo", "rate100"),
+    "ppo_ls0": ("ppo", "ls0"),
+    "ppo_ent": ("ppo", "ent"),
 }
 # Learned controllers that are residuals on top of a model-based law.
 RESIDUAL_BASE = {

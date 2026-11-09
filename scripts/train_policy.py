@@ -25,6 +25,24 @@ from pathlib import Path
 from morphjax import diffsim, pipeline, rl, safety
 
 ROOT = Path(__file__).resolve().parents[1]
+RATE_W = 0.05  # the paper's action-rate weight (rl.reward)
+# Training variants: config overrides on top of the method's defaults.
+VARIANTS: dict[str, dict] = {
+    "nominal": {},
+    "dr": {},  # domain randomization (model error, delay 0-60 ms, noise)
+    "lat": {"delay": 1, "history": 1},  # fixed 20 ms, pending command observed
+    # Round 3:
+    "lat40": {"delay": 2, "history": 2},  # fixed 40 ms, both pending commands observed
+    "lat60": {"delay": 3, "history": 3},  # fixed 60 ms
+    "ddr": {"delay_rand": 3},  # delay-only randomization, uniform 0-60 ms
+    # ... with the last 3 commands observed, those already applied zeroed (mask).
+    "ddrh": {"delay_rand": 3, "history": 3, "mask_pending": True},
+    "lin": {"linear": True},  # linear gain-scheduled policy (diff-sim only)
+    "smooth": {"rate_weight": 1000 * RATE_W},  # action-rate penalty x1000
+    "rate100": {"rate_weight": 100 * RATE_W},
+    "ls0": {"init_log_std": 0.0},  # PPO only
+    "ent": {"ent_coef": 0.01},  # PPO only
+}
 
 
 def main() -> None:
@@ -34,7 +52,7 @@ def main() -> None:
         choices=["ppo", "ppo_clean", "diffsim", "residual", "residual_proj"],
         default="ppo",
     )
-    ap.add_argument("--variant", choices=["nominal", "dr", "lat"], default="nominal")
+    ap.add_argument("--variant", choices=sorted(VARIANTS), default="nominal")
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--iters", type=int, default=None, help="PPO updates / diff-sim iterations")
     ap.add_argument("--out", type=Path, default=ROOT / "results" / "policies")
@@ -52,8 +70,7 @@ def main() -> None:
     # schedule are unused (the policy replaces them).
     lon = setup.schedules["gs"]
     dr = args.variant == "dr"
-    # "lat": a fixed 20 ms delay in every training scenario, pending command observed.
-    lat = {"delay": 1, "history": 1} if args.variant == "lat" else {}
+    lat = VARIANTS[args.variant]
     if args.method in ("ppo", "ppo_clean", "residual", "residual_proj"):
         # "residual": PPO learns a bounded correction on top of the certified LPV law;
         # "residual_proj" also projects it onto the LPV certificate inside the loop.
@@ -63,13 +80,15 @@ def main() -> None:
             filt = partial(safety.project, safety.make_safety_filter(setup))
         # "ppo_clean": the same PPO with CleanRL-style defaults (rl.CLEANRL).
         clean = rl.CLEANRL if args.method == "ppo_clean" else {}
-        cfg = rl.PPOConfig(seed=args.seed, domain_randomization=dr, **lat, **clean)
+        lat = {k: v for k, v in lat.items() if k != "linear"}
+        cfg = rl.PPOConfig(seed=args.seed, domain_randomization=dr, **{**lat, **clean})
         if args.iters:
             cfg = cfg._replace(updates=args.iters)
         if args.eval_every:
             cfg = cfg._replace(eval_every=args.eval_every)
         params, history, timing = rl.train(setup.plant, lon, cfg, base=base, residual_filter=filt)
     else:
+        lat = {k: v for k, v in lat.items() if k not in ("init_log_std", "ent_coef")}
         cfg = diffsim.DiffSimConfig(seed=args.seed, domain_randomization=dr, **lat)
         if args.iters:
             cfg = cfg._replace(iters=args.iters)

@@ -84,6 +84,15 @@ class PPOConfig(NamedTuple):
     split_clip: bool = False  # separate global-norm clipping for policy and value nets
     vf_clip: bool = False  # clipped value loss
     lr_final_frac: float = 0.1  # linear learning-rate decay to this fraction
+    # Round-3 options (defaults = the paper's setting):
+    rate_weight: float = 0.05  # weight of the action-rate penalty in the reward
+    # Delay-only randomization: delay uniform in 0..delay_rand samples (-1 = off).
+    delay_rand: int = -1
+    # Zero the observed commands that the current delay has already applied
+    # (needs the delay: the controller is assumed to know its own latency).
+    mask_pending: bool = False
+    # Linear gain-scheduled policy u = u0 + K(rho) dx, K multilinear on the design grid.
+    linear: bool = False
 
 
 # CleanRL ppo_continuous_action defaults applied to this task (the "PPO sanity" variant):
@@ -115,6 +124,15 @@ def init_params(key: jax.Array, cfg: PPOConfig) -> Params:
     k = jax.random.split(key, 6)
     h = cfg.hidden
     n = obs_dim(cfg)
+    if getattr(cfg, "linear", False):
+        # Normalized gains (action units per Bryson-scaled state) on the 63-point grid,
+        # zero at the start; "v" is unused by diff-sim but keeps the parameter layout.
+        return {
+            "K": jnp.zeros((*LIN_GRID_SHAPE, ACT_DIM * 8)),
+            "v": [_dense(k[3], n, h, math.sqrt(2)), _dense(k[4], h, h, math.sqrt(2)),
+                  _dense(k[5], h, 1, 1.0)],
+            "log_std": jnp.full(ACT_DIM, cfg.init_log_std),
+        }  # fmt: skip
     params = {
         "pi": [_dense(k[0], n, h, math.sqrt(2)), _dense(k[1], h, h, math.sqrt(2)),
                _dense(k[2], h, ACT_DIM, 0.01)],
@@ -144,7 +162,32 @@ def _normalize_obs(params: Params, obs: jnp.ndarray) -> jnp.ndarray:
 
 
 def policy_mean(params: Params, obs: jnp.ndarray) -> jnp.ndarray:
+    if "K" in params:
+        return _linear_policy(params["K"], obs)
     return _mlp(params["pi"], _normalize_obs(params, obs))
+
+
+# Linear gain-scheduled policy (round 3): the LQR's function class, learned.
+def _lin_axes():
+    from morphjax.design import ALT, ETA_S, V_SYN
+
+    return (jnp.asarray(V_SYN), jnp.asarray(ALT), jnp.asarray(ETA_S))
+
+
+LIN_GRID_SHAPE = (7, 3, 3)
+
+
+def _linear_policy(k_table: jnp.ndarray, obs: jnp.ndarray) -> jnp.ndarray:
+    """``a = K_n(rho) (dx / x_scale)``; ``rho`` and ``dx`` are recovered from ``obs``."""
+    from morphjax.data import Table
+    from morphjax.design import LAT_X_SCALE
+    from morphjax.interp import interp
+
+    raw = obs[..., :OBS_DIM] * OBS_SCALE + OBS_SHIFT
+    dx = raw[..., :8] / jnp.asarray(LAT_X_SCALE)
+    rho = (raw[..., 9], raw[..., 10], raw[..., 8])  # V_syn, h, eta_s (already clipped)
+    k = interp(Table(_lin_axes(), k_table), *rho).reshape(*obs.shape[:-1], ACT_DIM, 8)
+    return jnp.einsum("...ij,...j->...i", k, dx)
 
 
 def value(params: Params, obs: jnp.ndarray) -> jnp.ndarray:
@@ -181,6 +224,8 @@ def observation(
     buf: jnp.ndarray | None = None,
     history: int = 0,
     act_scale=ACT_LIMITS,
+    delay=None,
+    mask_pending: bool = False,
 ):
     """Normalized observation and the trim command ``u0``.
 
@@ -195,6 +240,9 @@ def observation(
     if history > 0:
         assert buf is not None, "a history policy needs the command buffer"
         pending = (buf[:history][:, LAT_CMD] - u0) / jnp.asarray(act_scale)
+        if mask_pending and delay is not None:
+            # Rows k >= delay were already applied: only the first ``delay`` are pending.
+            pending = pending * (jnp.arange(history) < delay)[:, None]
         obs = jnp.concatenate([obs, pending.reshape(-1)])
     return obs, u0
 
@@ -252,8 +300,11 @@ def make_policy_lateral(
     """
     cfg = cfg or PPOConfig()
 
-    def lateral(xw, phi_cmd, integ_phi, buf=None):
-        obs, u0 = observation(sched, xw, phi_cmd, integ_phi, buf, cfg.history, cfg.act_scale)
+    def lateral(xw, phi_cmd, integ_phi, buf=None, delay=None):
+        obs, u0 = observation(
+            sched, xw, phi_cmd, integ_phi, buf, cfg.history, cfg.act_scale, delay,
+            cfg.mask_pending,
+        )  # fmt: skip
         act = policy_mean(params, obs)
         return lateral_command(
             xw, phi_cmd, integ_phi, u0, act, base, residual_filter, cfg.act_scale
@@ -263,13 +314,13 @@ def make_policy_lateral(
     return lateral
 
 
-def reward(xw_true, phi_cmd, act, prev_act):
+def reward(xw_true, phi_cmd, act, prev_act, rate_weight: float = 0.05):
     e_phi = (xw_true[W.PHI] - phi_cmd) / (5 * DEG)
     beta = xw_true[W.BETA] / (1.5 * DEG)
     p = xw_true[W.P] / (30 * DEG)
     shaped = 0.6 * jnp.exp(-(e_phi**2)) + 0.3 * jnp.exp(-(beta**2)) + 0.1 * jnp.exp(-(p**2))
     a = jnp.clip(act, -1.0, 1.0)
-    return shaped - 0.05 * jnp.sum((a - prev_act) ** 2) - 0.01 * jnp.sum(a**2)
+    return shaped - rate_weight * jnp.sum((a - prev_act) ** 2) - 0.01 * jnp.sum(a**2)
 
 
 def training_scenario(key, cfg: PPOConfig) -> Scenario:
@@ -293,6 +344,8 @@ def training_scenario(key, cfg: PPOConfig) -> Scenario:
         scen = scen._replace(
             delay=jax.random.randint(k1, (), 0, 4), noise=jax.random.uniform(k2, maxval=1.5)
         )
+    if getattr(cfg, "delay_rand", -1) >= 0:
+        scen = scen._replace(delay=jax.random.randint(k_d, (), 0, cfg.delay_rand + 1))
     delay = getattr(cfg, "delay", -1)
     if delay >= 0:
         scen = scen._replace(delay=jnp.asarray(delay))
@@ -321,14 +374,22 @@ def deterministic_step(
     carry = carry._replace(key=key)
     phi_cmd, eta_cmd = scen.phi_cmd[t], scen.eta_s_cmd[t]
     obs, u0 = observation(
-        lon, xw_meas, phi_cmd, carry.integ[2], carry.buf, cfg.history, cfg.act_scale
+        lon,
+        xw_meas,
+        phi_cmd,
+        carry.integ[2],
+        carry.buf,
+        cfg.history,
+        cfg.act_scale,
+        scen.delay,
+        cfg.mask_pending,
     )
     act = policy_mean(params, obs)
     lat = lateral_command(
         xw_meas, phi_cmd, carry.integ[2], u0, act, base, residual_filter, cfg.act_scale
     )
     new, _ = closed_loop_step(plant, lon, carry, lat, phi_cmd, eta_cmd, scen, xw_meas)
-    r = reward(body_to_wind(new.x), phi_cmd, act, prev)
+    r = reward(body_to_wind(new.x), phi_cmd, act, prev, cfg.rate_weight)
     alive = ~carry.failed
     r = jnp.where(new.failed & alive, -10.0, jnp.where(alive, r, 0.0))
     return new, jnp.clip(act, -1.0, 1.0), r
@@ -449,7 +510,15 @@ def collect(
         carry = carry._replace(key=key)
         phi_cmd, eta_cmd = scen.phi_cmd[t], scen.eta_s_cmd[t]
         obs, u0 = observation(
-            lon, xw_meas, phi_cmd, carry.integ[2], carry.buf, cfg.history, cfg.act_scale
+            lon,
+            xw_meas,
+            phi_cmd,
+            carry.integ[2],
+            carry.buf,
+            cfg.history,
+            cfg.act_scale,
+            scen.delay,
+            cfg.mask_pending,
         )
         mu = policy_mean(params, obs)
         act = mu + jnp.exp(params["log_std"]) * jax.random.normal(k, mu.shape)
@@ -457,7 +526,7 @@ def collect(
             xw_meas, phi_cmd, carry.integ[2], u0, act, base, residual_filter, cfg.act_scale
         )
         new, _ = closed_loop_step(plant, lon, carry, lat, phi_cmd, eta_cmd, scen, xw_meas)
-        r = reward(body_to_wind(new.x), phi_cmd, act, prev_act)
+        r = reward(body_to_wind(new.x), phi_cmd, act, prev_act, cfg.rate_weight)
         term = new.failed & ~carry.failed
         r = jnp.where(term, -10.0, r)
         out = (obs, act, log_prob(params, obs, act), value(params, obs), r, ~carry.failed, term)
@@ -475,7 +544,15 @@ def collect(
     (carry, _), out = jax.lax.scan(body, init, jnp.arange(cfg.steps))
     final_obs, _ = jax.vmap(
         lambda c, s: observation(
-            lon, body_to_wind(c.x), s.phi_cmd[-1], c.integ[2], c.buf, cfg.history, cfg.act_scale
+            lon,
+            body_to_wind(c.x),
+            s.phi_cmd[-1],
+            c.integ[2],
+            c.buf,
+            cfg.history,
+            cfg.act_scale,
+            s.delay,
+            cfg.mask_pending,
         )
     )(carry, scen)
     last_val = jnp.where(carry.failed, 0.0, value(params, final_obs))
@@ -662,6 +739,8 @@ def policy_config(meta_config: dict) -> PPOConfig:
         delay=int(meta_config.get("delay", -1)),
         obs_norm=bool(meta_config.get("obs_norm", False)),
         reward_norm=bool(meta_config.get("reward_norm", False)),
+        mask_pending=bool(meta_config.get("mask_pending", False)),
+        linear=bool(meta_config.get("linear", False)),
     )
 
 

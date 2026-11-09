@@ -130,7 +130,7 @@ def rollout(plant: Plant, lon: Schedule, lateral: LateralFn, scen: Scenario) -> 
         xw_meas, key = measure(carry, scen)
         carry = carry._replace(key=key)
         if with_buf:
-            lat_cmd = lateral_any(xw_meas, phi_cmd, carry.integ[2], carry.buf)
+            lat_cmd = lateral_any(xw_meas, phi_cmd, carry.integ[2], carry.buf, scen.delay)
         else:
             lat_cmd = lateral(xw_meas, phi_cmd, carry.integ[2])
         new, cmd = closed_loop_step(plant, lon, carry, lat_cmd, phi_cmd, eta_s_cmd, scen, xw_meas)

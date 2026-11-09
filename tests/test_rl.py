@@ -106,3 +106,34 @@ def test_cleanrl_style_update_normalizes_and_trains(setup, tmp_path):
     (tmp_path / "c.json").write_text(json.dumps({"config": cfg._asdict()}))
     back, _ = load_policy(tmp_path / "c.npz")
     np.testing.assert_array_equal(back["obs_norm"]["mean"], new["obs_norm"]["mean"])
+
+
+def test_round3_linear_policy_and_masked_buffer(setup):
+    from morphjax.design import LAT_X_SCALE
+    from morphjax.rl import OBS_SCALE, OBS_SHIFT, observation, policy_mean, training_scenario
+
+    cfg = PPOConfig(linear=True)
+    p = init_params(jax.random.PRNGKey(0), cfg)
+    k = np.random.default_rng(0).normal(size=(3, 8))
+    p["K"] = jnp.broadcast_to(jnp.asarray(k.reshape(-1)), p["K"].shape)
+    dx = np.random.default_rng(1).normal(size=8) * LAT_X_SCALE * 0.1
+    raw = np.concatenate([dx, [-12.5, 90.0, 5000.0, dx[3]]])
+    obs = (jnp.asarray(raw) - OBS_SHIFT) / OBS_SCALE
+    np.testing.assert_allclose(policy_mean(p, obs), k @ (dx / LAT_X_SCALE), rtol=1e-9)
+    # delay-only randomization stays within 0..3 samples
+    d = jax.vmap(lambda kk: training_scenario(kk, PPOConfig(steps=20, delay_rand=3)).delay)(
+        jax.random.split(jax.random.PRNGKey(0), 64)
+    )
+    assert int(d.min()) == 0 and int(d.max()) == 3
+    # masked buffer: with delay 1 only the newest command is observed
+    from morphjax.sim import initial_carry
+
+    sc = training_scenario(jax.random.PRNGKey(2), PPOConfig(steps=20))
+    c = initial_carry(setup.plant, sc)
+    buf = c.buf.at[:, 1].add(3.0)  # aileron 3 deg off trim in every slot
+    from morphjax.dynamics import body_to_wind
+
+    o, _ = observation(setup.schedules["gs"], body_to_wind(c.x), 0.0, 0.0, buf, 3,
+                       (30.0, 30.0, 12.5), 1, True)  # fmt: skip
+    pend = np.asarray(o[12:]).reshape(3, 3)
+    assert pend[0, 0] != 0 and np.all(pend[1:] == 0)
