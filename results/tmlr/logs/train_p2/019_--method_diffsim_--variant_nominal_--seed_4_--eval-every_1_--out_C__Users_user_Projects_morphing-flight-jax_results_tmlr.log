@@ -1,0 +1,27 @@
+# slot 0 mask 0x1f: scripts/train_policy.py --method diffsim --variant nominal --seed 4 --eval-every 1 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/curves_fine
+design grid: 63 points, max trim residual 4.5e-15; LPV optimal_inaccurate, Lyapunov margin -1.039; weights LatWeights(phi=0.125, integ=0.03125, beta=0.125, eta_a=4.0, effort=0.03125)
+iter    0  steps    32,000  return   352.2  eval   396.7  survival 1.00  (3s)
+iter   10  steps   352,000  return   495.5  eval   494.6  survival 1.00  (32s)
+iter   20  steps   672,000  return   495.4  eval   495.6  survival 1.00  (60s)
+iter   30  steps   992,000  return   496.1  eval   495.7  survival 1.00  (87s)
+iter   40  steps 1,312,000  return   496.3  eval   495.8  survival 1.00  (114s)
+iter   50  steps 1,632,000  return   496.1  eval   495.8  survival 1.00  (142s)
+iter   60  steps 1,952,000  return   495.8  eval   495.8  survival 1.00  (169s)
+iter   70  steps 2,272,000  return   496.6  eval   495.9  survival 1.00  (197s)
+iter   80  steps 2,592,000  return   495.9  eval   495.9  survival 1.00  (226s)
+iter   90  steps 2,912,000  return   496.0  eval   495.9  survival 1.00  (254s)
+iter  100  steps 3,232,000  return   495.5  eval   495.9  survival 1.00  (281s)
+iter  110  steps 3,552,000  return   496.0  eval   495.9  survival 1.00  (308s)
+iter  120  steps 3,872,000  return   496.1  eval   495.9  survival 1.00  (335s)
+iter  130  steps 4,192,000  return   496.6  eval   495.9  survival 1.00  (362s)
+iter  140  steps 4,512,000  return   496.7  eval   495.9  survival 1.00  (388s)
+iter  150  steps 4,832,000  return   496.2  eval   495.9  survival 1.00  (413s)
+iter  160  steps 5,152,000  return   495.9  eval   495.9  survival 1.00  (437s)
+iter  170  steps 5,472,000  return   496.5  eval   495.9  survival 1.00  (461s)
+iter  180  steps 5,792,000  return   495.9  eval   495.9  survival 1.00  (484s)
+iter  190  steps 6,112,000  return   495.8  eval   495.9  survival 1.00  (503s)
+iter  199  steps 6,400,000  return   496.5  eval   495.9  survival 1.00  (519s)
+saved C:\Users\user\Projects\morphing-flight-jax\results\tmlr\curves_fine\diffsim_nominal_seed4.npz
+
+# 832 s
+JOB OK

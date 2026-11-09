@@ -1,0 +1,25 @@
+﻿design grid: 63 points, max trim residual 4.5e-15; LPV optimal_inaccurate, Lyapunov margin -1.039; weights LatWeights(phi=0.125, integ=0.03125, beta=0.125, eta_a=4.0, effort=0.03125)
+LPV no-disk optimal (margin -1.040); pointwise statuses ['optimal']
+controllers: ppo_clean x10
+[   306s] Frozen shape             ppo_clean: 0.33 deg / 100%
+[   340s] Fast morphing            ppo_clean: 0.33 deg / 100%
+[   374s] + noise, 40 ms delay     ppo_clean: 12.42 deg / 100%
+[   408s] + model error            ppo_clean: 0.33 deg / 100%
+[   443s] + aileron at 0-30 %      ppo_clean: 3.45 deg / 71%
+[   638s] sweep morph_rate done
+[   762s] sweep aileron done
+[   879s] sweep delay done
+training-distribution return: {'ppo_clean': 493.21}
+| Controller | Frozen shape | Fast morphing | + noise, 40 ms delay | + model error | + aileron at 0-30 % |
+|---|---:|---:|---:|---:|---:|
+| PPO, CleanRL-style settings | 0.33° · 100.0% | 0.33° · 100.0% | 12.42° · 99.8% | 0.33° · 100.0% | 3.45° · 70.9% |
+
+Cells: roll-tracking RMS error over successful runs · share of runs without loss of control. 95 % bootstrap intervals are in `metrics.json`.
+
+| Controller (fast morphing) | Sideslip, p95 of max | Command activity | RMS η_a |
+|---|---:|---:|---:|
+| PPO, CleanRL-style settings | 0.56° | 0.83 /s | 3.44 % |
+
+Command activity: mean |du/dt| of aileron, rudder and asymmetric-span commands, each divided by its position limit (higher = busier actuators).
+
+done in 1057s

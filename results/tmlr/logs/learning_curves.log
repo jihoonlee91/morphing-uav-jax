@@ -1,0 +1,87 @@
+﻿{
+ "eval_batch": {
+  "seed": "rl.EVAL_SEED",
+  "n": 64,
+  "steps": 500
+ },
+ "lqr_return_on_eval_batch": {
+  "gs": 481.96165612965973,
+  "gs_hg": 493.84107474643645
+ },
+ "thresholds": {
+  "lqr_gs": 481.96165612965973,
+  "lqr_no_margin": 493.84107474643645,
+  "ppo_final": 495.0509345777791
+ },
+ "committed_ppo_final_std": {
+  "ppo_dr_seed0": {
+   "final_std": 0.0442415394575222,
+   "final_train_return": 489.6216047052483
+  },
+  "ppo_dr_seed1": {
+   "final_std": 0.047239078038680715,
+   "final_train_return": 491.33231533016885
+  },
+  "ppo_dr_seed2": {
+   "final_std": 0.046356529687744785,
+   "final_train_return": 489.30700393795814
+  },
+  "ppo_nominal_seed0": {
+   "final_std": 0.043705395432851235,
+   "final_train_return": 494.03694222082197
+  },
+  "ppo_nominal_seed1": {
+   "final_std": 0.04608162736859878,
+   "final_train_return": 494.67273836307686
+  },
+  "ppo_nominal_seed2": {
+   "final_std": 0.045254395030951425,
+   "final_train_return": 494.2639619605278
+  }
+ },
+ "ratio_ppo_nominal_over_diffsim_nominal": {
+  "lqr_gs": {
+   "env_steps": 4.0,
+   "wall_s": 2.1394225035092087
+  },
+  "lqr_no_margin": {
+   "env_steps": 5.0,
+   "wall_s": 2.8378965501224425
+  },
+  "ppo_final": {
+   "env_steps": 7.333333333333333,
+   "wall_s": 4.158937401789644
+  },
+  "final99": {
+   "env_steps": 3.0,
+   "wall_s": 1.587980520934754
+  }
+ },
+ "ratio_ppo_lat_over_diffsim_lat": {
+  "lqr_gs": {
+   "env_steps": 4.0,
+   "wall_s": 2.5469848514102535
+  },
+  "lqr_no_margin": {
+   "env_steps": 4.666666666666667,
+   "wall_s": 2.9788090871478654
+  },
+  "ppo_final": {
+   "env_steps": 8.8,
+   "wall_s": 5.598686193839624
+  },
+  "final99": {
+   "env_steps": 4.0,
+   "wall_s": 2.440610948116053
+  }
+ }
+}
+diffsim_dr 10 492.13 {'lqr_gs': {'reached': 10, 'of': 10, 'median_env_steps': 320000.0, 'range_env_steps': [320000, 480000], 'median_wall_s': 27.82937800884247}, 'lqr_no_margin': {'reached': 0, 'of': 10, 'median_env_steps': None, 'range_env_steps': None, 'median_wall_s': None}, 'ppo_final': {'reached': 0, 'of': 10, 'median_env_steps': None, 'range_env_steps': None, 'median_wall_s': None}, 'final99': {'reached': 10, 'of': 10, 'median_env_steps': 480000.0, 'range_env_steps': [480000, 640000], 'median_wall_s': 41.40976023674011}}
+diffsim_lat 10 495.8 {'lqr_gs': {'reached': 10, 'of': 10, 'median_env_steps': 160000.0, 'range_env_steps': [160000, 160000], 'median_wall_s': 14.934135913848877}, 'lqr_no_margin': {'reached': 10, 'of': 10, 'median_env_steps': 480000.0, 'range_env_steps': [480000, 480000], 'median_wall_s': 44.92662250995636}, 'ppo_final': {'reached': 10, 'of': 10, 'median_env_steps': 800000.0, 'range_env_steps': [800000, 960000], 'median_wall_s': 75.34263980388641}, 'final99': {'reached': 10, 'of': 10, 'median_env_steps': 320000.0, 'range_env_steps': [320000, 320000], 'median_wall_s': 29.772346019744873}}
+diffsim_nominal 10 495.89 {'lqr_gs': {'reached': 10, 'of': 10, 'median_env_steps': 160000.0, 'range_env_steps': [160000, 160000], 'median_wall_s': 14.162777185440063}, 'lqr_no_margin': {'reached': 10, 'of': 10, 'median_env_steps': 320000.0, 'range_env_steps': [320000, 320000], 'median_wall_s': 27.884439826011658}, 'ppo_final': {'reached': 10, 'of': 10, 'median_env_steps': 480000.0, 'range_env_steps': [480000, 480000], 'median_wall_s': 41.26852607727051}, 'final99': {'reached': 10, 'of': 10, 'median_env_steps': 320000.0, 'range_env_steps': [320000, 320000], 'median_wall_s': 27.884439826011658}}
+ppo_clean_nominal 10 492.76 {'lqr_gs': {'reached': 10, 'of': 10, 'median_env_steps': 640000.0, 'range_env_steps': [320000, 960000], 'median_wall_s': 58.241437911987305}, 'lqr_no_margin': {'reached': 7, 'of': 10, 'median_env_steps': 1280000.0, 'range_env_steps': [960000, 2240000], 'median_wall_s': 123.75508332252502}, 'ppo_final': {'reached': 3, 'of': 10, 'median_env_steps': 2240000.0, 'range_env_steps': [2240000, 2880000], 'median_wall_s': 219.4775881767273}, 'final99': {'reached': 10, 'of': 10, 'median_env_steps': 640000.0, 'range_env_steps': [640000, 960000], 'median_wall_s': 62.137455224990845}}
+ppo_dr 10 491.08 {'lqr_gs': {'reached': 10, 'of': 10, 'median_env_steps': 960000.0, 'range_env_steps': [960000, 960000], 'median_wall_s': 44.670329570770264}, 'lqr_no_margin': {'reached': 0, 'of': 10, 'median_env_steps': None, 'range_env_steps': None, 'median_wall_s': None}, 'ppo_final': {'reached': 0, 'of': 10, 'median_env_steps': None, 'range_env_steps': None, 'median_wall_s': None}, 'final99': {'reached': 10, 'of': 10, 'median_env_steps': 1280000.0, 'range_env_steps': [1280000, 1600000], 'median_wall_s': 64.11164093017578}}
+ppo_lat 10 494.68 {'lqr_gs': {'reached': 10, 'of': 10, 'median_env_steps': 640000.0, 'range_env_steps': [640000, 640000], 'median_wall_s': 38.037017941474915}, 'lqr_no_margin': {'reached': 10, 'of': 10, 'median_env_steps': 2240000.0, 'range_env_steps': [1920000, 2560000], 'median_wall_s': 133.82783138751984}, 'ppo_final': {'reached': 1, 'of': 10, 'median_env_steps': 7040000.0, 'range_env_steps': [7040000, 7040000], 'median_wall_s': 421.81979727745056}, 'final99': {'reached': 10, 'of': 10, 'median_env_steps': 1280000.0, 'range_env_steps': [960000, 1280000], 'median_wall_s': 72.66271364688873}}
+ppo_nominal 10 495.05 {'lqr_gs': {'reached': 10, 'of': 10, 'median_env_steps': 640000.0, 'range_env_steps': [640000, 640000], 'median_wall_s': 30.300164222717285}, 'lqr_no_margin': {'reached': 10, 'of': 10, 'median_env_steps': 1600000.0, 'range_env_steps': [1600000, 1920000], 'median_wall_s': 79.13315558433533}, 'ppo_final': {'reached': 8, 'of': 10, 'median_env_steps': 3520000.0, 'range_env_steps': [2240000, 4800000], 'median_wall_s': 171.63321661949158}, 'final99': {'reached': 10, 'of': 10, 'median_env_steps': 960000.0, 'range_env_steps': [640000, 960000], 'median_wall_s': 44.27994728088379}}
+residual_dr 10 476.33 {'lqr_gs': {'reached': 0, 'of': 10, 'median_env_steps': None, 'range_env_steps': None, 'median_wall_s': None}, 'lqr_no_margin': {'reached': 0, 'of': 10, 'median_env_steps': None, 'range_env_steps': None, 'median_wall_s': None}, 'ppo_final': {'reached': 0, 'of': 10, 'median_env_steps': None, 'range_env_steps': None, 'median_wall_s': None}, 'final99': {'reached': 10, 'of': 10, 'median_env_steps': 800000.0, 'range_env_steps': [320000, 960000], 'median_wall_s': 44.64333140850067}}
+residual_proj_dr 10 476.01 {'lqr_gs': {'reached': 0, 'of': 10, 'median_env_steps': None, 'range_env_steps': None, 'median_wall_s': None}, 'lqr_no_margin': {'reached': 0, 'of': 10, 'median_env_steps': None, 'range_env_steps': None, 'median_wall_s': None}, 'ppo_final': {'reached': 0, 'of': 10, 'median_env_steps': None, 'range_env_steps': None, 'median_wall_s': None}, 'final99': {'reached': 10, 'of': 10, 'median_env_steps': 640000.0, 'range_env_steps': [320000, 960000], 'median_wall_s': 45.55564522743225}}

@@ -1,0 +1,858 @@
+{
+ "criteria": [
+  "bank>85",
+  "sideslip>25",
+  "alpha<-10",
+  "alpha>25",
+  "speed<40kt",
+  "non-finite"
+ ],
+ "n_per_controller_seed": 128,
+ "delays": {
+  "60ms": {
+   "fixed": {
+    "runs": 128,
+    "lost": 0,
+    "criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "gs": {
+    "runs": 128,
+    "lost": 0,
+    "criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "gs_hg": {
+    "runs": 128,
+    "lost": 128,
+    "criterion_counts": {
+     "bank>85": 125,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 3,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 125,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 3,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "lpv": {
+    "runs": 128,
+    "lost": 0,
+    "criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "gs_wide": {
+    "runs": 128,
+    "lost": 0,
+    "criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "gs_hg_wide": {
+    "runs": 128,
+    "lost": 128,
+    "criterion_counts": {
+     "bank>85": 98,
+     "sideslip>25": 6,
+     "alpha<-10": 1,
+     "alpha>25": 24,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 97,
+     "sideslip>25": 6,
+     "alpha<-10": 1,
+     "alpha>25": 23,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "gs_dr": {
+    "runs": 128,
+    "lost": 0,
+    "criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "lpv_pw": {
+    "runs": 128,
+    "lost": 0,
+    "criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "lpv_nodisk": {
+    "runs": 128,
+    "lost": 0,
+    "criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "ppo": {
+    "runs": 1280,
+    "lost": 199,
+    "criterion_counts": {
+     "bank>85": 165,
+     "sideslip>25": 10,
+     "alpha<-10": 9,
+     "alpha>25": 15,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 165,
+     "sideslip>25": 10,
+     "alpha<-10": 9,
+     "alpha>25": 15,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "ppo_dr": {
+    "runs": 1280,
+    "lost": 0,
+    "criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "diffsim": {
+    "runs": 1280,
+    "lost": 787,
+    "criterion_counts": {
+     "bank>85": 500,
+     "sideslip>25": 210,
+     "alpha<-10": 4,
+     "alpha>25": 75,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 498,
+     "sideslip>25": 210,
+     "alpha<-10": 4,
+     "alpha>25": 73,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "diffsim_dr": {
+    "runs": 1280,
+    "lost": 0,
+    "criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "residual_dr": {
+    "runs": 1280,
+    "lost": 0,
+    "criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "residual_proj": {
+    "runs": 1280,
+    "lost": 0,
+    "criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "residual_proj_trained": {
+    "runs": 1280,
+    "lost": 0,
+    "criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "residual_safe": {
+    "runs": 1280,
+    "lost": 0,
+    "criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "residual_safe2": {
+    "runs": 1280,
+    "lost": 0,
+    "criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "ppo_lat": {
+    "runs": 1280,
+    "lost": 38,
+    "criterion_counts": {
+     "bank>85": 34,
+     "sideslip>25": 0,
+     "alpha<-10": 1,
+     "alpha>25": 3,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 34,
+     "sideslip>25": 0,
+     "alpha<-10": 1,
+     "alpha>25": 3,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "diffsim_lat": {
+    "runs": 1280,
+    "lost": 663,
+    "criterion_counts": {
+     "bank>85": 579,
+     "sideslip>25": 65,
+     "alpha<-10": 2,
+     "alpha>25": 18,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 578,
+     "sideslip>25": 65,
+     "alpha<-10": 2,
+     "alpha>25": 17,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "ppo_clean": {
+    "runs": 1280,
+    "lost": 10,
+    "criterion_counts": {
+     "bank>85": 7,
+     "sideslip>25": 3,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 7,
+     "sideslip>25": 3,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   }
+  },
+  "80ms": {
+   "fixed": {
+    "runs": 128,
+    "lost": 0,
+    "criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "gs": {
+    "runs": 128,
+    "lost": 0,
+    "criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "gs_hg": {
+    "runs": 128,
+    "lost": 128,
+    "criterion_counts": {
+     "bank>85": 95,
+     "sideslip>25": 0,
+     "alpha<-10": 30,
+     "alpha>25": 3,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 95,
+     "sideslip>25": 0,
+     "alpha<-10": 30,
+     "alpha>25": 3,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "lpv": {
+    "runs": 128,
+    "lost": 0,
+    "criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "gs_wide": {
+    "runs": 128,
+    "lost": 0,
+    "criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "gs_hg_wide": {
+    "runs": 128,
+    "lost": 128,
+    "criterion_counts": {
+     "bank>85": 83,
+     "sideslip>25": 0,
+     "alpha<-10": 26,
+     "alpha>25": 21,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 81,
+     "sideslip>25": 0,
+     "alpha<-10": 26,
+     "alpha>25": 19,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "gs_dr": {
+    "runs": 128,
+    "lost": 0,
+    "criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "lpv_pw": {
+    "runs": 128,
+    "lost": 0,
+    "criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "lpv_nodisk": {
+    "runs": 128,
+    "lost": 0,
+    "criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "ppo": {
+    "runs": 1280,
+    "lost": 1019,
+    "criterion_counts": {
+     "bank>85": 578,
+     "sideslip>25": 170,
+     "alpha<-10": 97,
+     "alpha>25": 179,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 575,
+     "sideslip>25": 168,
+     "alpha<-10": 96,
+     "alpha>25": 175,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "ppo_dr": {
+    "runs": 1280,
+    "lost": 27,
+    "criterion_counts": {
+     "bank>85": 27,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 27,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "diffsim": {
+    "runs": 1280,
+    "lost": 1182,
+    "criterion_counts": {
+     "bank>85": 227,
+     "sideslip>25": 363,
+     "alpha<-10": 486,
+     "alpha>25": 111,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 222,
+     "sideslip>25": 363,
+     "alpha<-10": 486,
+     "alpha>25": 106,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "diffsim_dr": {
+    "runs": 1280,
+    "lost": 8,
+    "criterion_counts": {
+     "bank>85": 8,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 8,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "residual_dr": {
+    "runs": 1280,
+    "lost": 0,
+    "criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "residual_proj": {
+    "runs": 1280,
+    "lost": 0,
+    "criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "residual_proj_trained": {
+    "runs": 1280,
+    "lost": 0,
+    "criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "residual_safe": {
+    "runs": 1280,
+    "lost": 0,
+    "criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "residual_safe2": {
+    "runs": 1280,
+    "lost": 0,
+    "criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 0,
+     "sideslip>25": 0,
+     "alpha<-10": 0,
+     "alpha>25": 0,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "ppo_lat": {
+    "runs": 1280,
+    "lost": 686,
+    "criterion_counts": {
+     "bank>85": 421,
+     "sideslip>25": 35,
+     "alpha<-10": 114,
+     "alpha>25": 117,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 420,
+     "sideslip>25": 35,
+     "alpha<-10": 114,
+     "alpha>25": 116,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "diffsim_lat": {
+    "runs": 1280,
+    "lost": 1136,
+    "criterion_counts": {
+     "bank>85": 655,
+     "sideslip>25": 290,
+     "alpha<-10": 154,
+     "alpha>25": 40,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 652,
+     "sideslip>25": 290,
+     "alpha<-10": 154,
+     "alpha>25": 37,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   },
+   "ppo_clean": {
+    "runs": 1280,
+    "lost": 50,
+    "criterion_counts": {
+     "bank>85": 36,
+     "sideslip>25": 0,
+     "alpha<-10": 13,
+     "alpha>25": 1,
+     "speed<40kt": 0,
+     "non-finite": 0
+    },
+    "only_criterion_counts": {
+     "bank>85": 36,
+     "sideslip>25": 0,
+     "alpha<-10": 13,
+     "alpha>25": 1,
+     "speed<40kt": 0,
+     "non-finite": 0
+    }
+   }
+  }
+ },
+ "wall_seconds": 1415.8860433101654
+}

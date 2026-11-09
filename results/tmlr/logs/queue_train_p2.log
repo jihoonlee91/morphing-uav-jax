@@ -1,0 +1,21 @@
+﻿[04:15:48] slot 0 rc=0   1312s scripts/train_policy.py --method ppo_clean --variant nominal --seed 0 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/policies
+[04:15:48] slot 1 rc=0   1312s scripts/train_policy.py --method ppo_clean --variant nominal --seed 1 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/policies
+[04:15:57] slot 3 rc=0   1322s scripts/train_policy.py --method ppo_clean --variant nominal --seed 3 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/policies
+[04:16:18] slot 2 rc=0   1342s scripts/train_policy.py --method ppo_clean --variant nominal --seed 2 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/policies
+[04:38:47] slot 3 rc=0   1369s scripts/train_policy.py --method ppo_clean --variant nominal --seed 6 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/policies
+[04:38:48] slot 0 rc=0   1380s scripts/train_policy.py --method ppo_clean --variant nominal --seed 4 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/policies
+[04:38:50] slot 1 rc=0   1383s scripts/train_policy.py --method ppo_clean --variant nominal --seed 5 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/policies
+[04:39:00] slot 2 rc=0   1363s scripts/train_policy.py --method ppo_clean --variant nominal --seed 7 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/policies
+[04:53:43] slot 2 rc=0    882s scripts/train_policy.py --method diffsim --variant nominal --seed 0 --eval-every 1 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/curves_fine
+[04:57:44] slot 1 rc=0   1133s scripts/train_policy.py --method ppo --variant nominal --seed 0 --eval-every 1 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/curves_fine
+[04:58:26] slot 0 rc=0   1178s scripts/train_policy.py --method ppo_clean --variant nominal --seed 9 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/policies
+[04:58:55] slot 3 rc=0   1209s scripts/train_policy.py --method ppo_clean --variant nominal --seed 8 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/policies
+[05:12:21] slot 1 rc=0    878s scripts/train_policy.py --method diffsim --variant nominal --seed 1 --eval-every 1 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/curves_fine
+[05:13:19] slot 2 rc=0   1177s scripts/train_policy.py --method ppo --variant nominal --seed 1 --eval-every 1 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/curves_fine
+[05:13:50] slot 3 rc=0    895s scripts/train_policy.py --method diffsim --variant nominal --seed 2 --eval-every 1 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/curves_fine
+[05:18:10] slot 0 rc=0   1184s scripts/train_policy.py --method ppo --variant nominal --seed 2 --eval-every 1 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/curves_fine
+[05:28:45] slot 2 rc=0    925s scripts/train_policy.py --method diffsim --variant nominal --seed 3 --eval-every 1 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/curves_fine
+[05:31:12] slot 1 rc=0   1131s scripts/train_policy.py --method ppo --variant nominal --seed 3 --eval-every 1 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/curves_fine
+[05:31:54] slot 3 rc=0   1084s scripts/train_policy.py --method ppo --variant nominal --seed 4 --eval-every 1 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/curves_fine
+[05:32:02] slot 0 rc=0    832s scripts/train_policy.py --method diffsim --variant nominal --seed 4 --eval-every 1 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/curves_fine
+queue done
