@@ -152,6 +152,7 @@ def main() -> None:
     )
     ap.add_argument("--wide", type=Path, default=ROOT / "results" / "tmlr" / "lqr_wide.json")
     ap.add_argument("--no-figures", action="store_true")
+    ap.add_argument("--only", default=None, help="comma-separated controllers to evaluate")
     args = ap.parse_args()
     if args.quick:
         args.n, args.n_sweep = 4, 2
@@ -162,6 +163,9 @@ def main() -> None:
     else:
         setup = pipeline.build_for_evaluation(args.weights, verbose=True)
     ctrls = controllers(setup, args.policies, max_seeds=1 if args.quick else None)
+    if args.only:
+        keep = set(args.only.split(","))
+        ctrls = {k: v for k, v in ctrls.items() if k in keep}
     runners = make_runners(setup, ctrls)
     print(f"controllers: {', '.join(f'{k} x{len(v)}' for k, v in runners.items())}")
 
