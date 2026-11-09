@@ -64,3 +64,27 @@ def test_one_ppo_update_runs(setup):
     old, upd = jax.tree_util.tree_leaves(params), jax.tree_util.tree_leaves(new)
     moved = [np.abs(np.asarray(a) - np.asarray(b)).max() for a, b in zip(old, upd, strict=True)]
     assert max(moved) > 0
+
+
+def test_history_policy_sees_the_pending_command_and_runs_delayed(setup, tmp_path):
+    import json
+
+    from morphjax.rl import LEGACY_ACT_SCALE, load_policy, make_policy_lateral, training_scenario
+    from morphjax.sim import rollout
+
+    cfg = PPOConfig(steps=30, delay=1, history=1)
+    params = init_params(jax.random.PRNGKey(2), cfg)
+    assert params["pi"][0]["w"].shape[0] == 15  # 12 + one pending 3-vector
+    scen = training_scenario(jax.random.PRNGKey(5), cfg)
+    assert int(scen.delay) == 1
+    lat = make_policy_lateral(setup.schedules["gs"], params, cfg=cfg)
+    traj = rollout(setup.plant, setup.schedules["gs"], lat, scen)
+    assert np.isfinite(np.asarray(traj.xw)).all()
+    # the saved interface round-trips; a config without act_scale is a legacy policy
+    save_params(tmp_path / "h.npz", params)
+    (tmp_path / "h.json").write_text(json.dumps({"config": cfg._asdict()}))
+    _, back = load_policy(tmp_path / "h.npz")
+    assert back.history == 1 and tuple(back.act_scale) == (30.0, 30.0, 12.5)
+    save_params(tmp_path / "old.npz", init_params(jax.random.PRNGKey(0), PPOConfig()))
+    (tmp_path / "old.json").write_text(json.dumps({"config": {"hidden": 128}}))
+    assert tuple(load_policy(tmp_path / "old.npz")[1].act_scale) == LEGACY_ACT_SCALE

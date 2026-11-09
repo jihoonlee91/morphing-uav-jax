@@ -19,7 +19,6 @@ the state, not in the intermediate activations.
 
 from __future__ import annotations
 
-import time
 from collections.abc import Callable
 from functools import partial
 from typing import NamedTuple
@@ -29,18 +28,18 @@ import jax.numpy as jnp
 import optax
 
 from morphjax.control import Schedule
-from morphjax.dynamics import Plant, body_to_wind
+from morphjax.dynamics import Plant
 from morphjax.rl import (
+    ACT_LIMITS,
     Params,
     PPOConfig,
-    action_to_command,
+    deterministic_step,
     init_params,
-    observation,
-    policy_mean,
-    reward,
+    make_eval,
+    run_training,
     training_scenario,
 )
-from morphjax.sim import Carry, Scenario, closed_loop_step, initial_carry, measure
+from morphjax.sim import Carry, Scenario, initial_carry
 
 
 class DiffSimConfig(NamedTuple):
@@ -53,41 +52,48 @@ class DiffSimConfig(NamedTuple):
     hidden: int = 128
     domain_randomization: bool = False
     seed: int = 0
+    act_scale: tuple[float, float, float] = ACT_LIMITS
+    delay: int = -1  # fixed training delay (samples); see rl.PPOConfig
+    history: int = 0  # pending commands in the observation; see rl.PPOConfig
+    eval_every: int = 5
+    eval_envs: int = 64
+    # The cosine learning-rate decay spans every optimizer step (iters x windows).
+    # Up to bbafe40 it spanned only ``iters`` while each iteration takes
+    # episode // window = 5 steps, so the rate reached its floor at iteration 40;
+    # True restores that schedule.
+    legacy_lr_schedule: bool = False
 
 
-def _step(plant: Plant, lon: Schedule, params: Params, carry: Carry, prev, scen: Scenario, t):
+def policy_interface(cfg: DiffSimConfig) -> PPOConfig:
+    """The PPO-style config that fixes the network, observation, action and scenarios."""
+    return PPOConfig(
+        hidden=cfg.hidden, steps=cfg.episode, domain_randomization=cfg.domain_randomization,
+        act_scale=cfg.act_scale, delay=cfg.delay, history=cfg.history, eval_envs=cfg.eval_envs,
+    )  # fmt: skip
+
+
+def _step(plant: Plant, lon: Schedule, params: Params, carry: Carry, prev, scen: Scenario, t,
+          cfg: PPOConfig | None = None):  # fmt: skip
     """One deterministic closed-loop step; returns (carry, action, reward)."""
-    xw_meas, key = measure(carry, scen)
-    carry = carry._replace(key=key)
-    phi_cmd, eta_cmd = scen.phi_cmd[t], scen.eta_s_cmd[t]
-    obs, u0 = observation(lon, xw_meas, phi_cmd, carry.integ[2])
-    act = policy_mean(params, obs)
-    new, _ = closed_loop_step(
-        plant, lon, carry, action_to_command(u0, act), phi_cmd, eta_cmd, scen, xw_meas
-    )
-    r = reward(body_to_wind(new.x), phi_cmd, act, prev)
-    alive = ~carry.failed
-    r = jnp.where(new.failed & alive, -10.0, jnp.where(alive, r, 0.0))
-    return new, jnp.clip(act, -1.0, 1.0), r
+    return deterministic_step(plant, lon, params, carry, prev, scen, t, cfg)
 
 
 def make_train(plant: Plant, lon: Schedule, cfg: DiffSimConfig):
     """Return ``(init_state, update)``; one update = one window per environment."""
-    ppo_like = PPOConfig(
-        hidden=cfg.hidden, steps=cfg.episode, domain_randomization=cfg.domain_randomization
-    )
+    ppo_like = policy_interface(cfg)
+    windows = cfg.episode // cfg.window
+    decay_steps = cfg.iters if cfg.legacy_lr_schedule else cfg.iters * windows
     tx = optax.chain(
         optax.clip_by_global_norm(cfg.max_grad_norm),
-        optax.adam(optax.cosine_decay_schedule(cfg.lr, cfg.iters, alpha=0.1)),
+        optax.adam(optax.cosine_decay_schedule(cfg.lr, decay_steps, alpha=0.1)),
     )
-    windows = cfg.episode // cfg.window
 
     def init_state(key):
         params = init_params(key, ppo_like)
         return params, tx.init(params)
 
     def window_loss(params, carry, prev, scen, t0):
-        step = jax.checkpoint(partial(_step, plant, lon, params))
+        step = jax.checkpoint(partial(_step, plant, lon, params, cfg=ppo_like))
 
         def body(state, t):
             carry, prev = state
@@ -107,6 +113,8 @@ def make_train(plant: Plant, lon: Schedule, cfg: DiffSimConfig):
         )
         carry = jax.lax.stop_gradient(jax.vmap(partial(initial_carry, plant))(scen))
         prev = jnp.zeros((cfg.num_envs, 3))
+        # Each window starts from the state the policy reached; the delay buffer is
+        # part of that state, so a delayed loop is differentiated through it too.
 
         def one_window(state, w):
             params, opt_state, carry, prev = state
@@ -130,25 +138,11 @@ def make_train(plant: Plant, lon: Schedule, cfg: DiffSimConfig):
 
 
 def train(plant: Plant, lon: Schedule, cfg: DiffSimConfig, log: Callable[[str], None] = print):
-    """Train a policy by gradient ascent through the simulator."""
+    """Train by gradient ascent through the simulator; returns ``(params, history, timing)``."""
     init_state, update = make_train(plant, lon, cfg)
     key = jax.random.PRNGKey(cfg.seed)
     key, k0 = jax.random.split(key)
     params, opt_state = init_state(k0)
-    history: list[dict[str, float]] = []
-    t0 = time.time()
-    for i in range(cfg.iters):
-        key, k = jax.random.split(key)
-        params, opt_state, stats = update(params, opt_state, k)
-        row = {k: float(v) for k, v in stats.items()}
-        row["update"] = i
-        row["env_steps"] = (i + 1) * cfg.num_envs * cfg.episode
-        row["wall_s"] = time.time() - t0
-        history.append(row)
-        if i % 10 == 0 or i == cfg.iters - 1:
-            log(
-                f"iter {i:4d}  steps {row['env_steps']:>9,d}  return {row['return']:7.1f}  "
-                f"survival {row['survival']:.2f}  |g| {row['grad_norm']:.2e}  "
-                f"({row['wall_s']:.0f}s)"
-            )
-    return params, history
+    evaluate = make_eval(plant, lon, policy_interface(cfg), cfg.episode)
+    return run_training(update, params, opt_state, key, cfg.iters, cfg.num_envs * cfg.episode,
+                        evaluate, cfg.eval_every, log, "iter")  # fmt: skip

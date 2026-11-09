@@ -23,7 +23,7 @@ import jax.numpy as jnp
 import numpy as np
 
 from morphjax import diffsim, pipeline
-from morphjax.rl import PPOConfig, init_params, load_params, training_scenario
+from morphjax.rl import PPOConfig, init_params, load_policy, training_scenario
 from morphjax.sim import DT, initial_carry
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -44,9 +44,9 @@ def main() -> None:
     )
     carry0 = jax.vmap(partial(initial_carry, plant))(scen)
 
-    def grad_norm(params, horizon: int):
+    def grad_norm(params, pcfg, horizon: int):
         def ret(p):
-            step = jax.checkpoint(partial(diffsim._step, plant, lon, p))
+            step = jax.checkpoint(partial(diffsim._step, plant, lon, p, cfg=pcfg))
 
             def body(state, t):
                 carry, prev = state
@@ -60,15 +60,15 @@ def main() -> None:
         norm = jnp.sqrt(sum(jnp.sum(x * x) for x in jax.tree_util.tree_leaves(g)))
         return float(value), float(norm)
 
-    policies = {"untrained": init_params(jax.random.PRNGKey(0), PPOConfig())}
+    policies = {"untrained": (init_params(jax.random.PRNGKey(0), PPOConfig()), PPOConfig())}
     trained = ROOT / "results" / "policies" / "diffsim_nominal_seed0.npz"
     if trained.exists():
-        policies["trained (diff-sim seed 0)"] = load_params(trained, PPOConfig())
+        policies["trained (diff-sim seed 0)"] = load_policy(trained)
 
     out: dict = {"horizons_steps": list(HORIZONS), "dt": DT, "n_scenarios": N}
     out["policies"] = {}
-    for label, params in policies.items():
-        rows = [grad_norm(params, h) for h in HORIZONS]
+    for label, (params, pcfg) in policies.items():
+        rows = [grad_norm(params, pcfg, h) for h in HORIZONS]
         out["policies"][label] = {
             "return": [r[0] for r in rows],
             "grad_norm": [r[1] for r in rows],

@@ -14,10 +14,11 @@ import json
 import time
 from pathlib import Path
 
+import jax.numpy as jnp
 import numpy as np
 
 from morphjax import pipeline
-from morphjax.rl import RESIDUAL_SCALE, PPOConfig, load_params
+from morphjax.rl import RESIDUAL_SCALE, load_policy
 from morphjax.safety import (
     _relative_error,
     estimate_margin,
@@ -53,14 +54,14 @@ def main() -> None:
         if name in pipeline.PROJECTED:
             continue  # not linearizable at trim; checked by sampling below
         for f in sorted((ROOT / "results" / "policies").glob(f"{method}_{variant}_seed*.npz")):
-            params = load_params(f, PPOConfig())
+            params, pcfg = load_policy(f)
             if name in pipeline.RESIDUAL_BASE:
                 # Residual policies act on top of the base law: K = K_base + K_residual.
                 base = setup.lat_gains[pipeline.RESIDUAL_BASE[name]]
                 gains, saturated = policy_gains(params, dense, RESIDUAL_SCALE)
                 gains = gains + interpolate_gains(setup.grid, base, dense)
             else:
-                gains, saturated = policy_gains(params, dense)
+                gains, saturated = policy_gains(params, dense, jnp.asarray(pcfg.act_scale))
             checks = check_gains(setup, dense, gains)
             row = summarize(checks, on_grid)._asdict()
             row["seed_file"] = f.name

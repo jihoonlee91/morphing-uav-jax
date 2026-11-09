@@ -32,7 +32,7 @@ import numpy as np
 from morphjax import design, pipeline
 from morphjax.control import lateral_law, make_schedule
 from morphjax.dynamics import Cmd
-from morphjax.rl import ACT_SCALE, PPOConfig, reward, training_scenario
+from morphjax.rl import LEGACY_ACT_SCALE, PPOConfig, reward, training_scenario
 from morphjax.sim import DT, rollout
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -51,9 +51,14 @@ GRID = {
 }
 
 
-def episode_return(traj, scen) -> np.ndarray:
-    """PPO reward summed over each episode (actions ~ commands / ACT_SCALE)."""
-    act = traj.cmd[..., jnp.array([Cmd.DA, Cmd.DR, Cmd.ETA_A])] / ACT_SCALE
+def episode_return(traj, scen, act_scale=LEGACY_ACT_SCALE) -> np.ndarray:
+    """PPO reward summed over each episode (actions ~ commands / act_scale).
+
+    The committed ``results/lqr_weights.json`` was scored with the legacy +/-25 deg
+    action scale; the revision scores with the actuator limits (``rl.ACT_LIMITS``).
+    The scale only enters the small action and action-rate penalties.
+    """
+    act = traj.cmd[..., jnp.array([Cmd.DA, Cmd.DR, Cmd.ETA_A])] / jnp.asarray(act_scale)
     prev = jnp.concatenate([jnp.zeros_like(act[:, :1]), jnp.clip(act[:, :-1], -1, 1)], axis=1)
     r = jax.vmap(jax.vmap(reward))(traj.xw, scen.phi_cmd, act, prev)
     alive = ~traj.failed

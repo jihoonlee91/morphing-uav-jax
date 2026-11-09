@@ -43,7 +43,8 @@ def test_gradient_through_the_simulator_matches_finite_differences(setup):
             jax.tree_util.tree_leaves(g), jax.tree_util.tree_leaves(direction), strict=True
         )
     )
-    eps = 1e-5
+    # 1e-6: with the actuator-limit action scale a table breakpoint lies within 1e-5.
+    eps = 1e-6
 
     def shifted(s):
         return jax.tree_util.tree_map(lambda p, d: p + s * d, params, direction)
@@ -67,3 +68,12 @@ def test_one_training_iteration_runs(setup):
         )
         > 0
     )
+
+
+def test_lr_schedule_spans_every_window():
+    cfg = diffsim.DiffSimConfig(episode=40, window=20, iters=3)
+    # 3 iterations x 2 windows = 6 optimizer steps; the legacy schedule spanned 3
+    import optax
+
+    full = optax.cosine_decay_schedule(cfg.lr, cfg.iters * (cfg.episode // cfg.window), alpha=0.1)
+    assert float(full(3)) > 0.1 * cfg.lr * 1.01

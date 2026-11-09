@@ -22,7 +22,7 @@ import numpy as np
 from morphjax import design, pipeline
 from morphjax.control import lateral_law
 from morphjax.evaluation import Metrics, batch_rollout, scenario_metrics, summarize
-from morphjax.rl import PPOConfig, load_params, make_policy_lateral, training_scenario
+from morphjax.rl import PPOConfig, load_policy, make_policy_lateral, training_scenario
 from morphjax.safety import estimate_margin, make_projected_residual_lateral, make_safety_filter
 from morphjax.scenarios import sample_scenario
 from morphjax.sim import DT
@@ -87,16 +87,19 @@ def controllers(setup, policy_dir: Path, max_seeds: int | None = None):
                 out[name] = [
                     (
                         lon,
-                        make_projected_residual_lateral(lon, load_params(f, PPOConfig()), base, fl),
+                        make_projected_residual_lateral(lon, load_policy(f)[0], base, fl),
                     )
                     for f in files
                 ]
             else:
                 out[name] = [
-                    (lon, make_policy_lateral(lon, load_params(f, PPOConfig()), base))
-                    for f in files
+                    (lon, make_policy_lateral(lon, *_with_cfg(load_policy(f)), base)) for f in files
                 ]
     return out
+
+
+def _with_cfg(loaded):
+    return loaded[0], None, None, loaded[1]
 
 
 def pooled(metrics: list[Metrics]) -> Metrics:

@@ -117,13 +117,22 @@ def measure(carry: Carry, scen: Scenario) -> tuple[jnp.ndarray, jnp.ndarray]:
 
 
 def rollout(plant: Plant, lon: Schedule, lateral: LateralFn, scen: Scenario) -> Trajectory:
-    """Simulate one scenario for ``len(scen.phi_cmd)`` steps."""
+    """Simulate one scenario for ``len(scen.phi_cmd)`` steps.
+
+    A lateral function with ``uses_history = True`` (a policy that observes its
+    pending commands) is also passed the command buffer ``carry.buf``.
+    """
+    with_buf = getattr(lateral, "uses_history", False)
+    lateral_any: Callable[..., jnp.ndarray] = lateral
 
     def body(carry: Carry, inputs):
         phi_cmd, eta_s_cmd = inputs
         xw_meas, key = measure(carry, scen)
         carry = carry._replace(key=key)
-        lat_cmd = lateral(xw_meas, phi_cmd, carry.integ[2])
+        if with_buf:
+            lat_cmd = lateral_any(xw_meas, phi_cmd, carry.integ[2], carry.buf)
+        else:
+            lat_cmd = lateral(xw_meas, phi_cmd, carry.integ[2])
         new, cmd = closed_loop_step(plant, lon, carry, lat_cmd, phi_cmd, eta_s_cmd, scen, xw_meas)
         return new, (body_to_wind(carry.x), cmd, carry.failed)
 
