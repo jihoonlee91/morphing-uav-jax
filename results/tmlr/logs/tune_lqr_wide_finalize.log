@@ -1,0 +1,63 @@
+﻿tuning on 96 scenarios per distribution; grid {'phi': [1.0, 0.5, 0.25, 0.125], 'integ': [1.0, 0.5, 0.25, 0.125, 0.0625, 0.03125], 'beta': [1.0, 0.5, 0.25, 0.125], 'eta_a': [1.0, 4.0], 'effort': [0.25, 0.125, 0.0625, 0.03125]}
+{"nominal_constrained": [{"phi": 0.0625, "integ": 0.015625, "beta": 0.0625, "eta_a": 4.0, "effort": 0.015625}, 485.0877226459367, 481.6705569565306], "nominal_unconstrained": [{"phi": 2.0, "integ": 0.015625, "beta": 0.0625, "eta_a": 1.0, "effort": 0.5}, 495.97587400990784, null], "dr_constrained": [{"phi": 0.0625, "integ": 0.015625, "beta": 0.0625, "eta_a": 4.0, "effort": 0.015625}, 485.0877226459367, 481.6705569565306]}
+{"nominal_constrained": [{"phi": 0.03125, "integ": 0.0078125, "beta": 0.03125, "eta_a": 4.0, "effort": 0.0078125}, 485.09266658472006, 481.6748059946131], "nominal_unconstrained": [{"phi": 4.0, "integ": 0.0078125, "beta": 0.0625, "eta_a": 0.25, "effort": 1.0}, 496.2763710722185, null], "dr_constrained": [{"phi": 0.03125, "integ": 0.0078125, "beta": 0.03125, "eta_a": 4.0, "effort": 0.0078125}, 485.09266658472006, 481.6748059946131]}
+{"nominal_constrained": [{"phi": 0.03125, "integ": 0.0078125, "beta": 0.03125, "eta_a": 4.0, "effort": 0.0078125}, 485.09266658472006, 481.6748059946131], "nominal_unconstrained": [{"phi": 8.0, "integ": 0.00390625, "beta": 0.0625, "eta_a": 0.0625, "effort": 1.0}, 496.32789664190796, null], "dr_constrained": [{"phi": 0.03125, "integ": 0.0078125, "beta": 0.03125, "eta_a": 4.0, "effort": 0.0078125}, 485.09266658472006, 481.6748059946131]}
+[   160s] 2 candidates scored
+{
+ "optima_position": {
+  "nominal_constrained": {
+   "phi": "low edge",
+   "integ": "interior",
+   "beta": "low edge",
+   "eta_a": "interior",
+   "effort": "low edge"
+  },
+  "nominal_unconstrained": {
+   "phi": "high edge",
+   "integ": "low edge",
+   "beta": "interior",
+   "eta_a": "low edge",
+   "effort": "interior"
+  },
+  "dr_constrained": {
+   "phi": "low edge",
+   "integ": "interior",
+   "beta": "low edge",
+   "eta_a": "interior",
+   "effort": "low edge"
+  }
+ },
+ "heldout": {
+  "nominal_constrained": {
+   "nominal_return": 483.97830873837137,
+   "dr_return": 480.0565822503018,
+   "nominal_failures": 0,
+   "dr_failures": 0
+  },
+  "nominal_unconstrained": {
+   "nominal_return": 496.1315814436276,
+   "dr_return": 134.3195708045751,
+   "nominal_failures": 0,
+   "dr_failures": 183
+  },
+  "dr_constrained": {
+   "nominal_return": 483.97830873837137,
+   "dr_return": 480.0565822503018,
+   "nominal_failures": 0,
+   "dr_failures": 0
+  },
+  "original_constrained": {
+   "nominal_return": 483.9522217107812,
+   "dr_return": 480.03349141399787,
+   "nominal_failures": 0,
+   "dr_failures": 0
+  },
+  "original_unconstrained": {
+   "nominal_return": 494.5054379462381,
+   "dr_return": 351.2331538598726,
+   "nominal_failures": 0,
+   "dr_failures": 64
+  }
+ }
+}
+wrote C:\Users\user\Projects\morphing-flight-jax\results\tmlr\lqr_wide.json in 257s
