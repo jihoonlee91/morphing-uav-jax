@@ -38,6 +38,13 @@ def main() -> None:
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--iters", type=int, default=None, help="PPO updates / diff-sim iterations")
     ap.add_argument("--out", type=Path, default=ROOT / "results" / "policies")
+    ap.add_argument(
+        "--eval-every",
+        type=int,
+        default=None,
+        help="held-out evaluation interval (updates); evaluation does not touch the "
+        "training RNG, so a seed trains to the same policy at any interval",
+    )
     args = ap.parse_args()
 
     setup = pipeline.build_for_evaluation(ROOT / "results" / "lqr_weights.json", verbose=True)
@@ -59,11 +66,15 @@ def main() -> None:
         cfg = rl.PPOConfig(seed=args.seed, domain_randomization=dr, **lat, **clean)
         if args.iters:
             cfg = cfg._replace(updates=args.iters)
+        if args.eval_every:
+            cfg = cfg._replace(eval_every=args.eval_every)
         params, history, timing = rl.train(setup.plant, lon, cfg, base=base, residual_filter=filt)
     else:
         cfg = diffsim.DiffSimConfig(seed=args.seed, domain_randomization=dr, **lat)
         if args.iters:
             cfg = cfg._replace(iters=args.iters)
+        if args.eval_every:
+            cfg = cfg._replace(eval_every=args.eval_every)
         params, history, timing = diffsim.train(setup.plant, lon, cfg)
 
     args.out.mkdir(parents=True, exist_ok=True)
