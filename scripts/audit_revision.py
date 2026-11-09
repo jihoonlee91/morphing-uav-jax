@@ -81,7 +81,18 @@ def main() -> None:
     ap.add_argument("--metrics", type=Path, default=ROOT / "results" / "tmlr" / "metrics.json")
     ap.add_argument("--wide", type=Path, default=ROOT / "results" / "tmlr" / "lqr_wide.json")
     ap.add_argument("--out", type=Path, default=ROOT / "results" / "tmlr")
+    ap.add_argument(
+        "--pairs-only",
+        action="store_true",
+        help="recompute only the controller-delay pairs of an existing audit.json",
+    )
     args = ap.parse_args()
+    if args.pairs_only:
+        res = json.loads((args.out / "audit.json").read_text(encoding="utf-8"))
+        res["pairs"] = all_pairs(json.loads(args.metrics.read_text(encoding="utf-8")), res)
+        (args.out / "audit.json").write_text(json.dumps(res, indent=1), encoding="utf-8")
+        print(json.dumps({k: v for k, v in res["pairs"].items() if k != "pairs"}, indent=1))
+        return
     t0 = time.time()
     setup = pipeline.build_revision(ROOT / "results" / "lqr_weights.json", args.wide, verbose=True)
     dense, on_grid = dense_grid(setup)
@@ -102,8 +113,9 @@ def main() -> None:
 
     def check(kx_all, ku_all=None):
         """Per-point arrays: stability, tolerated delay, certificates."""
-        out = {k: np.zeros(shp) for k in ("max_real_eig", "max_delay_steps", "cert_lpv",
-                                          "cert_nodisk", "radius0")}  # fmt: skip
+        keys = ["max_real_eig", "max_delay_steps", "cert_lpv", "cert_nodisk", "radius0"]
+        keys += [f"stable_at_{20 * d}ms" for d in range(MAX_D + 1)]
+        out = {k: np.zeros(shp) for k in keys}
         for idx in np.ndindex(*shp):
             a, b = lat[idx]
             kx = kx_all[idx]
@@ -111,14 +123,15 @@ def main() -> None:
             ad, bd = zohs[idx]
             out["max_real_eig"][idx] = (float(np.real(np.linalg.eigvals(a + b @ kx)).max())
                                         if ku_all is None else np.nan)  # fmt: skip
-            d_ok = -1
+            d_ok, broken = -1, False
             for d in range(MAX_D + 1):
                 r = radius(ad, bd, kx, ku, d)
+                out[f"stable_at_{20 * d}ms"][idx] = r < 1.0
                 if d == 0:
                     out["radius0"][idx] = r
-                if r >= 1.0:
-                    break
-                d_ok = d
+                broken = broken or r >= 1.0
+                if not broken:
+                    d_ok = d
             out["max_delay_steps"][idx] = d_ok
             out["cert_lpv"][idx] = certified(a, b, kx, p_lpv) if ku_all is None else False
             out["cert_nodisk"][idx] = certified(a, b, kx, p_nodisk) if ku_all is None else False
@@ -139,6 +152,11 @@ def main() -> None:
                 str(20 * d): float((c["max_delay_steps"][env] >= d).mean())
                 for d in range(MAX_D + 1)
             },
+            # Stable with exactly this delay (a policy trained with 20 ms can be unstable
+            # at 0 ms yet stable at 20 ms; "tolerates" needs every smaller delay too).
+            "envelope_stable_at_ms": {
+                str(20 * d): float(c[f"stable_at_{20 * d}ms"][env].mean()) for d in range(MAX_D + 1)
+            },
             "all_points_tolerates_ms": {
                 str(20 * d): float((c["max_delay_steps"] >= d).mean()) for d in range(MAX_D + 1)
             },
@@ -154,7 +172,7 @@ def main() -> None:
         res["model_based"][name] = summary(c)
         for k, v in c.items():
             points[f"{name}/{k}"] = v
-        tol = res["model_based"][name]["envelope_tolerates_ms"]
+        tol = res["model_based"][name]["envelope_stable_at_ms"]
         print(f"[{time.time() - t0:5.0f}s] {name}: {tol}")
 
     lpv_dense = interpolate_gains(setup.grid, setup.lat_gains["lpv"], dense)
@@ -235,6 +253,10 @@ def main() -> None:
                     d: float(np.mean([r[mode]["envelope_tolerates_ms"][d] for r in rows]))
                     for d in rows[0][mode]["envelope_tolerates_ms"]
                 },
+                "envelope_stable_at_ms": {
+                    d: float(np.mean([r[mode]["envelope_stable_at_ms"][d] for r in rows]))
+                    for d in rows[0][mode]["envelope_stable_at_ms"]
+                },
                 "envelope_stable_per_seed": [r[mode]["envelope_stable"] for r in rows],
                 "certified_lpv_P_per_seed": [r[mode]["certified_lpv_P"] for r in rows],
                 "seeds_tolerating_20ms_somewhere": int(
@@ -242,7 +264,7 @@ def main() -> None:
                 ),
             }
         res["learned"][name] = {"seeds": rows, "pooled": pooled}
-        tx0, teq = pooled["x0"]["envelope_tolerates_ms"], pooled["eq"]["envelope_tolerates_ms"]
+        tx0, teq = pooled["x0"]["envelope_stable_at_ms"], pooled["eq"]["envelope_stable_at_ms"]
         print(f"[{time.time() - t0:5.0f}s] {name} x{len(rows)}: x0 {tx0} eq {teq}")
 
     if args.metrics.exists():
@@ -266,10 +288,10 @@ def all_pairs(m: dict, res: dict) -> dict:
         if name == "value":
             continue
         if name in res["model_based"]:
-            shares = {"x0": res["model_based"][name]["envelope_tolerates_ms"]}
+            shares = {"x0": res["model_based"][name]["envelope_stable_at_ms"]}
             shares["eq"] = shares["x0"]
         elif name in res["learned"]:
-            shares = {mode: res["learned"][name]["pooled"][mode]["envelope_tolerates_ms"]
+            shares = {mode: res["learned"][name]["pooled"][mode]["envelope_stable_at_ms"]
                       for mode in ("x0", "eq")}  # fmt: skip
         else:
             continue
