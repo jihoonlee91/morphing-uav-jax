@@ -94,7 +94,12 @@ def main() -> None:
         print(json.dumps({k: v for k, v in res["pairs"].items() if k != "pairs"}, indent=1))
         return
     t0 = time.time()
-    setup = pipeline.build_revision(ROOT / "results" / "lqr_weights.json", args.wide, verbose=True)
+    setup = pipeline.build_revision(
+        ROOT / "results" / "lqr_weights.json",
+        args.wide,
+        verbose=True,
+        lpv_tuned_path=ROOT / "results" / "tmlr" / "r3" / "lpv_tuned.json",
+    )
     dense, on_grid = dense_grid(setup)
     shp = dense.residual.shape
     pts = np.stack(np.meshgrid(dense.v_syn, dense.alt, dense.eta_s, indexing="ij"), -1)

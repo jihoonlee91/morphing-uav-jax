@@ -3,10 +3,10 @@
 Every design point is trimmed and linearized with JAX (vectorized with
 ``vmap``). Three lateral-directional designs are built on top:
 
-* ``fixed``  — one LQR designed at the nominal point and used everywhere.
-* ``gs``     — pointwise LQR at every grid point, gains interpolated online
+* ``fixed``  ??one LQR designed at the nominal point and used everywhere.
+* ``gs``     ??pointwise LQR at every grid point, gains interpolated online
   (classical gain scheduling: no guarantee while the parameters move).
-* ``lpv``    — a guaranteed-cost state feedback with one Lyapunov matrix shared
+* ``lpv``    ??a guaranteed-cost state feedback with one Lyapunov matrix shared
   by all grid points, found by LMI optimization. A common quadratic Lyapunov
   function certifies stability for arbitrarily fast parameter variation on the
   gridded LPV model, which is the property the paper relies on.
@@ -321,6 +321,7 @@ def lateral_gains_lpv_pointwise(
     decay: float = 0.1,
     radius: float = 30.0,
     solver: str = "CLARABEL",
+    disk: bool = True,
 ) -> tuple[np.ndarray, np.ndarray, list[str]]:
     """Ablation: the LMIs of :func:`lateral_gains_lpv` with a separate ``X_i`` per point.
 
@@ -348,8 +349,9 @@ def lateral_gains_lpv_pointwise(
             X >> 1e-6 * np.eye(n),
             cp.bmat([[Z, np.eye(n)], [np.eye(n), X]]) >> 0,
             0.5 * (blk + blk.T) << 0,
-            0.5 * (dsk + dsk.T) << 0,
         ]
+        if disk:
+            cons.append(0.5 * (dsk + dsk.T) << 0)
         prob = cp.Problem(cp.Minimize(cp.trace(Z)), cons)
         prob.solve(solver=solver)
         if X.value is None or Y.value is None:
@@ -360,3 +362,82 @@ def lateral_gains_lpv_pointwise(
         xs_out[idx] = Xv
         statuses.append(str(prob.status))
     return out, xs_out, statuses
+
+
+def lateral_gains_lpv_pd(
+    grid: DesignGrid,
+    weights: LatWeights | None = None,
+    rate_bounds: tuple[float, float] = (5.0, 80.0),
+    decay: float = 0.1,
+    radius: float = 30.0,
+    solver: str = "CLARABEL",
+) -> tuple[np.ndarray, dict]:
+    """Round 3: guaranteed-cost LPV state feedback with a parameter-dependent Lyapunov matrix.
+
+    ``X(rho) = X0 + v X1 + e X2`` with ``v = (V_syn - 90) / 30`` and
+    ``e = (eta_s + 12.5) / 12.5`` (affine in airspeed and symmetric span, constant in
+    altitude), and the parameter rates bounded by ``rate_bounds`` = (|dV_syn/dt| kt/s,
+    |d eta_s/dt| %/s). For every grid point and every vertex of the rate box:
+
+        [[A X + X A' + B Y + Y' B' - X-dot + 2 decay X,  X,  Y'], [X, -I, 0], [Y, 0, -I]] <= 0
+
+    with ``X-dot = v-dot X1 + e-dot X2``, plus the pole disk and ``[[Z, I], [I, X(rho)]] >= 0``
+    at every point; minimize ``trace(Z)``. ``K_i = Y_i X(rho_i)^-1``. With ``X1 = X2 = 0``
+    this is the common-X design, so it can only lower the cost bound.
+    """
+    xs, us = (weights or LatWeights()).scales()
+    n, m = 8, 3
+    xv = [cp.Variable((n, n), symmetric=True) for _ in range(3)]
+    Z = cp.Variable((n, n), symmetric=True)
+    vdot, edot = rate_bounds[0] / 30.0, rate_bounds[1] / 12.5
+    cons: list[cp.Constraint] = []
+    Ys, Xs = {}, {}
+    for idx in _grid_iter(grid.residual.shape):
+        v = (grid.v_syn[idx[0]] - 90.0) / 30.0
+        e = (grid.eta_s[idx[2]] + 12.5) / 12.5
+        X = xv[0] + v * xv[1] + e * xv[2]
+        Xs[idx] = (v, e)
+        a, b = _normalize(*lateral_model(grid.A[idx], grid.B[idx]), xs, us)
+        Y = cp.Variable((m, n))
+        Ys[idx] = Y
+        cons += [X >> 1e-6 * np.eye(n), cp.bmat([[Z, np.eye(n)], [np.eye(n), X]]) >> 0]
+        for sv in (-1.0, 1.0):
+            for se in (-1.0, 1.0):
+                xdot = sv * vdot * xv[1] + se * edot * xv[2]
+                lyap = a @ X + X @ a.T + b @ Y + Y.T @ b.T + 2 * decay * X - xdot
+                blk = cp.bmat([[lyap, X, Y.T], [X, -np.eye(n), np.zeros((n, m))],
+                               [Y, np.zeros((m, n)), -np.eye(m)]])  # fmt: skip
+                cons.append(0.5 * (blk + blk.T) << 0)
+        acl = a @ X + b @ Y
+        dsk = cp.bmat([[-radius * X, acl], [acl.T, -radius * X]])
+        cons.append(0.5 * (dsk + dsk.T) << 0)
+    prob = cp.Problem(cp.Minimize(cp.trace(Z)), cons)
+    prob.solve(solver=solver)
+    if xv[0].value is None:
+        raise RuntimeError(f"parameter-dependent LPV synthesis failed: {prob.status}")
+    vals = [0.5 * (np.asarray(x.value) + np.asarray(x.value).T) for x in xv]
+    out = np.zeros((*grid.residual.shape, m, n))
+    worst = -np.inf
+    for idx, Y in Ys.items():
+        v, e = Xs[idx]
+        Xi = vals[0] + v * vals[1] + e * vals[2]
+        kn = Y.value @ np.linalg.inv(Xi)
+        out[idx] = np.diag(us) @ kn @ np.diag(1.0 / xs)
+        a, b = _normalize(*lateral_model(grid.A[idx], grid.B[idx]), xs, us)
+        p = np.linalg.inv(Xi)
+        acl = a + b @ kn
+        for sv in (-1.0, 1.0):
+            for se in (-1.0, 1.0):
+                xdot = sv * vdot * vals[1] + se * edot * vals[2]
+                pdot = -p @ xdot @ p
+                worst = max(worst, float(np.linalg.eigvalsh(acl.T @ p + p @ acl + pdot).max()))
+    nx0 = np.linalg.norm(vals[0])
+    info = {
+        "status": str(prob.status),
+        "cost_bound": float(np.asarray(prob.value)),
+        "max_eig_lyapunov_derivative": worst,
+        "rate_bounds": list(rate_bounds),
+        "norm_X1_over_X0": float(np.linalg.norm(vals[1]) / nx0),
+        "norm_X2_over_X0": float(np.linalg.norm(vals[2]) / nx0),
+    }
+    return out, info

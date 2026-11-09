@@ -1,0 +1,19 @@
+{
+ "rates_5kt_s_80pct_s": {
+  "status": "optimal_inaccurate",
+  "cost_bound": 536.9861588412457,
+  "max_eig_lyapunov_derivative": -1.0302674856933123,
+  "rate_bounds": [
+   5.0,
+   80.0
+  ],
+  "norm_X1_over_X0": 0.2754840983872217,
+  "norm_X2_over_X0": 0.026229626532764113,
+  "linear_delay_margin_ms": 20.0
+ },
+ "rates_5kt_s_40pct_s": {
+  "failed": "Solver 'CLARABEL' failed. Try another solver, or solve with verbose=True for more information."
+ },
+ "common_X_cost_bound": 1923.8942753541858,
+ "wall_seconds": 181.6469202041626
+}

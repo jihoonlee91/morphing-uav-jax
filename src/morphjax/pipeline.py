@@ -7,6 +7,8 @@ import warnings
 from pathlib import Path
 from typing import NamedTuple
 
+import numpy as np
+
 from morphjax import design
 from morphjax.aero import build_aero_model
 from morphjax.control import Schedule, make_schedule
@@ -38,6 +40,7 @@ LABELS = {
     "lpv_nodisk": "LPV, no pole disk (ablation)",
     "lpv_pw_nodisk": "LPV, pointwise, no pole disk (ablation)",
     "lpv_tuned": "LPV, tuned multipliers (60 ms rule)",
+    "lpv_pd": "LPV, parameter-dependent Lyapunov matrix",
     "ppo_lat40": "PPO, trained with 40 ms delay",
     "diffsim_lat40": "Diff-sim, trained with 40 ms delay",
     "ppo_lat60": "PPO, trained with 60 ms delay",
@@ -178,10 +181,15 @@ def build_for_evaluation(weights_path: Path, verbose: bool = False) -> Setup:
 # Revision rows (results/tmlr): LQR designs from the bracketed search of
 # scripts/tune_lqr_wide.py and the two LPV ablations.
 WIDE_LQR = ("gs_wide", "gs_hg_wide", "gs_dr")
-LPV_ABLATIONS = ("lpv_pw", "lpv_nodisk")
+LPV_ABLATIONS = ("lpv_pw", "lpv_nodisk", "lpv_pw_nodisk", "lpv_tuned", "lpv_pd")
 
 
-def build_revision(weights_path: Path, wide_path: Path | None, verbose: bool = False) -> Setup:
+def build_revision(
+    weights_path: Path,
+    wide_path: Path | None,
+    verbose: bool = False,
+    lpv_tuned_path: Path | None = None,
+) -> Setup:
     """The evaluated set of the revision.
 
     The original designs keep the committed weights (``results/lqr_weights.json``),
@@ -201,8 +209,26 @@ def build_revision(weights_path: Path, wide_path: Path | None, verbose: bool = F
         warnings.simplefilter("ignore", UserWarning)
         nodisk = design.lateral_gains_lpv(setup.grid, setup.weights, disk=False)
         pw_gains, pw_x, pw_status = design.lateral_gains_lpv_pointwise(setup.grid, setup.weights)
+        # Round 3: the missing ablation cell (pointwise X and no pole disk), and the
+        # LPV design with multipliers tuned like the LQR (scripts/r3_tune_lpv.py).
+        pwnd_gains, _, _ = design.lateral_gains_lpv_pointwise(setup.grid, setup.weights, disk=False)
+        tuned = None
+        if (
+            lpv_tuned_path is not None
+            and Path(lpv_tuned_path).exists()
+            and json.loads(Path(lpv_tuned_path).read_text(encoding="utf-8")).get("lpv_tuned")
+        ):
+            tuned = design.lateral_gains_lpv(setup.grid, load_weights(lpv_tuned_path, "lpv_tuned"))
     k_lon = design.longitudinal_gains(setup.grid)
-    for name, g in (("lpv_nodisk", nodisk.gains), ("lpv_pw", pw_gains)):
+    extra_lpv = [("lpv_nodisk", nodisk.gains), ("lpv_pw", pw_gains), ("lpv_pw_nodisk", pwnd_gains)]
+    if tuned is not None:
+        extra_lpv.append(("lpv_tuned", tuned.gains))
+    # Round 3: parameter-dependent X(rho) design (design.lateral_gains_lpv_pd), solved
+    # once by scripts/r3_lpv_pd.py and stored next to lpv_tuned.json.
+    pd_path = Path(lpv_tuned_path).parent / "lpv_pd_gains.npy" if lpv_tuned_path else None
+    if pd_path is not None and pd_path.exists():
+        extra_lpv.append(("lpv_pd", np.load(pd_path)))
+    for name, g in extra_lpv:
         setup.lat_gains[name] = g
         setup.schedules[name] = make_schedule(setup.grid, k_lon, g)
     if verbose:

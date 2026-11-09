@@ -1,0 +1,75 @@
+# Round 3 P2 training queue
+scripts/train_policy.py --method ppo --variant lat40 --seed 0 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method diffsim --variant lat40 --seed 0 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method ppo --variant lat60 --seed 0 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method diffsim --variant lat60 --seed 0 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method ppo --variant ddr --seed 0 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method diffsim --variant ddr --seed 0 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method ppo --variant ddrh --seed 0 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method diffsim --variant ddrh --seed 0 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method diffsim --variant lin --seed 0 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method ppo --variant smooth --seed 0 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method diffsim --variant smooth --seed 0 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method ppo --variant lat40 --seed 1 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method diffsim --variant lat40 --seed 1 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method ppo --variant lat60 --seed 1 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method diffsim --variant lat60 --seed 1 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method ppo --variant ddr --seed 1 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method diffsim --variant ddr --seed 1 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method ppo --variant ddrh --seed 1 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method diffsim --variant ddrh --seed 1 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method diffsim --variant lin --seed 1 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method ppo --variant smooth --seed 1 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method diffsim --variant smooth --seed 1 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method ppo --variant lat40 --seed 2 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method diffsim --variant lat40 --seed 2 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method ppo --variant lat60 --seed 2 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method diffsim --variant lat60 --seed 2 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method ppo --variant ddr --seed 2 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method diffsim --variant ddr --seed 2 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method ppo --variant ddrh --seed 2 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method diffsim --variant ddrh --seed 2 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method diffsim --variant lin --seed 2 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method ppo --variant smooth --seed 2 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method diffsim --variant smooth --seed 2 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method ppo --variant lat40 --seed 3 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method diffsim --variant lat40 --seed 3 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method ppo --variant lat60 --seed 3 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method diffsim --variant lat60 --seed 3 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method ppo --variant ddr --seed 3 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method diffsim --variant ddr --seed 3 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method ppo --variant ddrh --seed 3 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method diffsim --variant ddrh --seed 3 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method diffsim --variant lin --seed 3 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method ppo --variant smooth --seed 3 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method diffsim --variant smooth --seed 3 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method ppo --variant lat40 --seed 4 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method diffsim --variant lat40 --seed 4 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method ppo --variant lat60 --seed 4 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method diffsim --variant lat60 --seed 4 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method ppo --variant ddr --seed 4 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method diffsim --variant ddr --seed 4 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method ppo --variant ddrh --seed 4 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method diffsim --variant ddrh --seed 4 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method diffsim --variant lin --seed 4 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method ppo --variant smooth --seed 4 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method diffsim --variant smooth --seed 4 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method ppo --variant rate100 --seed 0 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method ppo --variant ls0 --seed 0 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method ppo --variant ent --seed 0 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method ppo --variant rate100 --seed 1 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method ppo --variant ls0 --seed 1 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method ppo --variant ent --seed 1 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method ppo --variant rate100 --seed 2 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method ppo --variant ls0 --seed 2 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method ppo --variant ent --seed 2 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+scripts/train_policy.py --method ppo --variant nominal --seed 5 --eval-every 1 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/curves_fine
+scripts/train_policy.py --method diffsim --variant nominal --seed 5 --eval-every 1 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/curves_fine
+scripts/train_policy.py --method ppo --variant nominal --seed 6 --eval-every 1 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/curves_fine
+scripts/train_policy.py --method diffsim --variant nominal --seed 6 --eval-every 1 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/curves_fine
+scripts/train_policy.py --method ppo --variant nominal --seed 7 --eval-every 1 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/curves_fine
+scripts/train_policy.py --method diffsim --variant nominal --seed 7 --eval-every 1 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/curves_fine
+scripts/train_policy.py --method ppo --variant nominal --seed 8 --eval-every 1 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/curves_fine
+scripts/train_policy.py --method diffsim --variant nominal --seed 8 --eval-every 1 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/curves_fine
+scripts/train_policy.py --method ppo --variant nominal --seed 9 --eval-every 1 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/curves_fine
+scripts/train_policy.py --method diffsim --variant nominal --seed 9 --eval-every 1 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/curves_fine

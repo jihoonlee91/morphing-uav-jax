@@ -153,15 +153,34 @@ def main() -> None:
     ap.add_argument("--wide", type=Path, default=ROOT / "results" / "tmlr" / "lqr_wide.json")
     ap.add_argument("--no-figures", action="store_true")
     ap.add_argument("--only", default=None, help="comma-separated controllers to evaluate")
+    ap.add_argument("--conditions", default=None, help="comma-separated table conditions")
+    ap.add_argument("--sweeps", default=None, help="comma-separated sweeps")
+    ap.add_argument(
+        "--rate-limits",
+        default=None,
+        help="'surface_deg_s,wingtip_pct_s': fly with actuator rate limits (round-3 "
+        "sensitivity; the designs and policies are unchanged)",
+    )
     args = ap.parse_args()
     if args.quick:
         args.n, args.n_sweep = 4, 2
 
     t0 = time.time()
     if args.revision:
-        setup = pipeline.build_revision(args.weights, args.wide, verbose=True)
+        setup = pipeline.build_revision(
+            args.weights,
+            args.wide,
+            verbose=True,
+            lpv_tuned_path=ROOT / "results" / "tmlr" / "r3" / "lpv_tuned.json",
+        )
     else:
         setup = pipeline.build_for_evaluation(args.weights, verbose=True)
+    if args.rate_limits:
+        surf, morph = (float(v) for v in args.rate_limits.split(","))
+        setup = setup._replace(plant=setup.plant._replace(rate_limits=(surf, morph)))
+    conditions = {k: v for k, v in CONDITIONS.items()
+                  if not args.conditions or k in args.conditions.split(",")}  # fmt: skip
+    sweeps_run = {k: v for k, v in SWEEPS.items() if not args.sweeps or k in args.sweeps.split(",")}
     ctrls = controllers(setup, args.policies, max_seeds=1 if args.quick else None)
     if args.only:
         keep = set(args.only.split(","))
@@ -186,6 +205,8 @@ def main() -> None:
     table: dict[str, dict] = {}
     raw_example = None
     for i, (cond, (label, kw)) in enumerate(CONDITIONS.items()):
+        if cond not in conditions:
+            continue
         scen = scenarios(args.n, seed=1000 + i, **dict(kw))
         res = run(scen, f"table/{cond}")
         table[cond] = {"label": label, **{k: summarize(m) for k, m in res.items()}}
@@ -198,6 +219,8 @@ def main() -> None:
 
     sweeps: dict[str, dict] = {}
     for j, (sweep, (label, values, make_kw)) in enumerate(SWEEPS.items()):
+        if sweep not in sweeps_run:
+            continue
         rows = []
         for v in values:
             scen = scenarios(args.n_sweep, seed=2000 + 10 * j, **make_kw(v))
@@ -241,6 +264,7 @@ def main() -> None:
         "heldout_scenarios": {"seed": HELDOUT_SEED, "n": HELDOUT_N} if args.revision else None,
         "action_scale_for_returns": ACT_LIMITS if args.revision else LEGACY_ACT_SCALE,
         "policy_dir": str(args.policies),
+        "rate_limits": args.rate_limits,
         "steps": STEPS,
         "dt": DT,
         "n_per_condition": args.n,

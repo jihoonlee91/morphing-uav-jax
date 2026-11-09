@@ -1,0 +1,60 @@
+{
+ "discrete_decrease": {
+  "condition": "V(x+) <= exp(-2*lambda*T) V(x), T = 0.02 s, lambda = 0.1 (ZOH, true linearization)",
+  "exp_minus_2_lambda_T": 0.9960079893439915,
+  "margin_gamma_bar": 0.2810692891048965,
+  "lpv": {
+   "points_all_samples_decay": 325,
+   "points_all_samples_decrease": 325,
+   "min_share_decay": 1.0,
+   "median_share_decay": 1.0,
+   "max_V_ratio": 0.9491180109269551,
+   "max_violating_state_norm_normalized": 0.0,
+   "median_violating_state_norm_normalized": 0.0
+  },
+  "residual_dr": {
+   "points_all_samples_decay": 0,
+   "points_all_samples_decrease": 0,
+   "min_share_decay": 0.373046875,
+   "median_share_decay": 0.4169921875,
+   "max_V_ratio": 2917738.0786108985,
+   "max_violating_state_norm_normalized": 5.725605235376566,
+   "median_violating_state_norm_normalized": 1.5371218806783955
+  },
+  "residual_safe2": {
+   "points_all_samples_decay": 0,
+   "points_all_samples_decrease": 0,
+   "min_share_decay": 0.386962890625,
+   "median_share_decay": 0.448974609375,
+   "max_V_ratio": 2917738.0786108994,
+   "max_violating_state_norm_normalized": 4.522784842876164,
+   "median_violating_state_norm_normalized": 1.1763291471302633
+  }
+ },
+ "corner_refinement": {
+  "grid": "60-70 kt step 1, 0-2500 ft step 250, eta_s -25..0 step 2.5 (1,331 points)",
+  "sup_gamma": 0.23991403933202532,
+  "argmax": {
+   "v_syn": 65.0,
+   "h": 0.0,
+   "eta_s": -2.5
+  },
+  "sup_gamma_half_resolution_subgrid": 0.23234670437191546,
+  "points_above_margin_0.281": 0,
+  "margin": 0.2810692891048965,
+  "max_gamma_per_airspeed": [
+   0.036035221739332456,
+   0.07977561268314272,
+   0.11882731872043444,
+   0.16694984323231163,
+   0.21599767055230748,
+   0.23991403933202532,
+   0.23847136561112348,
+   0.2227513843189946,
+   0.1856620940359112,
+   0.12126686425521838,
+   0.014535919913992723
+  ]
+ },
+ "wall_seconds": 299.459508895874
+}

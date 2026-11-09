@@ -69,6 +69,9 @@ class Uncertainty(NamedTuple):
 class Plant(NamedTuple):
     aero: AeroModel
     airframe: Airframe = Airframe()
+    # Optional actuator rate limits (round-3 sensitivity study only; None = the model of
+    # the paper, which has none): (control surfaces deg/s, each wingtip %/s).
+    rate_limits: tuple[float, float] | None = None
 
 
 def engine_thrust(throttle: jnp.ndarray, h: jnp.ndarray) -> jnp.ndarray:
@@ -135,20 +138,27 @@ def forces_moments(plant: Plant, x: jnp.ndarray, unc: Uncertainty = Uncertainty(
     return f_aero + f_thr, m_aero + m_thr, m, J
 
 
-def actuator_rates(x: jnp.ndarray, cmd: jnp.ndarray, saturate: bool = True) -> jnp.ndarray:
+def actuator_rates(
+    x: jnp.ndarray, cmd: jnp.ndarray, saturate: bool = True, rate_limits=None
+) -> jnp.ndarray:
     """Time derivatives of the six actuator states."""
     surf_cmd = cmd[Cmd.DE : Cmd.DR + 1]
     if saturate:
         surf_cmd = jnp.clip(surf_cmd, SURFACE_LIMITS[:, 0], SURFACE_LIMITS[:, 1])
     eta_l_c, eta_r_c = morph_commands(cmd[Cmd.ETA_S], cmd[Cmd.ETA_A], saturate)
     thr_c = jnp.clip(cmd[Cmd.THR], 0.0, 100.0) if saturate else cmd[Cmd.THR]
-    return jnp.concatenate(
+    rates = jnp.concatenate(
         [
             OMEGA_SURFACE * (surf_cmd - x[Ix.DE : Ix.DR + 1]),
             OMEGA_MORPH * (jnp.array([eta_l_c, eta_r_c]) - x[Ix.ETA_L : Ix.ETA_R + 1]),
             jnp.array([(thr_c - x[Ix.THR]) / TAU_ENGINE]),
         ]
     )
+    if rate_limits is not None:
+        surf, morph = rate_limits
+        lim = jnp.array([surf, surf, surf, morph, morph, jnp.inf])
+        rates = jnp.clip(rates, -lim, lim)
+    return rates
 
 
 def state_derivative(
@@ -178,7 +188,13 @@ def state_derivative(
     ned_dot = dcm_body_to_ned(phi, theta, psi) @ vel
     pos_dot = jnp.array([ned_dot[0], ned_dot[1], -ned_dot[2]])
     return jnp.concatenate(
-        [vel_dot, omega_dot, euler_dot, pos_dot, actuator_rates(x, cmd, saturate)]
+        [
+            vel_dot,
+            omega_dot,
+            euler_dot,
+            pos_dot,
+            actuator_rates(x, cmd, saturate, plant.rate_limits),
+        ]
     )
 
 
