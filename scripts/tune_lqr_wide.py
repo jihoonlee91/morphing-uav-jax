@@ -63,6 +63,13 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", type=Path, default=ROOT / "results" / "tmlr" / "lqr_wide.json")
     ap.add_argument("--smoke", action="store_true", help="tiny run to test the script")
+    ap.add_argument(
+        "--from-log",
+        type=Path,
+        default=None,
+        help="finalize from the per-round optima printed by an interrupted run (re-scores "
+        "only the chosen designs; the full candidate list is then not available)",
+    )
     args = ap.parse_args()
     global N, HELDOUT_N, MAX_ROUNDS, GRID
     if args.smoke:
@@ -132,10 +139,22 @@ def main() -> None:
                 axes[k] = sorted({*axes[k], max(axes[k]) * STEP[k]})
     rounds = []
     prev_best: dict[str, float] = {}
-    for rnd in range(MAX_ROUNDS):
-        evaluate([tuple(w) for w in itertools.product(*(axes[k] for k in GRID))])
-        opts = {o: best(o) for o in OBJECTIVES}
-        rec = {"axes": {k: list(v) for k, v in axes.items()}, "candidates": len(cache),
+    logged = None
+    if args.from_log:
+        logged = []
+        for line in args.from_log.read_text(encoding="utf-8", errors="replace").splitlines():
+            if line.startswith('{"nominal_constrained"'):
+                raw = json.loads(line)
+                logged.append({o: {"weights": v[0], "nominal_return": v[1], "dr_return": v[2]}
+                               for o, v in raw.items()})  # fmt: skip
+    for rnd in range(len(logged) if logged else MAX_ROUNDS):
+        if logged:
+            opts = logged[rnd]
+        else:
+            evaluate([tuple(w) for w in itertools.product(*(axes[k] for k in GRID))])
+            opts = {o: best(o) for o in OBJECTIVES}
+        n_cand = int(np.prod([len(v) for v in axes.values()]))
+        rec = {"axes": {k: list(v) for k, v in axes.items()}, "candidates": n_cand,
                "optima": opts}  # fmt: skip
         rounds.append(rec)
         print(json.dumps({o: (r["weights"], r["nominal_return"], r["dr_return"])
@@ -159,6 +178,10 @@ def main() -> None:
 
     final = rounds[-1]["optima"]
     axes = rounds[-1]["axes"]  # the axes actually evaluated
+    if logged:
+        chosen_w = {o: tuple(r["weights"][k] for k in GRID) for o, r in final.items()}
+        evaluate(list(set(chosen_w.values())))
+        final = {o: cache[w] for o, w in chosen_w.items()}
     edges = {o: {k: ("low edge" if v == min(axes[k]) else "high edge" if v == max(axes[k])
                      else "interior") for k, v in r["weights"].items()}
              for o, r in final.items()}  # fmt: skip
@@ -205,7 +228,8 @@ def main() -> None:
         "rounds": rounds,
         "final_axes": axes,
         "optima_position": edges,
-        "top5": {o: top(o) for o in OBJECTIVES},
+        "top5": None if logged else {o: top(o) for o in OBJECTIVES},
+        "finalized_from_log": str(args.from_log) if logged else None,
         # pipeline.load_weights-compatible entries for the evaluation
         "gs_wide": final["nominal_constrained"],
         "gs_hg_wide": final["nominal_unconstrained"],
