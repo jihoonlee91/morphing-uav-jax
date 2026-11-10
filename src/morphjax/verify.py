@@ -189,7 +189,9 @@ def policy_command_full(
     raw = jnp.concatenate([dx, jnp.array([eta_s, v_syn, h, dx[3]])])
     obs = (raw - OBS_SHIFT) / OBS_SCALE
     if history > 0:
-        obs = jnp.concatenate([obs, jnp.tile(u_prev / scale, history)])
+        # u_prev: (3,) = every pending command equal, or (H, 3) = one row per lag
+        rows = jnp.tile(u_prev, (history, 1)) if u_prev.ndim == 1 else u_prev[:history]
+        obs = jnp.concatenate([obs, (rows / scale).reshape(-1)])
     act = policy_mean(params, obs)
     return scale * (jnp.clip(act, -1.0, 1.0) if clip else act)
 

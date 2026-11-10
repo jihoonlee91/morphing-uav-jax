@@ -59,19 +59,31 @@ def zoh(a, b):
     return e[:n, :n], e[:n, n:]
 
 
-def radius(ad, bd, kx, ku, d):
-    """verify.spectral_radius_hist with the ZOH matrices precomputed."""
+def radius(ad, bd, kx, ku, d, mask=False):
+    """Spectral radius of ``u_k = Kx x_k + sum_j Ku_j u_{k-j}`` applied ``d`` samples late.
+
+    ``ku`` is (3, 3) for one observed past command or (H, 3, 3) for H lags; with ``mask``
+    the lags the delay has already applied (j > d) are not observed (rl.observation).
+    State ``[x_k, u_{k-1}, ..., u_{k-D}]``, ``D = max(d, H, 1)``.
+    """
     n, m = bd.shape
-    big_d = max(d, 1)
+    ku = np.asarray(ku)
+    ku = ku[None] if ku.ndim == 2 else ku
+    h = ku.shape[0]
+    if mask:
+        ku = ku * (np.arange(h) < d)[:, None, None]
+    big_d = max(d, h, 1)
     big = np.zeros((n + big_d * m, n + big_d * m))
     big[:n, :n] = ad
     if d == 0:
         big[:n, :n] += bd @ kx
-        big[:n, n : n + m] += bd @ ku
+        for j in range(h):
+            big[:n, n + j * m : n + (j + 1) * m] += bd @ ku[j]
     else:
         big[:n, n + (d - 1) * m : n + d * m] = bd
     big[n : n + m, :n] = kx
-    big[n : n + m, n : n + m] = ku
+    for j in range(h):
+        big[n : n + m, n + j * m : n + (j + 1) * m] = ku[j]
     for j in range(1, big_d):
         big[n + j * m : n + (j + 1) * m, n + (j - 1) * m : n + j * m] = np.eye(m)
     return float(np.abs(np.linalg.eigvals(big)).max())
@@ -120,7 +132,7 @@ def main() -> None:
         acl = an + bn @ (np.diag(1 / us) @ kx @ np.diag(xs))
         return bool(np.linalg.eigvalsh(acl.T @ p + p @ acl).max() < 0)
 
-    def check(kx_all, ku_all=None):
+    def check(kx_all, ku_all=None, mask=False):
         """Per-point arrays: stability, tolerated delay, certificates."""
         keys = ["max_real_eig", "max_delay_steps", "cert_lpv", "cert_nodisk", "radius0"]
         keys += [f"stable_at_{20 * d}ms" for d in range(MAX_D + 1)]
@@ -134,7 +146,7 @@ def main() -> None:
                                         if ku_all is None else np.nan)  # fmt: skip
             d_ok, broken = -1, False
             for d in range(MAX_D + 1):
-                r = radius(ad, bd, kx, ku, d)
+                r = radius(ad, bd, kx, ku, d, mask)
                 out[f"stable_at_{20 * d}ms"][idx] = r < 1.0
                 if d == 0:
                     out["radius0"][idx] = r
@@ -208,7 +220,7 @@ def main() -> None:
                 pol = policy_command_full(params, dx, u, rho, scale, hist, clip)
                 return kb @ dx + pol if residual else pol
 
-            def newton(a, b, rho, kb, cmd=cmd):
+            def newton(a, b, rho, kb, cmd=cmd, hist=hist):
                 def resid(z):
                     return jnp.concatenate(
                         [a @ z[:8] + b @ z[8:], z[8:] - cmd(z[:8], z[8:], rho, kb)]
@@ -222,18 +234,27 @@ def main() -> None:
                     return cand[jnp.argmin(norms)], None
 
                 z, _ = jax.lax.scan(it, jnp.zeros(11), None, length=NEWTON_ITERS)
-                kx = jax.jacfwd(lambda xx: cmd(xx, z[8:], rho, kb))(z[:8])
-                ku = jax.jacfwd(lambda uu: cmd(z[:8], uu, rho, kb))(z[8:])
-                kx0 = jax.jacfwd(lambda xx: cmd(xx, jnp.zeros(3), rho, kb, False))(jnp.zeros(8))
-                ku0 = jax.jacfwd(lambda uu: cmd(jnp.zeros(8), uu, rho, kb, False))(jnp.zeros(3))
+                # Gains per observed lag (H, 3, 3): at equilibrium every pending command
+                # equals u*; at trim they are zero.
+                hh = max(hist, 1)
+                uh = jnp.tile(z[8:], (hh, 1))
+                kx = jax.jacfwd(lambda xx: cmd(xx, uh, rho, kb))(z[:8])
+                ku = jnp.moveaxis(jax.jacfwd(lambda uu: cmd(z[:8], uu, rho, kb))(uh), 1, 0)
+                z0 = jnp.zeros((hh, 3))
+                kx0 = jax.jacfwd(lambda xx: cmd(xx, z0, rho, kb, False))(jnp.zeros(8))
+                ku0 = jnp.moveaxis(
+                    jax.jacfwd(lambda uu: cmd(jnp.zeros(8), uu, rho, kb, False))(z0), 1, 0
+                )
                 return z, jnp.linalg.norm(resid(z)), kx, ku, kx0, ku0
 
             z, fres, kx, ku, kx0, ku0 = jax.jit(jax.vmap(newton))(a_all, b_all, flat_pts, kb_all)
             z, fres = np.asarray(z), np.asarray(fres)
             r3 = lambda x, s: np.asarray(x).reshape(*shp, *s)  # noqa: E731
             use_ku = hist > 0
-            c_x0 = check(r3(kx0, (3, 8)), r3(ku0, (3, 3)) if use_ku else None)
-            c_eq = check(r3(kx, (3, 8)), r3(ku, (3, 3)) if use_ku else None)
+            hh = max(hist, 1)
+            mask = bool(pcfg.mask_pending)
+            c_x0 = check(r3(kx0, (3, 8)), r3(ku0, (hh, 3, 3)) if use_ku else None, mask)
+            c_eq = check(r3(kx, (3, 8)), r3(ku, (hh, 3, 3)) if use_ku else None, mask)
             dx_n = z[:, :8] / xs
             row = {
                 "seed_file": f.name,
