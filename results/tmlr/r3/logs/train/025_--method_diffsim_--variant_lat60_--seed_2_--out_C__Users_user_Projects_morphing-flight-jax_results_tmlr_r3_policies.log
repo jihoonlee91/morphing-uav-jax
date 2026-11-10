@@ -1,0 +1,27 @@
+# slot 2 mask 0x7c00: scripts/train_policy.py --method diffsim --variant lat60 --seed 2 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+design grid: 63 points, max trim residual 4.5e-15; LPV optimal_inaccurate, Lyapunov margin -1.039; weights LatWeights(phi=0.125, integ=0.03125, beta=0.125, eta_a=4.0, effort=0.03125)
+iter    0  steps    32,000  return   343.1  survival 1.00  (3s)
+iter   10  steps   352,000  return   487.2  survival 1.00  (32s)
+iter   20  steps   672,000  return   491.8  survival 1.00  (59s)
+iter   30  steps   992,000  return   492.5  survival 1.00  (92s)
+iter   40  steps 1,312,000  return   492.9  survival 1.00  (129s)
+iter   50  steps 1,632,000  return   488.4  survival 1.00  (171s)
+iter   60  steps 1,952,000  return   494.5  survival 1.00  (215s)
+iter   70  steps 2,272,000  return   494.7  survival 1.00  (259s)
+iter   80  steps 2,592,000  return   494.7  survival 1.00  (306s)
+iter   90  steps 2,912,000  return   494.6  survival 1.00  (350s)
+iter  100  steps 3,232,000  return   494.5  survival 1.00  (396s)
+iter  110  steps 3,552,000  return   495.4  survival 1.00  (441s)
+iter  120  steps 3,872,000  return   494.5  survival 1.00  (481s)
+iter  130  steps 4,192,000  return   495.1  survival 1.00  (520s)
+iter  140  steps 4,512,000  return   495.0  survival 1.00  (554s)
+iter  150  steps 4,832,000  return   495.5  survival 1.00  (591s)
+iter  160  steps 5,152,000  return   495.0  survival 1.00  (629s)
+iter  170  steps 5,472,000  return   494.7  survival 1.00  (667s)
+iter  180  steps 5,792,000  return   495.3  survival 1.00  (710s)
+iter  190  steps 6,112,000  return   495.0  survival 1.00  (747s)
+iter  199  steps 6,400,000  return   495.1  eval   494.8  survival 1.00  (786s)
+saved C:\Users\user\Projects\morphing-flight-jax\results\tmlr\r3\policies\diffsim_lat60_seed2.npz
+
+# 973 s
+JOB OK

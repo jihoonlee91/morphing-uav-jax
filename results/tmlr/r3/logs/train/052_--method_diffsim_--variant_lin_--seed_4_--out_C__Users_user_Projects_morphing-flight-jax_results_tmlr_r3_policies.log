@@ -1,0 +1,27 @@
+# slot 1 mask 0x3e0: scripts/train_policy.py --method diffsim --variant lin --seed 4 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r3/policies
+design grid: 63 points, max trim residual 4.5e-15; LPV optimal_inaccurate, Lyapunov margin -1.039; weights LatWeights(phi=0.125, integ=0.03125, beta=0.125, eta_a=4.0, effort=0.03125)
+iter    0  steps    32,000  return   349.4  survival 1.00  (2s)
+iter   10  steps   352,000  return   447.1  survival 1.00  (23s)
+iter   20  steps   672,000  return   464.7  survival 1.00  (43s)
+iter   30  steps   992,000  return   478.2  survival 1.00  (64s)
+iter   40  steps 1,312,000  return   483.3  survival 1.00  (84s)
+iter   50  steps 1,632,000  return   486.3  survival 1.00  (102s)
+iter   60  steps 1,952,000  return   487.5  survival 1.00  (121s)
+iter   70  steps 2,272,000  return   490.7  survival 1.00  (137s)
+iter   80  steps 2,592,000  return   489.7  survival 1.00  (155s)
+iter   90  steps 2,912,000  return   491.1  survival 1.00  (174s)
+iter  100  steps 3,232,000  return   490.6  survival 1.00  (193s)
+iter  110  steps 3,552,000  return   491.8  survival 1.00  (213s)
+iter  120  steps 3,872,000  return   492.6  survival 1.00  (234s)
+iter  130  steps 4,192,000  return   493.7  survival 1.00  (256s)
+iter  140  steps 4,512,000  return   494.1  survival 1.00  (278s)
+iter  150  steps 4,832,000  return   493.6  survival 1.00  (300s)
+iter  160  steps 5,152,000  return   493.2  survival 1.00  (322s)
+iter  170  steps 5,472,000  return   494.0  survival 1.00  (343s)
+iter  180  steps 5,792,000  return   493.0  survival 1.00  (365s)
+iter  190  steps 6,112,000  return   493.0  survival 1.00  (386s)
+iter  199  steps 6,400,000  return   494.1  eval   493.0  survival 1.00  (405s)
+saved C:\Users\user\Projects\morphing-flight-jax\results\tmlr\r3\policies\diffsim_lin_seed4.npz
+
+# 542 s
+JOB OK

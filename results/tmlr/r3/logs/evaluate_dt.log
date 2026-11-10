@@ -1,0 +1,25 @@
+﻿design grid: 63 points, max trim residual 4.5e-15; LPV optimal_inaccurate, Lyapunov margin -1.039; weights LatWeights(phi=0.125, integ=0.03125, beta=0.125, eta_a=4.0, effort=0.03125)
+LPV no-disk optimal (margin -1.040); pointwise statuses ['optimal']
+controllers: residual_safe_dt x10
+[   456s] Frozen shape             residual_safe_dt: 1.24 deg / 100%
+[   573s] Fast morphing            residual_safe_dt: 1.20 deg / 100%
+[   680s] + noise, 40 ms delay     residual_safe_dt: 1.23 deg / 100%
+[   790s] + model error            residual_safe_dt: 1.25 deg / 100%
+[   885s] + aileron at 0-30 %      residual_safe_dt: 3.15 deg / 100%
+[  1413s] sweep morph_rate done
+[  1812s] sweep aileron done
+[  2144s] sweep delay done
+training-distribution return: {'residual_safe_dt': 481.79}
+| Controller | Frozen shape | Fast morphing | + noise, 40 ms delay | + model error | + aileron at 0-30 % |
+|---|---:|---:|---:|---:|---:|
+| LPV + residual, discrete-time Lyapunov filter | 1.24° · 100.0% | 1.20° · 100.0% | 1.23° · 100.0% | 1.25° · 100.0% | 3.15° · 100.0% |
+
+Cells: roll-tracking RMS error over successful runs · share of runs without loss of control. 95 % bootstrap intervals are in `metrics.json`.
+
+| Controller (fast morphing) | Sideslip, p95 of max | Command activity | RMS η_a |
+|---|---:|---:|---:|
+| LPV + residual, discrete-time Lyapunov filter | 0.87° | 0.32 /s | 0.54 % |
+
+Command activity: mean |du/dt| of aileron, rudder and asymmetric-span commands, each divided by its position limit (higher = busier actuators).
+
+done in 2445s

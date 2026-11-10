@@ -1,0 +1,23 @@
+﻿[  108s] gs: weakest rudder
+[  109s] gs_hg: weakest aileron
+[  110s] lpv: weakest aileron
+[  112s] fixed: weakest aileron
+uv : C:\Users\user\Projects\morphing-flight-jax\scripts\r3_margins.py:104: RuntimeWarning: All-NaN slice encountered
+At line:1 char:586
++ ... \audit.log; uv run python scripts/r3_margins.py --policies results/tm ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (C:\Users\user\P...ice encountered:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  "crossover_rad_s_median": float(np.nanmedian(s[:, c, 4])),
+[  113s] gs_hg_wide: weakest aileron
+[  115s] lpv_pw: weakest rudder
+[  117s] lpv_nodisk: weakest eta_a
+[  127s] ppo_ddr: weakest ['aileron', 'aileron', 'eta_a', 'eta_a', 'eta_a']
+[  135s] diffsim_ddr: weakest ['aileron', 'aileron', 'aileron', 'aileron', 'aileron']
+[  138s] diffsim_lin: weakest [None, None, None, None, None]
+[  140s] ppo_smooth: weakest [None, None, None, None, None]
+[  148s] diffsim_smooth: weakest ['rudder', 'rudder', 'rudder', 'rudder', 'rudder']
+[  156s] ppo_rate100: weakest ['aileron', 'aileron', 'aileron']
+[  159s] ppo_ls0: weakest [None, 'aileron', 'eta_a']
+[  165s] ppo_ent: weakest ['aileron', 'aileron', 'aileron']

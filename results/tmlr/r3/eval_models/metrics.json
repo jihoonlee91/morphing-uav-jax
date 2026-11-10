@@ -1,0 +1,1497 @@
+{
+ "meta": {
+  "training_distribution_return": {
+   "lpv_pw_nodisk": 485.3676705192115,
+   "lpv_tuned": 477.60581510774654,
+   "lpv_pd": 485.4057022680804
+  },
+  "training_distribution_return_per_seed": {
+   "lpv_pw_nodisk": [
+    485.3676705192115
+   ],
+   "lpv_tuned": [
+    477.60581510774654
+   ],
+   "lpv_pd": [
+    485.4057022680804
+   ]
+  },
+  "heldout_return": {
+   "nominal": {
+    "lpv_pw_nodisk": {
+     "mean": 484.2788827067402,
+     "per_seed": [
+      484.2788827067402
+     ]
+    },
+    "lpv_tuned": {
+     "mean": 475.93254911463566,
+     "per_seed": [
+      475.93254911463566
+     ]
+    },
+    "lpv_pd": {
+     "mean": 484.1979423980787,
+     "per_seed": [
+      484.1979423980787
+     ]
+    }
+   },
+   "dr": {
+    "lpv_pw_nodisk": {
+     "mean": 480.4322225734743,
+     "per_seed": [
+      480.4322225734743
+     ]
+    },
+    "lpv_tuned": {
+     "mean": 465.98895655258104,
+     "per_seed": [
+      465.98895655258104
+     ]
+    },
+    "lpv_pd": {
+     "mean": 471.7413842614034,
+     "per_seed": [
+      471.7413842614034
+     ]
+    }
+   }
+  },
+  "heldout_scenarios": {
+   "seed": 1007,
+   "n": 256
+  },
+  "action_scale_for_returns": [
+   30.0,
+   30.0,
+   12.5
+  ],
+  "policy_dir": "results\\tmlr\\policies",
+  "rate_limits": null,
+  "steps": 750,
+  "dt": 0.02,
+  "n_per_condition": 256,
+  "n_per_sweep_point": 128,
+  "seeds_per_controller": {
+   "lpv_pw_nodisk": 1,
+   "lpv_tuned": 1,
+   "lpv_pd": 1
+  },
+  "lqr_weights": {
+   "phi": 0.125,
+   "integ": 0.03125,
+   "beta": 0.125,
+   "eta_a": 4.0,
+   "effort": 0.03125
+  },
+  "linear_delay_margin_ms": {
+   "fixed": -20.0,
+   "gs": 60.0,
+   "lpv": 40.0,
+   "gs_hg": 0.0,
+   "gs_wide": 60.0,
+   "gs_hg_wide": -20.0,
+   "gs_dr": 60.0,
+   "lpv_nodisk": 0.0,
+   "lpv_pw": 40.0,
+   "lpv_pw_nodisk": 40.0,
+   "lpv_tuned": 40.0,
+   "lpv_pd": 20.0
+  },
+  "lpv": {
+   "status": "optimal_inaccurate",
+   "lyapunov_margin": -1.0386750514449719,
+   "cost_bound": 1923.8942753541858
+  },
+  "max_trim_residual": 4.46274888719354e-15,
+  "wall_seconds": 868.0524926185608
+ },
+ "table": {
+  "nominal": {
+   "label": "Frozen shape",
+   "lpv_pw_nodisk": {
+    "n": 256,
+    "success_rate": 1.0,
+    "success_ci": [
+     1.0,
+     1.0
+    ],
+    "roll_rmse_deg": 1.042858667152384,
+    "roll_rmse_ci": [
+     0.9986156355156487,
+     1.0910539270786108
+    ],
+    "max_beta_deg_p95": 0.7068972926079453,
+    "max_alt_dev_ft_p95": 0.5894157260423754,
+    "rms_aileron_deg": 1.3169375016056055,
+    "rms_eta_a": 0.335699639227134,
+    "cmd_activity": 0.13397991019896355
+   },
+   "lpv_tuned": {
+    "n": 256,
+    "success_rate": 1.0,
+    "success_ci": [
+     1.0,
+     1.0
+    ],
+    "roll_rmse_deg": 1.393785363487168,
+    "roll_rmse_ci": [
+     1.3370434212641376,
+     1.4558028376401202
+    ],
+    "max_beta_deg_p95": 1.379226821497733,
+    "max_alt_dev_ft_p95": 0.7981568750233237,
+    "rms_aileron_deg": 1.7190763377685692,
+    "rms_eta_a": 0.3541525848085627,
+    "cmd_activity": 0.1786534089443666
+   },
+   "lpv_pd": {
+    "n": 256,
+    "success_rate": 1.0,
+    "success_ci": [
+     1.0,
+     1.0
+    ],
+    "roll_rmse_deg": 1.0139962184670712,
+    "roll_rmse_ci": [
+     0.9702846968316227,
+     1.0612443787632129
+    ],
+    "max_beta_deg_p95": 1.0502332886131203,
+    "max_alt_dev_ft_p95": 0.6347272290533965,
+    "rms_aileron_deg": 1.2837231719332975,
+    "rms_eta_a": 0.3984851265514813,
+    "cmd_activity": 0.12672516970004266
+   }
+  },
+  "fast_morph": {
+   "label": "Fast morphing",
+   "lpv_pw_nodisk": {
+    "n": 256,
+    "success_rate": 1.0,
+    "success_ci": [
+     1.0,
+     1.0
+    ],
+    "roll_rmse_deg": 1.0057270040697832,
+    "roll_rmse_ci": [
+     0.9611962265432107,
+     1.05152840036205
+    ],
+    "max_beta_deg_p95": 0.7109044714704188,
+    "max_alt_dev_ft_p95": 0.68119986611282,
+    "rms_aileron_deg": 1.2716759028620863,
+    "rms_eta_a": 0.3220487422446688,
+    "cmd_activity": 0.13010297121285253
+   },
+   "lpv_tuned": {
+    "n": 256,
+    "success_rate": 1.0,
+    "success_ci": [
+     1.0,
+     1.0
+    ],
+    "roll_rmse_deg": 1.345123135248536,
+    "roll_rmse_ci": [
+     1.2877539945351846,
+     1.404213489634678
+    ],
+    "max_beta_deg_p95": 1.4322055496079784,
+    "max_alt_dev_ft_p95": 0.8715755439404802,
+    "rms_aileron_deg": 1.6592410118469296,
+    "rms_eta_a": 0.35302555093470034,
+    "cmd_activity": 0.17507483393539514
+   },
+   "lpv_pd": {
+    "n": 256,
+    "success_rate": 1.0,
+    "success_ci": [
+     1.0,
+     1.0
+    ],
+    "roll_rmse_deg": 0.975049700300466,
+    "roll_rmse_ci": [
+     0.9313060294349642,
+     1.0198219489002154
+    ],
+    "max_beta_deg_p95": 1.0765307786039626,
+    "max_alt_dev_ft_p95": 0.7434638063862167,
+    "rms_aileron_deg": 1.2434109727561773,
+    "rms_eta_a": 0.37993235416561466,
+    "cmd_activity": 0.12347068720807877
+   }
+  },
+  "noise_delay": {
+   "label": "+ noise, 40 ms delay",
+   "lpv_pw_nodisk": {
+    "n": 256,
+    "success_rate": 1.0,
+    "success_ci": [
+     1.0,
+     1.0
+    ],
+    "roll_rmse_deg": 1.053355413177868,
+    "roll_rmse_ci": [
+     1.007979704735587,
+     1.1007639480334666
+    ],
+    "max_beta_deg_p95": 0.8944810538145921,
+    "max_alt_dev_ft_p95": 2.8287770327174258,
+    "rms_aileron_deg": 1.4176041415579812,
+    "rms_eta_a": 0.3513554337768968,
+    "cmd_activity": 3.16209101739012
+   },
+   "lpv_tuned": {
+    "n": 256,
+    "success_rate": 1.0,
+    "success_ci": [
+     1.0,
+     1.0
+    ],
+    "roll_rmse_deg": 1.4717373772282856,
+    "roll_rmse_ci": [
+     1.4082097216808784,
+     1.5370914658920372
+    ],
+    "max_beta_deg_p95": 1.6489620344417113,
+    "max_alt_dev_ft_p95": 2.8337680282240854,
+    "rms_aileron_deg": 1.741745936500799,
+    "rms_eta_a": 0.5538851567125227,
+    "cmd_activity": 6.713683974765617
+   },
+   "lpv_pd": {
+    "n": 256,
+    "success_rate": 1.0,
+    "success_ci": [
+     1.0,
+     1.0
+    ],
+    "roll_rmse_deg": 1.02049222001023,
+    "roll_rmse_ci": [
+     0.9756971247207595,
+     1.0672796029379694
+    ],
+    "max_beta_deg_p95": 1.2731991058480803,
+    "max_alt_dev_ft_p95": 2.828961420540736,
+    "rms_aileron_deg": 1.4116974506998978,
+    "rms_eta_a": 0.42586395953866585,
+    "cmd_activity": 4.748806486188845
+   }
+  },
+  "model_error": {
+   "label": "+ model error",
+   "lpv_pw_nodisk": {
+    "n": 256,
+    "success_rate": 1.0,
+    "success_ci": [
+     1.0,
+     1.0
+    ],
+    "roll_rmse_deg": 1.0412951557979948,
+    "roll_rmse_ci": [
+     0.9962349239227606,
+     1.0887846385404207
+    ],
+    "max_beta_deg_p95": 0.7178415210254042,
+    "max_alt_dev_ft_p95": 0.7384385720202999,
+    "rms_aileron_deg": 1.3233532824935328,
+    "rms_eta_a": 0.3285243945493794,
+    "cmd_activity": 0.1323495020050191
+   },
+   "lpv_tuned": {
+    "n": 256,
+    "success_rate": 1.0,
+    "success_ci": [
+     1.0,
+     1.0
+    ],
+    "roll_rmse_deg": 1.3985271811231303,
+    "roll_rmse_ci": [
+     1.3409844520235763,
+     1.4575677626275958
+    ],
+    "max_beta_deg_p95": 1.3782972509526592,
+    "max_alt_dev_ft_p95": 0.9164314309072097,
+    "rms_aileron_deg": 1.7263605681876144,
+    "rms_eta_a": 0.36061515393016075,
+    "cmd_activity": 0.18111037826948048
+   },
+   "lpv_pd": {
+    "n": 256,
+    "success_rate": 1.0,
+    "success_ci": [
+     1.0,
+     1.0
+    ],
+    "roll_rmse_deg": 1.0101335588787204,
+    "roll_rmse_ci": [
+     0.9662551236756899,
+     1.0564166972049926
+    ],
+    "max_beta_deg_p95": 1.0635234255327244,
+    "max_alt_dev_ft_p95": 0.7762436151430165,
+    "rms_aileron_deg": 1.2875165516797793,
+    "rms_eta_a": 0.39406217382372144,
+    "cmd_activity": 0.12648107805185377
+   }
+  },
+  "aileron_fail": {
+   "label": "+ aileron at 0-30 %",
+   "lpv_pw_nodisk": {
+    "n": 256,
+    "success_rate": 1.0,
+    "success_ci": [
+     1.0,
+     1.0
+    ],
+    "roll_rmse_deg": 2.6027767713324987,
+    "roll_rmse_ci": [
+     2.4565498235701453,
+     2.7569304043582954
+    ],
+    "max_beta_deg_p95": 0.8609555054878371,
+    "max_alt_dev_ft_p95": 0.9980910775552161,
+    "rms_aileron_deg": 4.557263743546541,
+    "rms_eta_a": 1.367290122305727,
+    "cmd_activity": 0.49202718545784263
+   },
+   "lpv_tuned": {
+    "n": 256,
+    "success_rate": 1.0,
+    "success_ci": [
+     1.0,
+     1.0
+    ],
+    "roll_rmse_deg": 3.2681115763189545,
+    "roll_rmse_ci": [
+     3.0971222478671208,
+     3.453067786055664
+    ],
+    "max_beta_deg_p95": 2.11470844001182,
+    "max_alt_dev_ft_p95": 1.6828746254609825,
+    "rms_aileron_deg": 7.2584254469825,
+    "rms_eta_a": 1.553653485581861,
+    "cmd_activity": 0.47202116655203685
+   },
+   "lpv_pd": {
+    "n": 256,
+    "success_rate": 1.0,
+    "success_ci": [
+     1.0,
+     1.0
+    ],
+    "roll_rmse_deg": 2.2801685910210603,
+    "roll_rmse_ci": [
+     2.161847751971198,
+     2.4054804500695806
+    ],
+    "max_beta_deg_p95": 1.383692744171813,
+    "max_alt_dev_ft_p95": 0.951654365964373,
+    "rms_aileron_deg": 4.719979638966942,
+    "rms_eta_a": 1.3585871432342038,
+    "cmd_activity": 0.4546585984279179
+   }
+  }
+ },
+ "sweeps": {
+  "morph_rate": {
+   "label": "Symmetric-morphing command rate (%/s)",
+   "rows": [
+    {
+     "value": 0.0,
+     "lpv_pw_nodisk": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 0.9872597777809886,
+      "roll_rmse_ci": [
+       0.9223764850180006,
+       1.0561253035712639
+      ],
+      "max_beta_deg_p95": 0.6636898147418363,
+      "max_alt_dev_ft_p95": 0.5383074863447291,
+      "rms_aileron_deg": 1.2646271268013631,
+      "rms_eta_a": 0.309866258204884,
+      "cmd_activity": 0.1242007370066323
+     },
+     "lpv_tuned": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.3227898804422749,
+      "roll_rmse_ci": [
+       1.2358410475898647,
+       1.41420348149981
+      ],
+      "max_beta_deg_p95": 1.415019872705477,
+      "max_alt_dev_ft_p95": 0.7238052375525512,
+      "rms_aileron_deg": 1.6337869618144178,
+      "rms_eta_a": 0.3384357536270156,
+      "cmd_activity": 0.1687523474563796
+     },
+     "lpv_pd": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 0.9576584866129181,
+      "roll_rmse_ci": [
+       0.8937803074069006,
+       1.025903842430958
+      ],
+      "max_beta_deg_p95": 1.0362097060672957,
+      "max_alt_dev_ft_p95": 0.5697827059747851,
+      "rms_aileron_deg": 1.2231424954625054,
+      "rms_eta_a": 0.38304525706744924,
+      "cmd_activity": 0.11970999714454218
+     }
+    },
+    {
+     "value": 1.0,
+     "lpv_pw_nodisk": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 0.9847138803485471,
+      "roll_rmse_ci": [
+       0.919937560976797,
+       1.0530532840276194
+      ],
+      "max_beta_deg_p95": 0.6822925958290074,
+      "max_alt_dev_ft_p95": 0.5319387686072331,
+      "rms_aileron_deg": 1.2583221901827635,
+      "rms_eta_a": 0.3189496990316192,
+      "cmd_activity": 0.12266340389231509
+     },
+     "lpv_tuned": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.3225028681524011,
+      "roll_rmse_ci": [
+       1.2355716219221624,
+       1.4139714477284175
+      ],
+      "max_beta_deg_p95": 1.404785509455481,
+      "max_alt_dev_ft_p95": 0.7339230258728546,
+      "rms_aileron_deg": 1.6315551196609863,
+      "rms_eta_a": 0.3402593024385091,
+      "cmd_activity": 0.16552778671852092
+     },
+     "lpv_pd": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 0.9564693099365253,
+      "roll_rmse_ci": [
+       0.8923182506382012,
+       1.0249977652341267
+      ],
+      "max_beta_deg_p95": 1.0292325777210152,
+      "max_alt_dev_ft_p95": 0.5607728313339976,
+      "rms_aileron_deg": 1.2174209581662874,
+      "rms_eta_a": 0.3913103213469238,
+      "cmd_activity": 0.11745858218373442
+     }
+    },
+    {
+     "value": 2.5,
+     "lpv_pw_nodisk": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 0.9841676208026362,
+      "roll_rmse_ci": [
+       0.9195392552940348,
+       1.0526662558526605
+      ],
+      "max_beta_deg_p95": 0.6854994368447029,
+      "max_alt_dev_ft_p95": 0.5182860174763845,
+      "rms_aileron_deg": 1.2581082166300872,
+      "rms_eta_a": 0.31975481164578123,
+      "cmd_activity": 0.12266758024050406
+     },
+     "lpv_tuned": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.3225480628941466,
+      "roll_rmse_ci": [
+       1.2360085784033665,
+       1.4141446010230174
+      ],
+      "max_beta_deg_p95": 1.4059471691077494,
+      "max_alt_dev_ft_p95": 0.7354603936666989,
+      "rms_aileron_deg": 1.6304400421101892,
+      "rms_eta_a": 0.3396847727710539,
+      "cmd_activity": 0.16531504388679535
+     },
+     "lpv_pd": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 0.9562302586896694,
+      "roll_rmse_ci": [
+       0.8919539445027381,
+       1.0252603280765047
+      ],
+      "max_beta_deg_p95": 1.023762355212892,
+      "max_alt_dev_ft_p95": 0.5626021597396401,
+      "rms_aileron_deg": 1.2171590017333238,
+      "rms_eta_a": 0.39168095050967533,
+      "cmd_activity": 0.11726680439531613
+     }
+    },
+    {
+     "value": 5.0,
+     "lpv_pw_nodisk": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 0.9837912649501139,
+      "roll_rmse_ci": [
+       0.9187154273590685,
+       1.0532039795700052
+      ],
+      "max_beta_deg_p95": 0.6885562438961321,
+      "max_alt_dev_ft_p95": 0.5172347116488538,
+      "rms_aileron_deg": 1.2580648388866562,
+      "rms_eta_a": 0.3202588348708634,
+      "cmd_activity": 0.12279987250809571
+     },
+     "lpv_tuned": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.3223269109964666,
+      "roll_rmse_ci": [
+       1.2358337483042094,
+       1.414458553539515
+      ],
+      "max_beta_deg_p95": 1.3986608850319469,
+      "max_alt_dev_ft_p95": 0.7177204122086095,
+      "rms_aileron_deg": 1.6315015013708796,
+      "rms_eta_a": 0.3413676748046171,
+      "cmd_activity": 0.16540827331850588
+     },
+     "lpv_pd": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 0.9557201924778455,
+      "roll_rmse_ci": [
+       0.891421207620461,
+       1.024801910651738
+      ],
+      "max_beta_deg_p95": 1.031906882488258,
+      "max_alt_dev_ft_p95": 0.5611755518442351,
+      "rms_aileron_deg": 1.2178116268143748,
+      "rms_eta_a": 0.39016454497574254,
+      "cmd_activity": 0.11718224068023687
+     }
+    },
+    {
+     "value": 10.0,
+     "lpv_pw_nodisk": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 0.9850967539883078,
+      "roll_rmse_ci": [
+       0.9194099438132857,
+       1.0557272937349025
+      ],
+      "max_beta_deg_p95": 0.6825617519508481,
+      "max_alt_dev_ft_p95": 0.5817149672367578,
+      "rms_aileron_deg": 1.2624523094274624,
+      "rms_eta_a": 0.3147291198016489,
+      "cmd_activity": 0.1240103949956553
+     },
+     "lpv_tuned": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.3221398820357635,
+      "roll_rmse_ci": [
+       1.2353128824057806,
+       1.4144209557056338
+      ],
+      "max_beta_deg_p95": 1.3898993411224612,
+      "max_alt_dev_ft_p95": 0.7601806482947268,
+      "rms_aileron_deg": 1.6357595192359518,
+      "rms_eta_a": 0.3423582317216597,
+      "cmd_activity": 0.16783626587360695
+     },
+     "lpv_pd": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 0.9560300042867091,
+      "roll_rmse_ci": [
+       0.8918487240463325,
+       1.025319405445368
+      ],
+      "max_beta_deg_p95": 1.0183145325315932,
+      "max_alt_dev_ft_p95": 0.6308338148453798,
+      "rms_aileron_deg": 1.2231319218493213,
+      "rms_eta_a": 0.3831144354201982,
+      "cmd_activity": 0.11844211956858124
+     }
+    },
+    {
+     "value": 25.0,
+     "lpv_pw_nodisk": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 0.9862165185251792,
+      "roll_rmse_ci": [
+       0.920822567201633,
+       1.0569899651928043
+      ],
+      "max_beta_deg_p95": 0.679689950690797,
+      "max_alt_dev_ft_p95": 0.6475546657705308,
+      "rms_aileron_deg": 1.2666103541796954,
+      "rms_eta_a": 0.3101118586268448,
+      "cmd_activity": 0.12513437894914103
+     },
+     "lpv_tuned": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.32209887559242,
+      "roll_rmse_ci": [
+       1.2360594620984389,
+       1.414565266205888
+      ],
+      "max_beta_deg_p95": 1.3754714336002634,
+      "max_alt_dev_ft_p95": 0.8331442551440431,
+      "rms_aileron_deg": 1.6387090774415278,
+      "rms_eta_a": 0.3412940818343352,
+      "cmd_activity": 0.16970255402845524
+     },
+     "lpv_pd": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 0.9561198895600538,
+      "roll_rmse_ci": [
+       0.8918358470894062,
+       1.0253868655278364
+      ],
+      "max_beta_deg_p95": 1.0078991550917333,
+      "max_alt_dev_ft_p95": 0.6934727929153893,
+      "rms_aileron_deg": 1.228248350626407,
+      "rms_eta_a": 0.3770445369039942,
+      "cmd_activity": 0.11983038839813606
+     }
+    },
+    {
+     "value": 50.0,
+     "lpv_pw_nodisk": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 0.9867318707802664,
+      "roll_rmse_ci": [
+       0.9212070345175143,
+       1.0571863944721056
+      ],
+      "max_beta_deg_p95": 0.6798322402755923,
+      "max_alt_dev_ft_p95": 0.6789486241348412,
+      "rms_aileron_deg": 1.267806653320031,
+      "rms_eta_a": 0.3094199315701754,
+      "cmd_activity": 0.1255755924518297
+     },
+     "lpv_tuned": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.3222854824522976,
+      "roll_rmse_ci": [
+       1.2364499000282971,
+       1.4147472398436507
+      ],
+      "max_beta_deg_p95": 1.3739379366995974,
+      "max_alt_dev_ft_p95": 0.8634770279039913,
+      "rms_aileron_deg": 1.6390341822222707,
+      "rms_eta_a": 0.3406460876997325,
+      "cmd_activity": 0.17052770059088473
+     },
+     "lpv_pd": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 0.9562908325228595,
+      "roll_rmse_ci": [
+       0.8919481445061954,
+       1.0255424130107882
+      ],
+      "max_beta_deg_p95": 1.0086303132055845,
+      "max_alt_dev_ft_p95": 0.7410978561680676,
+      "rms_aileron_deg": 1.2292723987657066,
+      "rms_eta_a": 0.3764833826716587,
+      "cmd_activity": 0.12046636184077478
+     }
+    },
+    {
+     "value": null,
+     "lpv_pw_nodisk": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 0.9868027581350598,
+      "roll_rmse_ci": [
+       0.9212331965719188,
+       1.0572706264284955
+      ],
+      "max_beta_deg_p95": 0.6805874113517735,
+      "max_alt_dev_ft_p95": 0.7020616463698388,
+      "rms_aileron_deg": 1.2682240671376113,
+      "rms_eta_a": 0.30926662011034617,
+      "cmd_activity": 0.1258753014776683
+     },
+     "lpv_tuned": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.322220460814572,
+      "roll_rmse_ci": [
+       1.2365393382475023,
+       1.4147805080001312
+      ],
+      "max_beta_deg_p95": 1.3770247185758464,
+      "max_alt_dev_ft_p95": 0.8729534173888166,
+      "rms_aileron_deg": 1.638164468432932,
+      "rms_eta_a": 0.3393500176466485,
+      "cmd_activity": 0.17124893533564706
+     },
+     "lpv_pd": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 0.9563463905681204,
+      "roll_rmse_ci": [
+       0.8919440454834139,
+       1.0255684276211512
+      ],
+      "max_beta_deg_p95": 1.0095500710964735,
+      "max_alt_dev_ft_p95": 0.7486974582050379,
+      "rms_aileron_deg": 1.2297474224479856,
+      "rms_eta_a": 0.3761719878312406,
+      "cmd_activity": 0.12085440014937435
+     }
+    }
+   ]
+  },
+  "aileron": {
+   "label": "Aileron effectiveness (fast morphing)",
+   "rows": [
+    {
+     "value": 1.0,
+     "lpv_pw_nodisk": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 0.9899069890021511,
+      "roll_rmse_ci": [
+       0.9229749352489467,
+       1.0558003104712241
+      ],
+      "max_beta_deg_p95": 0.7031707216540926,
+      "max_alt_dev_ft_p95": 0.645426287496366,
+      "rms_aileron_deg": 1.2636984924780506,
+      "rms_eta_a": 0.31505566621608116,
+      "cmd_activity": 0.12886525060007034
+     },
+     "lpv_tuned": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.3239761786784614,
+      "roll_rmse_ci": [
+       1.2371091489245134,
+       1.4113007791879466
+      ],
+      "max_beta_deg_p95": 1.4143224247666981,
+      "max_alt_dev_ft_p95": 0.8233989486854852,
+      "rms_aileron_deg": 1.643629838835337,
+      "rms_eta_a": 0.34609324914320505,
+      "cmd_activity": 0.17389863002648126
+     },
+     "lpv_pd": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 0.960225333710857,
+      "roll_rmse_ci": [
+       0.8942625285898688,
+       1.0254590910274692
+      ],
+      "max_beta_deg_p95": 1.0560486325916802,
+      "max_alt_dev_ft_p95": 0.6970409582999763,
+      "rms_aileron_deg": 1.2386970241260304,
+      "rms_eta_a": 0.36736345925305347,
+      "cmd_activity": 0.12148823696515093
+     }
+    },
+    {
+     "value": 0.75,
+     "lpv_pw_nodisk": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.153508373304505,
+      "roll_rmse_ci": [
+       1.076999967447086,
+       1.2293938648585065
+      ],
+      "max_beta_deg_p95": 0.703887818985412,
+      "max_alt_dev_ft_p95": 0.6570322632285751,
+      "rms_aileron_deg": 1.579507495886722,
+      "rms_eta_a": 0.4217051982067209,
+      "cmd_activity": 0.16197207508734632
+     },
+     "lpv_tuned": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.554923030726638,
+      "roll_rmse_ci": [
+       1.454284273933053,
+       1.6558674381138687
+      ],
+      "max_beta_deg_p95": 1.4603804784350103,
+      "max_alt_dev_ft_p95": 0.893078062557015,
+      "rms_aileron_deg": 2.093447828926136,
+      "rms_eta_a": 0.4005292851118783,
+      "cmd_activity": 0.19977007750313455
+     },
+     "lpv_pd": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.0930796979557842,
+      "roll_rmse_ci": [
+       1.018974184734872,
+       1.1667323161441143
+      ],
+      "max_beta_deg_p95": 1.0999939450314233,
+      "max_alt_dev_ft_p95": 0.7192853722605376,
+      "rms_aileron_deg": 1.5627865261592087,
+      "rms_eta_a": 0.46274745354605745,
+      "cmd_activity": 0.1522810885549893
+     }
+    },
+    {
+     "value": 0.5,
+     "lpv_pw_nodisk": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.4323632513419535,
+      "roll_rmse_ci": [
+       1.3402101035090608,
+       1.5243910744409046
+      ],
+      "max_beta_deg_p95": 0.7028665933848192,
+      "max_alt_dev_ft_p95": 0.6959391130338644,
+      "rms_aileron_deg": 2.1193164819312575,
+      "rms_eta_a": 0.6091206129749693,
+      "cmd_activity": 0.22169886934662875
+     },
+     "lpv_tuned": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.9280374850060067,
+      "roll_rmse_ci": [
+       1.8038347000533377,
+       2.053054122350904
+      ],
+      "max_beta_deg_p95": 1.5305857699656344,
+      "max_alt_dev_ft_p95": 1.0106827636012894,
+      "rms_aileron_deg": 2.894700941192168,
+      "rms_eta_a": 0.5789142014419082,
+      "cmd_activity": 0.2530463616661419
+     },
+     "lpv_pd": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.3210111328494065,
+      "roll_rmse_ci": [
+       1.2328999128250426,
+       1.4081277867839956
+      ],
+      "max_beta_deg_p95": 1.148094311144689,
+      "max_alt_dev_ft_p95": 0.762589452503698,
+      "rms_aileron_deg": 2.1257987532831484,
+      "rms_eta_a": 0.630644977457042,
+      "cmd_activity": 0.20547049734597633
+     }
+    },
+    {
+     "value": 0.3,
+     "lpv_pw_nodisk": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.8560944170211329,
+      "roll_rmse_ci": [
+       1.7343599940675898,
+       1.9767222845394021
+      ],
+      "max_beta_deg_p95": 0.7286259077007078,
+      "max_alt_dev_ft_p95": 0.753639521832065,
+      "rms_aileron_deg": 2.9551395348890983,
+      "rms_eta_a": 0.8892481314399414,
+      "cmd_activity": 0.3209527965123252
+     },
+     "lpv_tuned": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 2.430021490685332,
+      "roll_rmse_ci": [
+       2.272531035396783,
+       2.587231830257704
+      ],
+      "max_beta_deg_p95": 1.6153388618460622,
+      "max_alt_dev_ft_p95": 1.2095900622339513,
+      "rms_aileron_deg": 4.249951554595939,
+      "rms_eta_a": 0.9223053556492757,
+      "cmd_activity": 0.3376334260312004
+     },
+     "lpv_pd": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.6671483660602213,
+      "roll_rmse_ci": [
+       1.5580704410108122,
+       1.7749447334151378
+      ],
+      "max_beta_deg_p95": 1.2177599923114113,
+      "max_alt_dev_ft_p95": 0.8386694078622211,
+      "rms_aileron_deg": 3.0183642889104325,
+      "rms_eta_a": 0.8855548285655656,
+      "cmd_activity": 0.291466161526006
+     }
+    },
+    {
+     "value": 0.15,
+     "lpv_pw_nodisk": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 2.519005060128479,
+      "roll_rmse_ci": [
+       2.3392227024016274,
+       2.7032894120347124
+      ],
+      "max_beta_deg_p95": 0.7983248427694273,
+      "max_alt_dev_ft_p95": 1.0105152486472886,
+      "rms_aileron_deg": 4.3083285907312,
+      "rms_eta_a": 1.304948751923341,
+      "cmd_activity": 0.47621360753935205
+     },
+     "lpv_tuned": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 3.2208377242233297,
+      "roll_rmse_ci": [
+       2.982574030426688,
+       3.472860631468929
+      ],
+      "max_beta_deg_p95": 1.9730112993834812,
+      "max_alt_dev_ft_p95": 1.5320027291305447,
+      "rms_aileron_deg": 6.941297524092745,
+      "rms_eta_a": 1.4800368912409776,
+      "cmd_activity": 0.4781847068593203
+     },
+     "lpv_pd": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 2.197948497622022,
+      "roll_rmse_ci": [
+       2.0496537862077226,
+       2.345025220227833
+      ],
+      "max_beta_deg_p95": 1.2690950544701705,
+      "max_alt_dev_ft_p95": 0.9340980501348893,
+      "rms_aileron_deg": 4.50659882231205,
+      "rms_eta_a": 1.2613550276423193,
+      "cmd_activity": 0.43044955848489785
+     }
+    },
+    {
+     "value": 0.0,
+     "lpv_pw_nodisk": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 4.018443782053181,
+      "roll_rmse_ci": [
+       3.6862029160061285,
+       4.367339460273024
+      ],
+      "max_beta_deg_p95": 1.0885841639711211,
+      "max_alt_dev_ft_p95": 1.4697846665474341,
+      "rms_aileron_deg": 8.37120013886793,
+      "rms_eta_a": 2.3508888888082193,
+      "cmd_activity": 0.7759621198500529
+     },
+     "lpv_tuned": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 4.694656366493341,
+      "roll_rmse_ci": [
+       4.313704452192872,
+       5.106204796350831
+      ],
+      "max_beta_deg_p95": 2.5210205405058725,
+      "max_alt_dev_ft_p95": 2.42536344912812,
+      "rms_aileron_deg": 13.67568439785363,
+      "rms_eta_a": 3.017326625712803,
+      "cmd_activity": 0.6744679294389311
+     },
+     "lpv_pd": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 3.469060850188889,
+      "roll_rmse_ci": [
+       3.1965155737902173,
+       3.7483596710227807
+      ],
+      "max_beta_deg_p95": 1.547115175466886,
+      "max_alt_dev_ft_p95": 1.1458945250104533,
+      "rms_aileron_deg": 8.782438844873194,
+      "rms_eta_a": 2.2706090271063237,
+      "cmd_activity": 0.7311933025876453
+     }
+    }
+   ]
+  },
+  "delay": {
+   "label": "Command transport delay, ms (fast morphing)",
+   "rows": [
+    {
+     "value": 0,
+     "lpv_pw_nodisk": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 0.9957194779480212,
+      "roll_rmse_ci": [
+       0.9327880926862134,
+       1.0564663714929488
+      ],
+      "max_beta_deg_p95": 0.6457429171121427,
+      "max_alt_dev_ft_p95": 0.6964966859986816,
+      "rms_aileron_deg": 1.2735332896829865,
+      "rms_eta_a": 0.30672171170894613,
+      "cmd_activity": 0.12501691748994986
+     },
+     "lpv_tuned": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.3425439415269091,
+      "roll_rmse_ci": [
+       1.2569737832523435,
+       1.4244334770660307
+      ],
+      "max_beta_deg_p95": 1.3089189502904013,
+      "max_alt_dev_ft_p95": 0.838034719902123,
+      "rms_aileron_deg": 1.6455123827481497,
+      "rms_eta_a": 0.350819681110947,
+      "cmd_activity": 0.17328271214220245
+     },
+     "lpv_pd": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 0.963130904890573,
+      "roll_rmse_ci": [
+       0.9021450461295636,
+       1.0223247935699233
+      ],
+      "max_beta_deg_p95": 0.9673303233481343,
+      "max_alt_dev_ft_p95": 0.7291243435552358,
+      "rms_aileron_deg": 1.2327449440118898,
+      "rms_eta_a": 0.37498475533889764,
+      "cmd_activity": 0.12006679650967227
+     }
+    },
+    {
+     "value": 1,
+     "lpv_pw_nodisk": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.0086053982872976,
+      "roll_rmse_ci": [
+       0.9449347852488816,
+       1.0701488441182778
+      ],
+      "max_beta_deg_p95": 0.6776854960472788,
+      "max_alt_dev_ft_p95": 0.7018357483992076,
+      "rms_aileron_deg": 1.2817935503690696,
+      "rms_eta_a": 0.31839693706151295,
+      "cmd_activity": 0.13552246382285538
+     },
+     "lpv_tuned": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.3913097554549996,
+      "roll_rmse_ci": [
+       1.302408759093102,
+       1.4760177163799924
+      ],
+      "max_beta_deg_p95": 1.3642483763678164,
+      "max_alt_dev_ft_p95": 0.8484797730596709,
+      "rms_aileron_deg": 1.6586394423342408,
+      "rms_eta_a": 0.4211679044080217,
+      "cmd_activity": 0.21798929794168698
+     },
+     "lpv_pd": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 0.9745603710087738,
+      "roll_rmse_ci": [
+       0.9128592423087224,
+       1.034547479893712
+      ],
+      "max_beta_deg_p95": 1.0009368757318229,
+      "max_alt_dev_ft_p95": 0.7341159296302521,
+      "rms_aileron_deg": 1.2401275901854163,
+      "rms_eta_a": 0.38489969867734386,
+      "cmd_activity": 0.13944166437208688
+     }
+    },
+    {
+     "value": 2,
+     "lpv_pw_nodisk": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.023645918389165,
+      "roll_rmse_ci": [
+       0.95890132437388,
+       1.0861295492153347
+      ],
+      "max_beta_deg_p95": 0.7416594889488669,
+      "max_alt_dev_ft_p95": 2.53768534333567,
+      "rms_aileron_deg": 1.300184171968085,
+      "rms_eta_a": 0.3313282047320155,
+      "cmd_activity": 0.28308986863940344
+     },
+     "lpv_tuned": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.4461889961669532,
+      "roll_rmse_ci": [
+       1.354470709667397,
+       1.5334372490565276
+      ],
+      "max_beta_deg_p95": 1.4382412340676232,
+      "max_alt_dev_ft_p95": 2.5378109635906125,
+      "rms_aileron_deg": 1.6778365206659953,
+      "rms_eta_a": 0.5090298013909617,
+      "cmd_activity": 1.3853666620017568
+     },
+     "lpv_pd": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 0.9878470915881146,
+      "roll_rmse_ci": [
+       0.9255336604641208,
+       1.0486885916664244
+      ],
+      "max_beta_deg_p95": 1.0725746281031634,
+      "max_alt_dev_ft_p95": 2.5282553895177613,
+      "rms_aileron_deg": 1.2630813838586419,
+      "rms_eta_a": 0.3999248213556317,
+      "cmd_activity": 0.5901966805286287
+     }
+    },
+    {
+     "value": 3,
+     "lpv_pw_nodisk": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.0621851649438492,
+      "roll_rmse_ci": [
+       0.9968435535752387,
+       1.1263206708305964
+      ],
+      "max_beta_deg_p95": 1.3750074553799057,
+      "max_alt_dev_ft_p95": 6.812026661047787,
+      "rms_aileron_deg": 1.4358245689441724,
+      "rms_eta_a": 0.35743099102262177,
+      "cmd_activity": 1.0937903743561384
+     },
+     "lpv_tuned": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.542929631498998,
+      "roll_rmse_ci": [
+       1.4523352125311288,
+       1.6322193289571911
+      ],
+      "max_beta_deg_p95": 1.9898770819321447,
+      "max_alt_dev_ft_p95": 6.686356883267615,
+      "rms_aileron_deg": 1.952465359026037,
+      "rms_eta_a": 1.0029117543866615,
+      "cmd_activity": 7.653895883146488
+     },
+     "lpv_pd": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 1.827220270215689,
+      "roll_rmse_ci": [
+       1.5420018022545858,
+       2.1422477489052203
+      ],
+      "max_beta_deg_p95": 7.3831315754391715,
+      "max_alt_dev_ft_p95": 6.510664868603999,
+      "rms_aileron_deg": 3.9422187133126734,
+      "rms_eta_a": 0.7871314451244689,
+      "cmd_activity": 5.530738498142276
+     }
+    },
+    {
+     "value": 4,
+     "lpv_pw_nodisk": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 2.035508447576996,
+      "roll_rmse_ci": [
+       1.8154852882511126,
+       2.274934453672643
+      ],
+      "max_beta_deg_p95": 6.749087210773362,
+      "max_alt_dev_ft_p95": 9.956628634020216,
+      "rms_aileron_deg": 3.4315433666913533,
+      "rms_eta_a": 0.6619680851074246,
+      "cmd_activity": 4.634591191701419
+     },
+     "lpv_tuned": {
+      "n": 128,
+      "success_rate": 1.0,
+      "success_ci": [
+       1.0,
+       1.0
+      ],
+      "roll_rmse_deg": 2.8835436438427102,
+      "roll_rmse_ci": [
+       2.6569091730648733,
+       3.1256832269195547
+      ],
+      "max_beta_deg_p95": 7.748431284170429,
+      "max_alt_dev_ft_p95": 9.948075871059672,
+      "rms_aileron_deg": 4.115774292379227,
+      "rms_eta_a": 2.0621337085253146,
+      "cmd_activity": 11.68099823989995
+     },
+     "lpv_pd": {
+      "n": 128,
+      "success_rate": 0.9140625,
+      "success_ci": [
+       0.859375,
+       0.9609375
+      ],
+      "roll_rmse_deg": 9.250775769031549,
+      "roll_rmse_ci": [
+       8.474287449852882,
+       10.075585365077465
+      ],
+      "max_beta_deg_p95": 13.138392164215459,
+      "max_alt_dev_ft_p95": 10.760156648619885,
+      "rms_aileron_deg": 15.926245219500721,
+      "rms_eta_a": 2.600894515536336,
+      "cmd_activity": 13.71463398001012
+     }
+    }
+   ]
+  }
+ }
+}

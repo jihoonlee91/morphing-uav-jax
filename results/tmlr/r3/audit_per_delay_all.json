@@ -1,0 +1,256 @@
+{
+ "n_pairs_without_duplicates": 128,
+ "removed": [
+  "gs_wide",
+  "gs_dr"
+ ],
+ "pooled_x0": {
+  "rho": 0.7441246920546668,
+  "p": 7.974915929045824e-24,
+  "n": 128
+ },
+ "by_delay_x0": {
+  "20": {
+   "rho": 0.5761047659181224,
+   "p": 0.0005594784737368436,
+   "n": 32
+  },
+  "40": {
+   "rho": 0.6963001049508988,
+   "p": 9.610190574221727e-06,
+   "n": 32
+  },
+  "60": {
+   "rho": 0.8277326529802672,
+   "p": 5.099935736158538e-09,
+   "n": 32
+  },
+  "80": {
+   "rho": 0.48890168021408126,
+   "p": 0.004519526214198235,
+   "n": 32
+  }
+ },
+ "confusion_x0": {
+  "share0_bad": 54,
+  "share0_notbad": 13,
+  "sharepos_bad": 7,
+  "sharepos_notbad": 54,
+  "share0_notbad_pairs": [
+   [
+    "lpv",
+    80
+   ],
+   [
+    "lpv_nodisk",
+    20
+   ],
+   [
+    "lpv_nodisk",
+    40
+   ],
+   [
+    "lpv_nodisk",
+    60
+   ],
+   [
+    "lpv_nodisk",
+    80
+   ],
+   [
+    "lpv_tuned",
+    80
+   ],
+   [
+    "ppo_lat40",
+    20
+   ],
+   [
+    "diffsim_lat40",
+    20
+   ],
+   [
+    "ppo_lat60",
+    20
+   ],
+   [
+    "ppo_lat60",
+    40
+   ],
+   [
+    "ppo_lat60",
+    80
+   ],
+   [
+    "diffsim_lat60",
+    20
+   ],
+   [
+    "diffsim_lat60",
+    40
+   ]
+  ],
+  "sharepos_bad_pairs": [
+   [
+    "ppo",
+    20,
+    0.008
+   ],
+   [
+    "ppo_dr",
+    80,
+    0.207
+   ],
+   [
+    "diffsim_dr",
+    80,
+    0.303
+   ],
+   [
+    "diffsim_ddr",
+    80,
+    0.356
+   ],
+   [
+    "diffsim_ddrh",
+    60,
+    0.959
+   ],
+   [
+    "ppo_rate100",
+    20,
+    0.084
+   ],
+   [
+    "ppo_ls0",
+    20,
+    0.025
+   ]
+  ]
+ },
+ "pooled_eq": {
+  "rho": 0.747163702458277,
+  "p": 4.175729789032245e-24,
+  "n": 128
+ },
+ "by_delay_eq": {
+  "20": {
+   "rho": 0.591679503375839,
+   "p": 0.0003614802234339731,
+   "n": 32
+  },
+  "40": {
+   "rho": 0.7074345535433612,
+   "p": 5.969033781913033e-06,
+   "n": 32
+  },
+  "60": {
+   "rho": 0.8261642348789309,
+   "p": 5.777869126699955e-09,
+   "n": 32
+  },
+  "80": {
+   "rho": 0.48890168021408126,
+   "p": 0.004519526214198235,
+   "n": 32
+  }
+ },
+ "confusion_eq": {
+  "share0_bad": 54,
+  "share0_notbad": 13,
+  "sharepos_bad": 7,
+  "sharepos_notbad": 54,
+  "share0_notbad_pairs": [
+   [
+    "lpv",
+    80
+   ],
+   [
+    "lpv_nodisk",
+    20
+   ],
+   [
+    "lpv_nodisk",
+    40
+   ],
+   [
+    "lpv_nodisk",
+    60
+   ],
+   [
+    "lpv_nodisk",
+    80
+   ],
+   [
+    "lpv_tuned",
+    80
+   ],
+   [
+    "ppo_lat40",
+    20
+   ],
+   [
+    "diffsim_lat40",
+    20
+   ],
+   [
+    "ppo_lat60",
+    20
+   ],
+   [
+    "ppo_lat60",
+    40
+   ],
+   [
+    "ppo_lat60",
+    80
+   ],
+   [
+    "diffsim_lat60",
+    20
+   ],
+   [
+    "diffsim_lat60",
+    40
+   ]
+  ],
+  "sharepos_bad_pairs": [
+   [
+    "ppo",
+    20,
+    0.008
+   ],
+   [
+    "ppo_dr",
+    80,
+    0.197
+   ],
+   [
+    "diffsim_dr",
+    80,
+    0.304
+   ],
+   [
+    "diffsim_ddr",
+    80,
+    0.356
+   ],
+   [
+    "diffsim_ddrh",
+    60,
+    0.963
+   ],
+   [
+    "ppo_rate100",
+    20,
+    0.086
+   ],
+   [
+    "ppo_ls0",
+    20,
+    0.02
+   ]
+  ]
+ },
+ "ranking_rule": "degradation rank: pairs with any loss of control above all others, ordered by the share lost, then by RMSE growth; pairs where every run is lost share the top rank (average rank for ties)"
+}

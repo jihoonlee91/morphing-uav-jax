@@ -1,0 +1,29 @@
+﻿design grid: 63 points, max trim residual 4.5e-15; LPV optimal_inaccurate, Lyapunov margin -1.039; weights LatWeights(phi=0.125, integ=0.03125, beta=0.125, eta_a=4.0, effort=0.03125)
+LPV no-disk optimal (margin -1.040); pointwise statuses ['optimal']
+controllers: lpv_pw_nodisk x1, lpv_tuned x1, lpv_pd x1
+[   387s] Frozen shape             lpv_pw_nodisk: 1.04 deg / 100%  lpv_tuned: 1.39 deg / 100%  lpv_pd: 1.01 deg / 100%
+[   394s] Fast morphing            lpv_pw_nodisk: 1.01 deg / 100%  lpv_tuned: 1.35 deg / 100%  lpv_pd: 0.98 deg / 100%
+[   402s] + noise, 40 ms delay     lpv_pw_nodisk: 1.05 deg / 100%  lpv_tuned: 1.47 deg / 100%  lpv_pd: 1.02 deg / 100%
+[   409s] + model error            lpv_pw_nodisk: 1.04 deg / 100%  lpv_tuned: 1.40 deg / 100%  lpv_pd: 1.01 deg / 100%
+[   418s] + aileron at 0-30 %      lpv_pw_nodisk: 2.60 deg / 100%  lpv_tuned: 3.27 deg / 100%  lpv_pd: 2.28 deg / 100%
+[   539s] sweep morph_rate done
+[   568s] sweep aileron done
+[   596s] sweep delay done
+training-distribution return: {'lpv_pw_nodisk': 485.37, 'lpv_tuned': 477.61, 'lpv_pd': 485.41}
+| Controller | Frozen shape | Fast morphing | + noise, 40 ms delay | + model error | + aileron at 0-30 % |
+|---|---:|---:|---:|---:|---:|
+| LPV, pointwise, no pole disk (ablation) | 1.04° · 100.0% | 1.01° · 100.0% | 1.05° · 100.0% | 1.04° · 100.0% | 2.60° · 100.0% |
+| LPV, tuned multipliers (60 ms rule) | 1.39° · 100.0% | 1.35° · 100.0% | 1.47° · 100.0% | 1.40° · 100.0% | 3.27° · 100.0% |
+| LPV, parameter-dependent Lyapunov matrix | 1.01° · 100.0% | 0.98° · 100.0% | 1.02° · 100.0% | 1.01° · 100.0% | 2.28° · 100.0% |
+
+Cells: roll-tracking RMS error over successful runs · share of runs without loss of control. 95 % bootstrap intervals are in `metrics.json`.
+
+| Controller (fast morphing) | Sideslip, p95 of max | Command activity | RMS η_a |
+|---|---:|---:|---:|
+| LPV, pointwise, no pole disk (ablation) | 0.71° | 0.13 /s | 0.32 % |
+| LPV, tuned multipliers (60 ms rule) | 1.43° | 0.18 /s | 0.35 % |
+| LPV, parameter-dependent Lyapunov matrix | 1.08° | 0.12 /s | 0.38 % |
+
+Command activity: mean |du/dt| of aileron, rudder and asymmetric-span commands, each divided by its position limit (higher = busier actuators).
+
+done in 868s

@@ -1,0 +1,21 @@
+﻿[  133s] gs: weakest rudder
+[  135s] gs_hg: weakest aileron
+[  137s] lpv: weakest aileron
+[  139s] fixed: weakest aileron
+[  141s] gs_hg_wide: weakest aileron
+uv : C:\Users\user\Projects\morphing-flight-jax\scripts\r3_margins.py:104: RuntimeWarning: All-NaN slice encountered
+At line:5 char:185
++ ... YTHONUNBUFFERED='1'; uv run python scripts/r3_margins.py 2>&1 | Out-F ...
++                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (C:\Users\user\P...ice encountered:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  "crossover_rad_s_median": float(np.nanmedian(s[:, c, 4])),
+[  143s] lpv_pw: weakest rudder
+[  145s] lpv_nodisk: weakest eta_a
+[  169s] ppo: weakest ['aileron', 'aileron', 'aileron', 'aileron', 'aileron', 'aileron', 'aileron', 'aileron', 'aileron', 'aileron']
+[  183s] ppo_dr: weakest ['eta_a', 'eta_a', 'eta_a', 'eta_a', 'eta_a', 'eta_a', 'eta_a', 'eta_a', 'aileron', 'eta_a']
+[  205s] diffsim: weakest ['rudder', 'rudder', 'rudder', 'rudder', 'rudder', 'rudder', 'rudder', 'rudder', 'rudder', 'rudder']
+[  226s] diffsim_dr: weakest ['aileron', 'aileron', 'aileron', 'aileron', 'eta_a', 'eta_a', 'eta_a', 'aileron', 'aileron', 'eta_a']
+[  242s] residual_dr: weakest ['aileron', 'aileron', 'aileron', 'aileron', 'aileron', 'aileron', 'aileron', 'aileron', 'aileron', 'aileron']
+[  253s] ppo_clean: weakest [None, 'eta_a', None, 'eta_a', None, 'eta_a', 'eta_a', 'aileron', None, 'aileron']
