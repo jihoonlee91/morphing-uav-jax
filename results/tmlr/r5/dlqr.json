@@ -1,0 +1,327 @@
+{
+ "description": "Round 5: delay-aware discrete gain-scheduled LQR, tuned like the other baselines.\n\n    uv run python scripts/r5_dlqr.py\n\nFor d = 0, 1, 2, 3 samples (0-60 ms) the discrete LQR of ``design.lateral_gains_dlqr``\n(exact ZOH model augmented with the d pending commands) is built for a 216-point subgrid\nof the five Bryson multipliers of ``tune_lqr.GRID`` (phi 1, 1/4, 1/16; integ 1, 1/4,\n1/16, 1/64; beta 1, 1/4, 1/16; eta_a 1, 4; effort 1/4, 1/16, 1/64) and scored like the\nLQR (PPO reward, actuator-limit action scale, the LQR tuning scenarios, seed 7, 96) with\nthe command delay fixed at d, the condition the design assumes. Rule: no loss of\ncontrol on the tuning scenarios and the frozen discrete loop with d samples of delay\nstable at all 63 design points (it is by construction; checked). Chosen designs are\nscored on held-out scenarios (seed 1007, 256, delay d) and saved as\n``r5/dlqr_gains_d{d}.npy`` (evaluated as ``dlqr{d}``). Writes ``r5/dlqr.json``.\n",
+ "subgrid": {
+  "phi": [
+   1.0,
+   0.25,
+   0.0625
+  ],
+  "integ": [
+   1.0,
+   0.25,
+   0.0625,
+   0.015625
+  ],
+  "beta": [
+   1.0,
+   0.25,
+   0.0625
+  ],
+  "eta_a": [
+   1.0,
+   4.0
+  ],
+  "effort": [
+   0.25,
+   0.0625,
+   0.015625
+  ]
+ },
+ "d0": {
+  "best": {
+   "weights": {
+    "phi": 1.0,
+    "integ": 0.015625,
+    "beta": 0.0625,
+    "eta_a": 4.0,
+    "effort": 0.25
+   },
+   "return": 495.38819991819383,
+   "failures": 0
+  },
+  "heldout_return": 495.1277732802033,
+  "heldout_return_se": 0.17004608810565172,
+  "heldout_failures": 0,
+  "top5": [
+   {
+    "weights": {
+     "phi": 1.0,
+     "integ": 0.015625,
+     "beta": 0.0625,
+     "eta_a": 4.0,
+     "effort": 0.25
+    },
+    "return": 495.38819991819383,
+    "failures": 0
+   },
+   {
+    "weights": {
+     "phi": 0.25,
+     "integ": 0.015625,
+     "beta": 0.0625,
+     "eta_a": 4.0,
+     "effort": 0.25
+    },
+    "return": 495.37551094972633,
+    "failures": 0
+   },
+   {
+    "weights": {
+     "phi": 1.0,
+     "integ": 0.015625,
+     "beta": 0.0625,
+     "eta_a": 1.0,
+     "effort": 0.25
+    },
+    "return": 495.37055726451655,
+    "failures": 0
+   },
+   {
+    "weights": {
+     "phi": 0.25,
+     "integ": 0.015625,
+     "beta": 0.0625,
+     "eta_a": 1.0,
+     "effort": 0.25
+    },
+    "return": 495.3580721415073,
+    "failures": 0
+   },
+   {
+    "weights": {
+     "phi": 0.0625,
+     "integ": 0.015625,
+     "beta": 0.0625,
+     "eta_a": 4.0,
+     "effort": 0.25
+    },
+    "return": 495.2322487448114,
+    "failures": 0
+   }
+  ],
+  "candidates": 216
+ },
+ "d1": {
+  "best": {
+   "weights": {
+    "phi": 1.0,
+    "integ": 0.015625,
+    "beta": 0.0625,
+    "eta_a": 4.0,
+    "effort": 0.25
+   },
+   "return": 494.83742960714727,
+   "failures": 0
+  },
+  "heldout_return": 494.5428812716574,
+  "heldout_return_se": 0.19221423535969856,
+  "heldout_failures": 0,
+  "top5": [
+   {
+    "weights": {
+     "phi": 1.0,
+     "integ": 0.015625,
+     "beta": 0.0625,
+     "eta_a": 4.0,
+     "effort": 0.25
+    },
+    "return": 494.83742960714727,
+    "failures": 0
+   },
+   {
+    "weights": {
+     "phi": 1.0,
+     "integ": 0.015625,
+     "beta": 0.0625,
+     "eta_a": 1.0,
+     "effort": 0.25
+    },
+    "return": 494.81241561773476,
+    "failures": 0
+   },
+   {
+    "weights": {
+     "phi": 0.25,
+     "integ": 0.015625,
+     "beta": 0.0625,
+     "eta_a": 4.0,
+     "effort": 0.25
+    },
+    "return": 494.81161264977095,
+    "failures": 0
+   },
+   {
+    "weights": {
+     "phi": 0.25,
+     "integ": 0.015625,
+     "beta": 0.0625,
+     "eta_a": 1.0,
+     "effort": 0.25
+    },
+    "return": 494.78690822399295,
+    "failures": 0
+   },
+   {
+    "weights": {
+     "phi": 0.0625,
+     "integ": 0.015625,
+     "beta": 0.0625,
+     "eta_a": 4.0,
+     "effort": 0.25
+    },
+    "return": 494.5269032577292,
+    "failures": 0
+   }
+  ],
+  "candidates": 216
+ },
+ "d2": {
+  "best": {
+   "weights": {
+    "phi": 1.0,
+    "integ": 0.015625,
+    "beta": 0.0625,
+    "eta_a": 4.0,
+    "effort": 0.25
+   },
+   "return": 494.01305347487096,
+   "failures": 0
+  },
+  "heldout_return": 493.6629322043093,
+  "heldout_return_se": 0.22073493516087755,
+  "heldout_failures": 0,
+  "top5": [
+   {
+    "weights": {
+     "phi": 1.0,
+     "integ": 0.015625,
+     "beta": 0.0625,
+     "eta_a": 4.0,
+     "effort": 0.25
+    },
+    "return": 494.01305347487096,
+    "failures": 0
+   },
+   {
+    "weights": {
+     "phi": 1.0,
+     "integ": 0.015625,
+     "beta": 0.0625,
+     "eta_a": 1.0,
+     "effort": 0.25
+    },
+    "return": 493.98148763345006,
+    "failures": 0
+   },
+   {
+    "weights": {
+     "phi": 0.25,
+     "integ": 0.015625,
+     "beta": 0.0625,
+     "eta_a": 4.0,
+     "effort": 0.25
+    },
+    "return": 493.9700752836084,
+    "failures": 0
+   },
+   {
+    "weights": {
+     "phi": 0.25,
+     "integ": 0.015625,
+     "beta": 0.0625,
+     "eta_a": 1.0,
+     "effort": 0.25
+    },
+    "return": 493.9389330079868,
+    "failures": 0
+   },
+   {
+    "weights": {
+     "phi": 0.0625,
+     "integ": 0.015625,
+     "beta": 0.0625,
+     "eta_a": 4.0,
+     "effort": 0.25
+    },
+    "return": 493.5087425111856,
+    "failures": 0
+   }
+  ],
+  "candidates": 216
+ },
+ "d3": {
+  "best": {
+   "weights": {
+    "phi": 1.0,
+    "integ": 0.015625,
+    "beta": 0.0625,
+    "eta_a": 1.0,
+    "effort": 0.25
+   },
+   "return": 491.2293523291157,
+   "failures": 0
+  },
+  "heldout_return": 490.8537361148619,
+  "heldout_return_se": 0.2696694559239349,
+  "heldout_failures": 0,
+  "top5": [
+   {
+    "weights": {
+     "phi": 1.0,
+     "integ": 0.015625,
+     "beta": 0.0625,
+     "eta_a": 1.0,
+     "effort": 0.25
+    },
+    "return": 491.2293523291157,
+    "failures": 0
+   },
+   {
+    "weights": {
+     "phi": 0.25,
+     "integ": 0.015625,
+     "beta": 0.0625,
+     "eta_a": 1.0,
+     "effort": 0.25
+    },
+    "return": 491.21074014913233,
+    "failures": 0
+   },
+   {
+    "weights": {
+     "phi": 1.0,
+     "integ": 0.015625,
+     "beta": 0.0625,
+     "eta_a": 4.0,
+     "effort": 0.25
+    },
+    "return": 491.1172211031272,
+    "failures": 0
+   },
+   {
+    "weights": {
+     "phi": 0.25,
+     "integ": 0.015625,
+     "beta": 0.0625,
+     "eta_a": 4.0,
+     "effort": 0.25
+    },
+    "return": 491.10902715000185,
+    "failures": 0
+   },
+   {
+    "weights": {
+     "phi": 0.0625,
+     "integ": 0.015625,
+     "beta": 0.0625,
+     "eta_a": 1.0,
+     "effort": 0.25
+    },
+    "return": 490.90144639841975,
+    "failures": 0
+   }
+  ],
+  "candidates": 216
+ },
+ "wall_seconds": 1444.7383787631989
+}
