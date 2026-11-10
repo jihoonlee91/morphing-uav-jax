@@ -63,9 +63,26 @@ def main() -> None:
         help="held-out evaluation interval (updates); evaluation does not touch the "
         "training RNG, so a seed trains to the same policy at any interval",
     )
+    ap.add_argument(
+        "--override",
+        default=None,
+        help="JSON dict of config fields applied last (round-5 hyperparameter search)",
+    )
+    ap.add_argument(
+        "--name", default=None, help="variant name in the file stem (default --variant)"
+    )
+    ap.add_argument(
+        "--rate-limits",
+        default=None,
+        help="'surface_deg_s,wingtip_pct_s': train with actuator rate limits (round 5)",
+    )
     args = ap.parse_args()
 
     setup = pipeline.build_for_evaluation(ROOT / "results" / "lqr_weights.json", verbose=True)
+    if args.rate_limits:
+        surf, morph = (float(v) for v in args.rate_limits.split(","))
+        setup = setup._replace(plant=setup.plant._replace(rate_limits=(surf, morph)))
+    override = json.loads(args.override) if args.override else {}
     # The policy shares the longitudinal hold; the lateral gains of this
     # schedule are unused (the policy replaces them).
     lon = setup.schedules["gs"]
@@ -86,6 +103,7 @@ def main() -> None:
             cfg = cfg._replace(updates=args.iters)
         if args.eval_every:
             cfg = cfg._replace(eval_every=args.eval_every)
+        cfg = cfg._replace(**override)
         params, history, timing = rl.train(setup.plant, lon, cfg, base=base, residual_filter=filt)
     else:
         lat = {k: v for k, v in lat.items() if k not in ("init_log_std", "ent_coef")}
@@ -94,12 +112,14 @@ def main() -> None:
             cfg = cfg._replace(iters=args.iters)
         if args.eval_every:
             cfg = cfg._replace(eval_every=args.eval_every)
+        cfg = cfg._replace(**override)
         params, history, timing = diffsim.train(setup.plant, lon, cfg)
 
     args.out.mkdir(parents=True, exist_ok=True)
-    stem = f"{args.method}_{args.variant}_seed{args.seed}"
+    stem = f"{args.method}_{args.name or args.variant}_seed{args.seed}"
     rl.save_params(args.out / f"{stem}.npz", params)
-    meta = {"method": args.method, "config": cfg._asdict(), "timing": timing, "history": history}
+    meta = {"method": args.method, "config": cfg._asdict(), "timing": timing, "history": history,
+            "rate_limits": args.rate_limits, "override": override}  # fmt: skip
     (args.out / f"{stem}.json").write_text(json.dumps(meta, indent=1), encoding="utf-8")
     print(f"saved {args.out / stem}.npz")
 

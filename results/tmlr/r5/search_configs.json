@@ -1,0 +1,238 @@
+{
+ "ppo": [
+  {},
+  {
+   "lr": 0.0006382677831049199,
+   "epochs": 4,
+   "minibatches": 32,
+   "clip": 0.2,
+   "ent_coef": 0.001,
+   "init_log_std": -1.0,
+   "obs_norm": false,
+   "reward_norm": true,
+   "lam": 0.9,
+   "gamma": 0.98,
+   "vf_clip": false
+  },
+  {
+   "lr": 0.00025613752305563513,
+   "epochs": 4,
+   "minibatches": 8,
+   "clip": 0.1,
+   "ent_coef": 0.0,
+   "init_log_std": -2.0,
+   "obs_norm": true,
+   "reward_norm": false,
+   "lam": 0.95,
+   "gamma": 0.995,
+   "vf_clip": false
+  },
+  {
+   "lr": 0.000272237251964316,
+   "epochs": 4,
+   "minibatches": 32,
+   "clip": 0.1,
+   "ent_coef": 0.01,
+   "init_log_std": 0.0,
+   "obs_norm": true,
+   "reward_norm": false,
+   "lam": 0.95,
+   "gamma": 0.99,
+   "vf_clip": false
+  },
+  {
+   "lr": 0.0004749953431548741,
+   "epochs": 6,
+   "minibatches": 8,
+   "clip": 0.3,
+   "ent_coef": 0.001,
+   "init_log_std": 0.0,
+   "obs_norm": false,
+   "reward_norm": false,
+   "lam": 0.98,
+   "gamma": 0.98,
+   "vf_clip": false
+  },
+  {
+   "lr": 0.00047772892033850415,
+   "epochs": 4,
+   "minibatches": 32,
+   "clip": 0.2,
+   "ent_coef": 0.0,
+   "init_log_std": -1.0,
+   "obs_norm": true,
+   "reward_norm": true,
+   "lam": 0.98,
+   "gamma": 0.98,
+   "vf_clip": false
+  },
+  {
+   "lr": 0.0005099123930849753,
+   "epochs": 10,
+   "minibatches": 8,
+   "clip": 0.1,
+   "ent_coef": 0.001,
+   "init_log_std": -1.0,
+   "obs_norm": false,
+   "reward_norm": true,
+   "lam": 0.9,
+   "gamma": 0.99,
+   "vf_clip": false
+  },
+  {
+   "lr": 0.0006400521061853438,
+   "epochs": 4,
+   "minibatches": 8,
+   "clip": 0.1,
+   "ent_coef": 0.0,
+   "init_log_std": -2.0,
+   "obs_norm": true,
+   "reward_norm": true,
+   "lam": 0.95,
+   "gamma": 0.98,
+   "vf_clip": true
+  },
+  {
+   "lr": 0.000171995251648231,
+   "epochs": 4,
+   "minibatches": 8,
+   "clip": 0.1,
+   "ent_coef": 0.01,
+   "init_log_std": -1.0,
+   "obs_norm": true,
+   "reward_norm": false,
+   "lam": 0.95,
+   "gamma": 0.995,
+   "vf_clip": false
+  },
+  {
+   "lr": 0.0001034037479443464,
+   "epochs": 4,
+   "minibatches": 32,
+   "clip": 0.3,
+   "ent_coef": 0.0,
+   "init_log_std": 0.0,
+   "obs_norm": true,
+   "reward_norm": false,
+   "lam": 0.95,
+   "gamma": 0.995,
+   "vf_clip": true
+  },
+  {
+   "lr": 0.0002508564439512896,
+   "epochs": 4,
+   "minibatches": 32,
+   "clip": 0.1,
+   "ent_coef": 0.001,
+   "init_log_std": 0.0,
+   "obs_norm": false,
+   "reward_norm": false,
+   "lam": 0.98,
+   "gamma": 0.98,
+   "vf_clip": true
+  },
+  {
+   "lr": 0.0004832871104268437,
+   "epochs": 6,
+   "minibatches": 16,
+   "clip": 0.3,
+   "ent_coef": 0.0,
+   "init_log_std": -1.0,
+   "obs_norm": true,
+   "reward_norm": true,
+   "lam": 0.9,
+   "gamma": 0.98,
+   "vf_clip": true
+  },
+  {
+   "lr": 0.0004319035760323408,
+   "epochs": 10,
+   "minibatches": 16,
+   "clip": 0.1,
+   "ent_coef": 0.01,
+   "init_log_std": -2.0,
+   "obs_norm": false,
+   "reward_norm": false,
+   "lam": 0.95,
+   "gamma": 0.98,
+   "vf_clip": true
+  },
+  {
+   "lr": 0.0002401460074366452,
+   "epochs": 4,
+   "minibatches": 32,
+   "clip": 0.1,
+   "ent_coef": 0.001,
+   "init_log_std": -2.0,
+   "obs_norm": true,
+   "reward_norm": true,
+   "lam": 0.98,
+   "gamma": 0.99,
+   "vf_clip": true
+  },
+  {
+   "lr": 0.0006439376362098974,
+   "epochs": 4,
+   "minibatches": 8,
+   "clip": 0.2,
+   "ent_coef": 0.01,
+   "init_log_std": -1.0,
+   "obs_norm": true,
+   "reward_norm": true,
+   "lam": 0.95,
+   "gamma": 0.99,
+   "vf_clip": true
+  },
+  {
+   "lr": 0.00030163918018324043,
+   "epochs": 6,
+   "minibatches": 32,
+   "clip": 0.3,
+   "ent_coef": 0.0,
+   "init_log_std": -1.0,
+   "obs_norm": false,
+   "reward_norm": false,
+   "lam": 0.9,
+   "gamma": 0.995,
+   "vf_clip": false
+  }
+ ],
+ "apg": [
+  {},
+  {
+   "lr": 0.0012839773447449602,
+   "window": 125,
+   "max_grad_norm": 2.6526294366906775
+  },
+  {
+   "lr": 0.0006374866113516153,
+   "window": 250,
+   "max_grad_norm": 3.082201486906017
+  },
+  {
+   "lr": 0.0004621640868507665,
+   "window": 250,
+   "max_grad_norm": 0.45421292376595457
+  },
+  {
+   "lr": 0.0007624649909553102,
+   "window": 250,
+   "max_grad_norm": 0.3745185314780375
+  },
+  {
+   "lr": 0.0021635163716479996,
+   "window": 250,
+   "max_grad_norm": 0.43630410444179285
+  },
+  {
+   "lr": 0.001009782247440198,
+   "window": 250,
+   "max_grad_norm": 0.5729826833152561
+  },
+  {
+   "lr": 0.0009308869772598079,
+   "window": 125,
+   "max_grad_norm": 0.40388902414925765
+  }
+ ]
+}
