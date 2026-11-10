@@ -3,10 +3,10 @@
 Every design point is trimmed and linearized with JAX (vectorized with
 ``vmap``). Three lateral-directional designs are built on top:
 
-* ``fixed``  ??one LQR designed at the nominal point and used everywhere.
-* ``gs``     ??pointwise LQR at every grid point, gains interpolated online
+* ``fixed``  — one LQR designed at the nominal point and used everywhere.
+* ``gs``     — pointwise LQR at every grid point, gains interpolated online
   (classical gain scheduling: no guarantee while the parameters move).
-* ``lpv``    ??a guaranteed-cost state feedback with one Lyapunov matrix shared
+* ``lpv``    — a guaranteed-cost state feedback with one Lyapunov matrix shared
   by all grid points, found by LMI optimization. A common quadratic Lyapunov
   function certifies stability for arbitrarily fast parameter variation on the
   gridded LPV model, which is the property the paper relies on.
@@ -441,3 +441,49 @@ def lateral_gains_lpv_pd(
         "norm_X2_over_X0": float(np.linalg.norm(vals[2]) / nx0),
     }
     return out, info
+
+
+def lateral_gains_dlqr(
+    grid: DesignGrid, weights: LatWeights | None = None, delay: int = 0, dt: float = 0.02
+) -> np.ndarray:
+    """Round 5: discrete-time LQR on the exact ZOH model with ``delay`` pending commands.
+
+    The lateral model (with the roll-error integrator) is discretized exactly (ZOH at
+    ``dt``) in Bryson-normalized coordinates and augmented with the ``delay`` commands
+    computed but not yet applied, ``z = [x, u_{k-1}, ..., u_{k-d}]``; the oldest acts now.
+    Discrete LQR with ``Q = dt I`` on the plant states (a negligible 1e-6 dt on the
+    buffer, for numerics) and ``R = dt I``, so the weights approximate the continuous
+    Bryson cost. Returns ``K`` (physical units) of shape ``(..., 3, 8 + 3 d)`` for
+    ``u_k = u0 + K_x dx + sum_j K_j (u_{k-j} - u0)``.
+    """
+    xs, us = (weights or LatWeights()).scales()
+    n, m, d = 8, 3, delay
+    out = np.zeros((*grid.residual.shape, m, n + m * d))
+    for idx in _grid_iter(grid.residual.shape):
+        an, bn = _normalize(*lateral_model(grid.A[idx], grid.B[idx]), xs, us)
+        blk = np.zeros((n + m, n + m))
+        blk[:n, :n], blk[:n, n:] = an, bn
+        e = scipy.linalg.expm(blk * dt)
+        ad, bd = e[:n, :n], e[:n, n:]
+        size = n + m * d
+        az = np.zeros((size, size))
+        bz = np.zeros((size, m))
+        az[:n, :n] = ad
+        if d == 0:
+            bz[:n] = bd
+        else:
+            az[:n, n + (d - 1) * m :] = bd
+            bz[n : n + m] = np.eye(m)
+            for j in range(1, d):
+                az[n + j * m : n + (j + 1) * m, n + (j - 1) * m : n + j * m] = np.eye(m)
+        q = np.diag(np.r_[np.ones(n), 1e-6 * np.ones(m * d)]) * dt
+        p = scipy.linalg.solve_discrete_are(az, bz, q, np.eye(m) * dt)
+        kz = -np.linalg.solve(np.eye(m) * dt + bz.T @ p @ bz, bz.T @ p @ az)
+        k = np.zeros((m, size))
+        k[:, :n] = np.diag(us) @ kz[:, :n] @ np.diag(1.0 / xs)
+        for j in range(d):
+            k[:, n + j * m : n + (j + 1) * m] = (
+                np.diag(us) @ kz[:, n + j * m : n + (j + 1) * m] @ np.diag(1.0 / us)
+            )
+        out[idx] = k
+    return out

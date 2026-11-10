@@ -56,6 +56,19 @@ LABELS = {
     "ppo_rate100": "PPO, action-rate penalty x100",
     "ppo_ls0": "PPO, initial log-std 0",
     "ppo_ent": "PPO, entropy coefficient 0.01",
+    "ppo_tuned": "PPO, tuned (random search)",
+    "diffsim_tuned": "Diff-sim, tuned (random search)",
+    "ppo_dr_tuned": "PPO + DR, tuned config",
+    "diffsim_dr_tuned": "Diff-sim + DR, tuned config",
+    "ppo_rl": "PPO, trained with rate limits",
+    "diffsim_rl": "Diff-sim, trained with rate limits",
+    "ppo_drrl": "PPO + DR, trained with rate limits",
+    "diffsim_drrl": "Diff-sim + DR, trained with rate limits",
+    "ppo_smoothls2": "PPO, rate penalty x1000, log-std -2",
+    "dlqr0": "Discrete LQR (ZOH), 0 ms",
+    "dlqr1": "Discrete delay-aware LQR, 20 ms",
+    "dlqr2": "Discrete delay-aware LQR, 40 ms",
+    "dlqr3": "Discrete delay-aware LQR, 60 ms",
 }
 # Learned controllers: name -> (training method, variant); files are
 # results/policies/<method>_<variant>_seed<k>.npz
@@ -96,6 +109,17 @@ LEARNED = {
     "ppo_rate100": ("ppo", "rate100"),
     "ppo_ls0": ("ppo", "ls0"),
     "ppo_ent": ("ppo", "ent"),
+    # Round 5 (results/tmlr/r5/policies): tuned hyperparameters (random search),
+    # actuator rate limits in training, smoothness-priced PPO with initial log-std -2.
+    "ppo_tuned": ("ppo", "tuned"),
+    "diffsim_tuned": ("diffsim", "tuned"),
+    "ppo_dr_tuned": ("ppo", "drtuned"),
+    "diffsim_dr_tuned": ("diffsim", "drtuned"),
+    "ppo_rl": ("ppo", "rl"),
+    "diffsim_rl": ("diffsim", "rl"),
+    "ppo_drrl": ("ppo", "drrl"),
+    "diffsim_drrl": ("diffsim", "drrl"),
+    "ppo_smoothls2": ("ppo", "smoothls2"),
 }
 # Learned controllers that are residuals on top of a model-based law.
 RESIDUAL_BASE = {

@@ -18,10 +18,12 @@ from functools import partial
 from pathlib import Path
 
 import jax
+import jax.numpy as jnp
 import numpy as np
 
 from morphjax import design, pipeline
-from morphjax.control import lateral_law
+from morphjax.control import lateral_law, make_delayed_lateral
+from morphjax.data import Table
 from morphjax.evaluation import Metrics, batch_rollout, scenario_metrics, summarize
 from morphjax.rl import (
     ACT_LIMITS,
@@ -95,6 +97,13 @@ def controllers(setup, policy_dir: Path, max_seeds: int | None = None):
         s = setup.schedules[name]
         out[name] = (s, [lambda xw, pc, ig, s=s: lateral_law(s, xw, pc, ig)], None, None)
     lon = setup.schedules["gs"]
+    # Round 5: discrete delay-aware LQRs (scripts/r5_dlqr.py), if designed.
+    for d in range(4):
+        path = ROOT / "results" / "tmlr" / "r5" / f"dlqr_gains_d{d}.npy"
+        if path.exists():
+            g = np.load(path)
+            table = Table(lon.k_lat.grids, jnp.asarray(g.reshape(*g.shape[:3], -1)))
+            out[f"dlqr{d}"] = (lon, [make_delayed_lateral(lon, table, d)], None, None)
     filt = make_safety_filter(setup)
     margined = {n: estimate_margin(setup, filt, factor=k)[0] for n, k in pipeline.MARGINED.items()}
     for name, (method, variant) in pipeline.LEARNED.items():
@@ -151,6 +160,7 @@ def pooled(metrics: list[Metrics]) -> Metrics:
 
 
 def main() -> None:
+    global STEPS
     ap = argparse.ArgumentParser()
     ap.add_argument("--quick", action="store_true", help="tiny batches (CI smoke test)")
     ap.add_argument("--n", type=int, default=256, help="scenarios per table condition")
@@ -167,6 +177,7 @@ def main() -> None:
     ap.add_argument("--wide", type=Path, default=ROOT / "results" / "tmlr" / "lqr_wide.json")
     ap.add_argument("--no-figures", action="store_true")
     ap.add_argument("--only", default=None, help="comma-separated controllers to evaluate")
+    ap.add_argument("--steps", type=int, default=750, help="episode length (750 = 15 s)")
     ap.add_argument("--conditions", default=None, help="comma-separated table conditions")
     ap.add_argument("--sweeps", default=None, help="comma-separated sweeps")
     ap.add_argument(
@@ -178,6 +189,7 @@ def main() -> None:
     args = ap.parse_args()
     if args.quick:
         args.n, args.n_sweep = 4, 2
+    STEPS = args.steps
 
     t0 = time.time()
     if args.revision:

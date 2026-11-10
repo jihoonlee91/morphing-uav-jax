@@ -99,3 +99,24 @@ def lateral_law(sched: Schedule, xw, phi_cmd, integ_phi):
     dx, u0, rho = lateral_error_state(sched, xw, phi_cmd, integ_phi)
     k = interp(sched.k_lat, *rho).reshape(3, 8)
     return u0 + k @ dx
+
+
+def make_delayed_lateral(sched: Schedule, k_table, delay: int):
+    """Round 5: discrete delay-aware LQR (``design.lateral_gains_dlqr``) as a lateral law.
+
+    ``k_table`` is a :class:`Table` of the (3, 8 + 3 d) gains; the law uses the ``delay``
+    pending commands from the command buffer (row 0 = computed one sample ago).
+    """
+    lat_idx = jnp.array([Cmd.DA, Cmd.DR, Cmd.ETA_A])
+
+    def lateral(xw, phi_cmd, integ_phi, buf=None, delay_now=None):
+        dx, u0, rho = lateral_error_state(sched, xw, phi_cmd, integ_phi)
+        k = interp(k_table, *rho).reshape(3, 8 + 3 * delay)
+        u = u0 + k[:, :8] @ dx
+        for j in range(delay):
+            assert buf is not None
+            u = u + k[:, 8 + 3 * j : 11 + 3 * j] @ (buf[j][lat_idx] - u0)
+        return u
+
+    lateral.uses_history = delay > 0  # type: ignore[attr-defined]
+    return lateral
