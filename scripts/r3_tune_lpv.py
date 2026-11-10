@@ -129,6 +129,7 @@ def main() -> None:
         r["max_cumulative_delay_ms"] = delays.get(tuple(r["weights"][k] for k in GRID))
     measured = [r for r in rows if r.get("max_cumulative_delay_ms") is not None]
     requirement_ms = 60.0
+    n60 = len(ok)
     if not ok:
         requirement_ms = 40.0  # the original LPV design's level
         ok = [r for r in measured if r["failures"] == 0 and r["max_cumulative_delay_ms"] >= 40.0]
@@ -140,7 +141,8 @@ def main() -> None:
         "grid": LPV_GRID,
         "candidates": len(rows),
         "feasible": sum(bool(r.get("feasible")) for r in rows),
-        "feasible_and_60ms": len(ok),
+        "feasible_and_60ms": n60,
+        "meeting_requirement_no_failures": len(ok),
         "original_lpv_weights": orig,
         "original_row": orig_row,
         "lpv_tuned": best,

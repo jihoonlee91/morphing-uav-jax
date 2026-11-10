@@ -1,0 +1,161 @@
+{
+ "description": "Round 3: tune the LPV design's Bryson multipliers like the LQR's.\n\n    uv run python scripts/r3_tune_lpv.py\n\nThe paper's LPV law reuses the weights tuned for the GS LQR. Here the common-Lyapunov\nguaranteed-cost synthesis (same decay rate 0.1, pole disk 30 rad/s, trace objective)\nis solved for a 3^5 grid of the same five multipliers around those weights; each design\nis scored like ``tune_lqr.py`` (PPO reward, actuator-limit action scale, tuning\nscenarios seed 7, 96 per distribution) under the same requirement, applied\ncumulatively: every frozen design point stable for every delay of 0-60 ms. The chosen\ndesign is then scored on the held-out scenarios (seed 1007, 256 per distribution).\nRows are appended to ``results/tmlr/r3/lpv_tuning_rows.jsonl`` as they finish (the run\ncan be resumed); the result is ``results/tmlr/r3/lpv_tuned.json``.\n",
+ "grid": {
+  "phi": [
+   0.5,
+   0.125,
+   0.03125
+  ],
+  "integ": [
+   0.125,
+   0.03125,
+   0.0078125
+  ],
+  "beta": [
+   0.5,
+   0.125,
+   0.03125
+  ],
+  "eta_a": [
+   1.0,
+   4.0,
+   16.0
+  ],
+  "effort": [
+   0.125,
+   0.03125,
+   0.0078125
+  ]
+ },
+ "candidates": 243,
+ "feasible": 203,
+ "feasible_and_60ms": 0,
+ "original_lpv_weights": {
+  "phi": 0.125,
+  "integ": 0.03125,
+  "beta": 0.125,
+  "eta_a": 4.0,
+  "effort": 0.03125
+ },
+ "original_row": {
+  "weights": {
+   "phi": 0.125,
+   "integ": 0.03125,
+   "beta": 0.125,
+   "eta_a": 4.0,
+   "effort": 0.03125
+  },
+  "feasible": true,
+  "cumulative_60ms_ok": false,
+  "return": 476.1504674274236,
+  "failures": 0,
+  "max_cumulative_delay_ms": 40.0
+ },
+ "lpv_tuned": {
+  "weights": {
+   "phi": 0.5,
+   "integ": 0.03125,
+   "beta": 0.125,
+   "eta_a": 1.0,
+   "effort": 0.125
+  },
+  "feasible": true,
+  "cumulative_60ms_ok": false,
+  "return": 477.60581510774654,
+  "failures": 0,
+  "max_cumulative_delay_ms": 40.0
+ },
+ "requirement_ms": 40.0,
+ "max_cumulative_delay_ms_in_grid": 40.0,
+ "designs_by_max_delay_ms": {
+  "0.0": 34,
+  "20.0": 93,
+  "40.0": 76
+ },
+ "top5": [
+  {
+   "weights": {
+    "phi": 0.5,
+    "integ": 0.03125,
+    "beta": 0.125,
+    "eta_a": 1.0,
+    "effort": 0.125
+   },
+   "feasible": true,
+   "cumulative_60ms_ok": false,
+   "return": 477.60581510774654,
+   "failures": 0,
+   "max_cumulative_delay_ms": 40.0
+  },
+  {
+   "weights": {
+    "phi": 0.125,
+    "integ": 0.03125,
+    "beta": 0.125,
+    "eta_a": 1.0,
+    "effort": 0.125
+   },
+   "feasible": true,
+   "cumulative_60ms_ok": false,
+   "return": 477.27629595608374,
+   "failures": 0,
+   "max_cumulative_delay_ms": 40.0
+  },
+  {
+   "weights": {
+    "phi": 0.125,
+    "integ": 0.03125,
+    "beta": 0.03125,
+    "eta_a": 1.0,
+    "effort": 0.125
+   },
+   "feasible": true,
+   "cumulative_60ms_ok": false,
+   "return": 477.0044242572549,
+   "failures": 0,
+   "max_cumulative_delay_ms": 40.0
+  },
+  {
+   "weights": {
+    "phi": 0.5,
+    "integ": 0.03125,
+    "beta": 0.03125,
+    "eta_a": 1.0,
+    "effort": 0.125
+   },
+   "feasible": true,
+   "cumulative_60ms_ok": false,
+   "return": 476.8240738269972,
+   "failures": 0,
+   "max_cumulative_delay_ms": 40.0
+  },
+  {
+   "weights": {
+    "phi": 0.125,
+    "integ": 0.03125,
+    "beta": 0.125,
+    "eta_a": 4.0,
+    "effort": 0.03125
+   },
+   "feasible": true,
+   "cumulative_60ms_ok": false,
+   "return": 476.1504674274236,
+   "failures": 0,
+   "max_cumulative_delay_ms": 40.0
+  }
+ ],
+ "heldout": {
+  "lpv_tuned/nominal_return": 475.93254911463566,
+  "lpv_tuned/nominal_failures": 0,
+  "lpv_tuned/dr_return": 465.98895655258104,
+  "lpv_tuned/dr_failures": 0,
+  "lpv_tuned/linear_delay_margin_ms": 40.0,
+  "lpv_original/nominal_return": 474.37694371037185,
+  "lpv_original/nominal_failures": 0,
+  "lpv_original/dr_return": 466.544122212734,
+  "lpv_original/dr_failures": 0,
+  "lpv_original/linear_delay_margin_ms": 40.0
+ },
+ "wall_seconds": 3734.233680486679,
+ "meeting_requirement_no_failures": 76
+}

@@ -1,0 +1,48 @@
+{
+ "rho_d": 0.9960079893439915,
+ "factor": 2.0,
+ "g_estimation_max": 0.3676823017131048,
+ "g_d": 0.7353646034262096,
+ "feasibility": {
+  "max_V_ratio_LPV_interpolated_dense": 0.9913218297409416,
+  "required_at_most": 0.9960079893439915,
+  "feasible_points_dense": 325,
+  "points": 325
+ },
+ "validation": {
+  "random_2000": {
+   "points": 2000,
+   "max_g": 0.3745983589355889,
+   "covered": 2000
+  },
+  "offset_13x5x5": {
+   "points": 325,
+   "max_g": 0.3308102992883791,
+   "covered": 325
+  },
+  "corner_1331": {
+   "points": 1331,
+   "max_g": 0.40406439563534147,
+   "covered": 1331
+  },
+  "check_grid_325": {
+   "points": 325,
+   "max_g": 0.3569879460555693,
+   "covered": 325
+  }
+ },
+ "sampled_data_check": {
+  "interp": {
+   "points_all_samples": 325,
+   "min_share": 1.0,
+   "max_V_ratio": 0.9432666642855158
+  },
+  "true": {
+   "points_all_samples": 325,
+   "min_share": 1.0,
+   "max_V_ratio": 0.9420435853993833
+  },
+  "mean_filtered_over_raw_residual_norm": 0.4571019859511963
+ },
+ "wall_seconds": 565.7389669418335
+}
