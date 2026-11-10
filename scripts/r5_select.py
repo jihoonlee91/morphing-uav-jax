@@ -7,7 +7,7 @@ Every search policy (``r5/search``: 16 PPO and 8 APG configs x seeds 0-2) flies 
 tuning scenarios (``tune_lqr``: seed 7, 96 scenarios of the nominal training
 distribution, 10 s) deterministically; a config's score is the mean return over its seeds
 (PPO reward, actuator-limit action scale, -10 at a departure). The winners are retrained
-with 10 seeds (``ppo_tuned``, ``diffsim_tuned``) and, with domain randomization, 5 seeds
+with 10 seeds (``ppo_tuned``, ``diffsim_tuned``) and, with domain randomization, 3 seeds (reduced from 5 for time)
 (``ppo_dr_tuned``, ``diffsim_dr_tuned``). Writes ``r5/search_selection.json`` and
 ``r5/jobs/train_r5b.txt``.
 """
@@ -56,14 +56,14 @@ def main() -> None:
         res[method] = {"rows": rows, "winner": best, "default_row": rows[0]}
     (R5 / "search_selection.json").write_text(json.dumps(res, indent=1), encoding="utf-8")
     pol = str(R5 / "policies").replace("\\", "/")
-    lines = ["# Round 5 queue B: winners of the search, 10 seeds nominal, 5 seeds DR"]
+    lines = ["# Round 5 queue B: winners of the search, 10 seeds nominal, 3 seeds DR"]
     for seed in range(10):
         for method in ("ppo", "diffsim"):
             o = json.dumps(res[method]["winner"]["override"], separators=(",", ":"))
             lines.append(
                 f"scripts/train_policy.py --method {method} --variant nominal --name tuned --seed {seed} --override {o} --out {pol}"
             )
-            if seed < 5:
+            if seed < 3:  # reduced from 5 for the time budget
                 lines.append(
                     f"scripts/train_policy.py --method {method} --variant dr --name drtuned --seed {seed} --override {o} --out {pol}"
                 )
