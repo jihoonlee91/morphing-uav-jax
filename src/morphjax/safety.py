@@ -232,3 +232,148 @@ def sampled_decrease(
             out[name]["decay"][idx] = np.mean(vdot <= -2.0 * f.decay * v + 1e-9)
             out[name]["neg"][idx] = np.mean(vdot < 0.0)
     return out
+
+
+# ----------------------------------------------------------------------------- round 3
+# Sampled-data (discrete-time) Lyapunov filter.
+#
+# The continuous-time half-space above is vacuous at x -> 0 (a = 2B'Px -> 0 and b -> 0,
+# so any residual is admitted), and a residual held for one 20 ms sample can then
+# increase V: on the 50 Hz ZOH model the certified residual fails V(x+) <= rho_d V(x)
+# for about half of the sampled states (scripts/r3_certificate.py). The filter below
+# enforces the discrete condition directly. With the frozen ZOH model of the lateral
+# loop at the interpolated rho, Phi_cl = Phi + Gamma K (normalized coordinates, LPV
+# gain K) and x+ = Phi_cl x + Gamma du:
+#
+#     V(x+) - rho_d V(x) + g_d [x' D x + du' R du] <= 0,
+#     D = rho_d P - Phi_cl' P Phi_cl,   R = Gamma' P Gamma,
+#
+# i.e. du' H du + 2 c' du + e <= 0 with H = (1 + g_d) R, c = Gamma' P Phi_cl x,
+# e = -(1 - g_d) x' D x: an ellipsoid in du. rho_d = exp(-2 lambda T). D > 0 is the
+# discrete decrease margin of the LPV loop itself (its V ratio is at most 0.991 < rho_d
+# on the interpolated model at all check points). g_d is a relative bound on the model
+# mismatch, exactly like gamma-bar: for z = (x, du), the true-minus-interpolated
+# quadratic form of V(x+) satisfies |z' dM z| <= g z' N z with N = blkdiag(D, R)
+# (generalized eigenvalue), and g_d = factor * max g over random conditions. Then
+# V_true(x+) <= rho_d V(x) whenever the filtered du satisfies the inequality and g <= g_d.
+# du = 0 is feasible wherever D > 0 and g_d < 1, and at x = 0 only du = 0 is admitted
+# (small-control property). The projection
+# min |du - du0|^2 s.t. the ellipsoid is du(nu) = (I + nu H)^-1 (du0 - nu c), with the
+# multiplier nu >= 0 found by bisection on the (monotone) constraint value.
+
+
+class DTSafetyFilter(NamedTuple):
+    phi: Table  # rho -> Phi (8 x 8) of the normalized open-loop lateral model, ZOH at DT
+    gam: Table  # rho -> Gamma (8 x 3)
+    k_n: Table  # rho -> normalized LPV gain (3 x 8)
+    p: jnp.ndarray
+    xs: jnp.ndarray
+    us: jnp.ndarray
+    rho_d: float  # exp(-2 lambda T)
+    margin: float = 0.0  # g_d
+
+
+def _zoh(a: np.ndarray, b: np.ndarray, dt: float) -> tuple[np.ndarray, np.ndarray]:
+    n, m = b.shape
+    blk = np.zeros((n + m, n + m))
+    blk[:n, :n], blk[:n, n:] = a, b
+    e = scipy.linalg.expm(blk * dt)
+    return e[:n, :n], e[:n, n:]
+
+
+def make_dt_safety_filter(setup: Setup, dt: float = 0.02) -> DTSafetyFilter:
+    f = make_safety_filter(setup)
+    grid = setup.grid
+    shp = grid.residual.shape
+    xs, us = np.asarray(f.xs), np.asarray(f.us)
+    ph = np.zeros((*shp, 8, 8))
+    gm = np.zeros((*shp, 8, 3))
+    for idx in np.ndindex(*shp):
+        a, b = design._normalize(*design.lateral_model(grid.A[idx], grid.B[idx]), xs, us)
+        ph[idx], gm[idx] = _zoh(a, b, dt)
+    axes = f.a_n.grids
+    return DTSafetyFilter(
+        Table(axes, jnp.asarray(ph.reshape(*shp, -1))),
+        Table(axes, jnp.asarray(gm.reshape(*shp, -1))),
+        f.k_n, f.p, f.xs, f.us, float(np.exp(-2.0 * f.decay * dt)),
+    )  # fmt: skip
+
+
+def dt_ellipsoid(f: DTSafetyFilter, rho, dx: jnp.ndarray):
+    """``(H, c, e)`` of ``du_n' H du_n + 2 c' du_n + e <= 0`` at ``rho`` for deviation ``dx``."""
+    ph = interp(f.phi, *rho).reshape(8, 8)
+    gm = interp(f.gam, *rho).reshape(8, 3)
+    k = interp(f.k_n, *rho).reshape(3, 8)
+    x = dx / f.xs
+    phc = ph + gm @ k
+    r = gm.T @ f.p @ gm
+    h = (1.0 + f.margin) * r
+    c = gm.T @ f.p @ (phc @ x)
+    e = (1.0 - f.margin) * (x @ (phc.T @ f.p @ phc) @ x - f.rho_d * (x @ f.p @ x))
+    return h, c, e
+
+
+def dt_project(f: DTSafetyFilter, rho, dx: jnp.ndarray, du: jnp.ndarray, iters: int = 60):
+    """Residual ``du`` (physical units) projected onto the discrete-time ellipsoid."""
+    h, c, e = dt_ellipsoid(f, rho, dx)
+    du0 = du / f.us
+
+    def at(nu):
+        return jnp.linalg.solve(jnp.eye(3) + nu * h, du0 - nu * c)
+
+    def g(nu):
+        d = at(nu)
+        return d @ h @ d + 2.0 * c @ d + e
+
+    def body(_, lohi):
+        lo, hi = lohi
+        mid = 0.5 * (lo + hi)
+        ok = g(jnp.tan(mid)) <= 0.0  # nu = tan(t), t in [0, pi/2)
+        return jnp.where(ok, lo, mid), jnp.where(ok, mid, hi)
+
+    _, hi = jax.lax.fori_loop(0, iters, body, (0.0, 0.5 * jnp.pi - 1e-9))
+    out = jnp.where(g(0.0) <= 0.0, du0, at(jnp.tan(hi)))
+    return out * f.us
+
+
+def dt_relative_error(f: DTSafetyFilter, grid: design.DesignGrid, dt: float = 0.02) -> np.ndarray:
+    """Per point of ``grid``: ``g`` with ``|z' (M_true - M_int) z| <= g z' N z``."""
+    xs, us, p = np.asarray(f.xs), np.asarray(f.us), np.asarray(f.p)
+    pts = np.stack(np.meshgrid(grid.v_syn, grid.alt, grid.eta_s, indexing="ij"), axis=-1)
+    out = np.zeros(grid.residual.shape)
+    for idx in np.ndindex(*grid.residual.shape):
+        a, b = design._normalize(*design.lateral_model(grid.A[idx], grid.B[idx]), xs, us)
+        out[idx] = _dt_gamma(f, p, a, b, tuple(jnp.asarray(v) for v in pts[idx]), dt)
+    return out
+
+
+def _dt_gamma(f: DTSafetyFilter, p, a, b, rho, dt) -> float:
+    ph_t, gm_t = _zoh(a, b, dt)
+    ph = np.asarray(interp(f.phi, *rho)).reshape(8, 8)
+    gm = np.asarray(interp(f.gam, *rho)).reshape(8, 3)
+    k = np.asarray(interp(f.k_n, *rho)).reshape(3, 8)
+
+    def form(phi, gam):
+        m = np.hstack([phi + gam @ k, gam])  # x+ = m z, z = (x, du)
+        return m.T @ p @ m
+
+    dm = form(ph_t, gm_t) - form(ph, gm)
+    phc = ph + gm @ k
+    n = scipy.linalg.block_diag(f.rho_d * p - phc.T @ p @ phc, gm.T @ p @ gm)
+    ev = scipy.linalg.eigh(dm, n, eigvals_only=True)
+    return float(np.abs(ev).max())
+
+
+def estimate_dt_margin(
+    setup: Setup, f: DTSafetyFilter, factor: float = 2.0, per_axis: int = 10, seed: int = 0
+) -> tuple[DTSafetyFilter, dict]:
+    """``g_d = factor * max g`` on the random conditions of :func:`estimate_margin`."""
+    rng = np.random.default_rng(seed)
+    axes = (
+        np.sort(rng.uniform(60.0, 120.0, per_axis)),
+        np.sort(rng.uniform(0.0, 10000.0, per_axis)),
+        np.sort(rng.uniform(-25.0, 0.0, per_axis)),
+    )
+    g = dt_relative_error(f, design.build_grid(setup.plant, *axes))
+    margin = factor * float(g.max())
+    return f._replace(margin=margin), {"max_g": float(g.max()), "margin": margin, "factor": factor}

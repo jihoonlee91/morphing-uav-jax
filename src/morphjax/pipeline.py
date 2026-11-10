@@ -30,6 +30,7 @@ LABELS = {
     "residual_proj_trained": "LPV + residual, projected in training",
     "residual_safe": "LPV + residual, projected with error margin",
     "residual_safe2": "LPV + residual, projected with 2x error margin",
+    "residual_safe_dt": "LPV + residual, discrete-time Lyapunov filter",
     "ppo_lat": "PPO, trained with 20 ms delay",
     "diffsim_lat": "Diff-sim, trained with 20 ms delay",
     "ppo_clean": "PPO, CleanRL-style settings",
@@ -71,6 +72,8 @@ LEARNED = {
     # The same trained policies, projected with an interpolation-error margin.
     "residual_safe": ("residual_proj", "dr"),
     "residual_safe2": ("residual_proj", "dr"),
+    # Round 3: the residual_dr policies behind the discrete-time (sampled-data) filter.
+    "residual_safe_dt": ("residual", "dr"),
     # Revision: trained with a fixed 20 ms delay, pending command observed.
     "ppo_lat": ("ppo", "lat"),
     "diffsim_lat": ("diffsim", "lat"),
@@ -101,12 +104,15 @@ RESIDUAL_BASE = {
     "residual_proj_trained": "lpv",
     "residual_safe": "lpv",
     "residual_safe2": "lpv",
+    "residual_safe_dt": "lpv",
 }
 # Residuals passed through the Lyapunov projection of morphjax.safety.
 PROJECTED = ("residual_proj", "residual_proj_trained", "residual_safe", "residual_safe2")
 # Of those, the ones projected with an interpolation-error margin, and its safety
 # factor on the worst relative error seen on 1,000 random flight conditions.
 MARGINED = {"residual_safe": 1.5, "residual_safe2": 2.0}
+# Residuals behind the discrete-time filter (safety.dt_project), with g_d = factor * max g.
+DT_FILTERED = {"residual_safe_dt": 2.0}
 
 
 class Setup(NamedTuple):

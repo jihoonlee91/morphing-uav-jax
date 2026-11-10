@@ -158,7 +158,7 @@ def main() -> None:
     flat = jnp.asarray(pts.reshape(-1, 3))
     for d in args.policies:
         for name, (method, variant) in pipeline.LEARNED.items():
-            if name in pipeline.PROJECTED:
+            if name in pipeline.PROJECTED or name in pipeline.DT_FILTERED:
                 continue
             files = sorted(d.glob(f"{method}_{variant}_seed*.npz"))
             if not files:

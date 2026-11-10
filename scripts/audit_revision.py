@@ -46,7 +46,9 @@ ROOT = Path(__file__).resolve().parents[1]
 MAX_D = 4
 NEWTON_ITERS = 40
 STEPS_T = jnp.array([1.0, 0.5, 0.25, 0.125, 0.0625, 0.03125, 0.0])
-SKIP = set(pipeline.PROJECTED)  # filtered laws: checked by sampling, not by a Jacobian
+SKIP = set(pipeline.PROJECTED) | set(
+    pipeline.DT_FILTERED
+)  # filtered laws: checked by sampling, not by a Jacobian
 
 
 def zoh(a, b):
@@ -77,7 +79,9 @@ def radius(ad, bd, kx, ku, d):
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--policies", type=Path, default=ROOT / "results" / "tmlr" / "policies")
+    ap.add_argument(
+        "--policies", type=Path, nargs="+", default=[ROOT / "results" / "tmlr" / "policies"]
+    )
     ap.add_argument("--metrics", type=Path, default=ROOT / "results" / "tmlr" / "metrics.json")
     ap.add_argument("--wide", type=Path, default=ROOT / "results" / "tmlr" / "lqr_wide.json")
     ap.add_argument("--out", type=Path, default=ROOT / "results" / "tmlr")
@@ -189,7 +193,7 @@ def main() -> None:
     for name, (method, variant) in pipeline.LEARNED.items():
         if name in SKIP:
             continue
-        files = sorted(args.policies.glob(f"{method}_{variant}_seed*.npz"))
+        files = sorted(f for d in args.policies for f in d.glob(f"{method}_{variant}_seed*.npz"))
         if not files:
             continue
         residual = name in pipeline.RESIDUAL_BASE
@@ -277,7 +281,8 @@ def main() -> None:
 
     res["meta"] = {"grid_points": int(on_grid.size), "envelope_points": int(envelope.sum()),
                    "envelope": "V_syn 70-110 kt, h 500-9500 ft (the training/test envelope)",
-                   "policies": str(args.policies), "wall_seconds": time.time() - t0}  # fmt: skip
+                   "policies": [str(d) for d in args.policies],
+                   "wall_seconds": time.time() - t0}  # fmt: skip
     args.out.mkdir(parents=True, exist_ok=True)
     (args.out / "audit.json").write_text(json.dumps(res, indent=1), encoding="utf-8")
     np.savez_compressed(args.out / "audit_points.npz", **points)

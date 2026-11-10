@@ -31,7 +31,14 @@ from morphjax.rl import (
     make_policy_lateral,
     training_scenario,
 )
-from morphjax.safety import estimate_margin, make_projected_residual_lateral, make_safety_filter
+from morphjax.safety import (
+    dt_project,
+    estimate_dt_margin,
+    estimate_margin,
+    make_dt_safety_filter,
+    make_projected_residual_lateral,
+    make_safety_filter,
+)
 from morphjax.scenarios import sample_scenario
 from morphjax.sim import DT, rollout
 
@@ -102,7 +109,14 @@ def controllers(setup, policy_dir: Path, max_seeds: int | None = None):
         loaded = [load_policy(f) for f in files]
         pcfg = loaded[0][1]
         assert all(c == pcfg for _, c in loaded), f"{name}: seeds differ in interface"
-        if name in pipeline.PROJECTED:
+        if name in pipeline.DT_FILTERED:
+            dtf, _ = estimate_dt_margin(
+                setup, make_dt_safety_filter(setup), pipeline.DT_FILTERED[name]
+            )
+
+            def factory(p, dtf=dtf, base=base):
+                return make_policy_lateral(lon, p, base, residual_filter=partial(dt_project, dtf))
+        elif name in pipeline.PROJECTED:
             fl = margined.get(name, filt)
 
             def factory(p, fl=fl, base=base):

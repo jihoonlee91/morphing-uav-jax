@@ -42,6 +42,7 @@ LPV_GRID = {
     "effort": [0.125, 0.03125, 0.0078125],
 }
 HELDOUT_SEED, HELDOUT_N = 1007, 256
+TOP = 40
 
 
 def scen(seed, n, dr):
@@ -53,7 +54,7 @@ def scen(seed, n, dr):
 
 def main() -> None:
     t0 = time.time()
-    setup = pipeline.build()
+    setup = pipeline.build(pipeline.load_weights(ROOT / "results" / "lqr_weights.json"))
     k_lon = design.longitudinal_gains(setup.grid)
     tune = scen(SEED, N, False)
 
@@ -100,6 +101,37 @@ def main() -> None:
 
     rows = list(done.values())
     ok = [r for r in rows if r.get("feasible") and r["cumulative_60ms_ok"] and r["failures"] == 0]
+    # The largest cumulative delay every design point tolerates, for every feasible
+    # design (gains re-solved; appended to lpv_tuning_delays.jsonl, resumable).
+    dpath = OUT / "lpv_tuning_delays.jsonl"
+    delays = {}
+    if dpath.exists():
+        for line in dpath.read_text(encoding="utf-8").splitlines():
+            r = json.loads(line)
+            delays[tuple(r["weights"][k] for k in GRID)] = r["max_cumulative_delay_ms"]
+    with dpath.open("a", encoding="utf-8") as fh:
+        for r in rows:
+            w = tuple(r["weights"][k] for k in GRID)
+            if not r.get("feasible") or w in delays:
+                continue
+            try:
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore", UserWarning)
+                    g = design.lateral_gains_lpv(setup.grid, design.LatWeights(*w)).gains
+                d = 1000 * DT * design.max_stable_delay(setup.grid, g, DT)
+            except Exception:  # the re-solve can fail where the first one succeeded
+                d = None
+            delays[w] = d
+            fh.write(json.dumps({"weights": r["weights"], "max_cumulative_delay_ms": d}) + "\n")
+            fh.flush()
+            print(r["weights"], r["return"], d, flush=True)
+    for r in rows:
+        r["max_cumulative_delay_ms"] = delays.get(tuple(r["weights"][k] for k in GRID))
+    measured = [r for r in rows if r.get("max_cumulative_delay_ms") is not None]
+    requirement_ms = 60.0
+    if not ok:
+        requirement_ms = 40.0  # the original LPV design's level
+        ok = [r for r in measured if r["failures"] == 0 and r["max_cumulative_delay_ms"] >= 40.0]
     best = max(ok, key=lambda r: r["return"]) if ok else None
     orig = setup.weights._asdict()
     orig_row = done.get(tuple(orig[k] for k in GRID))
@@ -112,6 +144,14 @@ def main() -> None:
         "original_lpv_weights": orig,
         "original_row": orig_row,
         "lpv_tuned": best,
+        "requirement_ms": requirement_ms,
+        "max_cumulative_delay_ms_in_grid": max(
+            (r["max_cumulative_delay_ms"] for r in measured), default=None
+        ),
+        "designs_by_max_delay_ms": {
+            str(d): sum(r["max_cumulative_delay_ms"] == d for r in measured)
+            for d in sorted({r["max_cumulative_delay_ms"] for r in measured})
+        },
         "top5": sorted(ok, key=lambda r: -r["return"])[:5],
     }
     if best is not None:

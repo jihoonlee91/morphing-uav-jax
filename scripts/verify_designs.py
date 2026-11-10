@@ -56,7 +56,7 @@ def main() -> None:
 
     learned: dict[str, list] = {}
     for name, (method, variant) in pipeline.LEARNED.items():
-        if name in pipeline.PROJECTED:
+        if name in pipeline.PROJECTED or name in pipeline.DT_FILTERED:
             continue  # not linearizable at trim; checked by sampling below
         for f in sorted(args.policies.glob(f"{method}_{variant}_seed*.npz")):
             params, pcfg = load_policy(f)

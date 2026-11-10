@@ -1,0 +1,594 @@
+{
+ "description": "Round 3: score the frontier's Pareto designs on scenarios they were not selected on.\n\n    uv run python scripts/r3_frontier_heldout.py\n\nThe Pareto designs of ``frontier.json`` were picked on the first 64 of the 256 nominal\n(frozen-shape) evaluation scenarios (seed 1000) and scored on the same 64. Here they, and\ngs / gs_hg / gs_hg_wide for reference, fly the remaining 192 (held out from the\nselection) and all 256, reporting RMSE over runs that keep control, loss of control and\nactuator activity (``evaluation.command_activity``, as in the tables), plus the\nevaluation delay sweep (fast morphing, seed 2020, 128 scenarios) at 20/40/60 ms.\nWrites ``results/tmlr/r3/frontier_heldout.json``.\n",
+ "designs": [
+  {
+   "weights": {
+    "phi": 0.5,
+    "integ": 0.00390625,
+    "beta": 0.125,
+    "eta_a": 16.0,
+    "effort": 2.0
+   },
+   "labels": [
+    "pareto_envelope@-1",
+    "pareto_design_points@-1"
+   ],
+   "selection_64": {
+    "rmse": 0.05069747413409335,
+    "loc": 0.0,
+    "activity": 165.690095228065
+   },
+   "heldout_192": {
+    "rmse": 0.050702030628722784,
+    "loc": 0.0,
+    "activity": 168.84364809523515
+   },
+   "all_256": {
+    "rmse": 0.05070089150506542,
+    "loc": 0.0,
+    "activity": 168.0552598784426
+   },
+   "delay_20ms": {
+    "rmse": null,
+    "loc": 1.0,
+    "activity": null
+   },
+   "delay_40ms": {
+    "rmse": null,
+    "loc": 1.0,
+    "activity": null
+   },
+   "delay_60ms": {
+    "rmse": null,
+    "loc": 1.0,
+    "activity": null
+   }
+  },
+  {
+   "weights": {
+    "phi": 0.5,
+    "integ": 0.00390625,
+    "beta": 1.0,
+    "eta_a": 16.0,
+    "effort": 1.0
+   },
+   "labels": [
+    "pareto_envelope@0"
+   ],
+   "selection_64": {
+    "rmse": 0.052299979784571876,
+    "loc": 0.0,
+    "activity": 0.9468908283212152
+   },
+   "heldout_192": {
+    "rmse": 0.05243242684486818,
+    "loc": 0.0,
+    "activity": 1.1168588998892697
+   },
+   "all_256": {
+    "rmse": 0.052399315079794104,
+    "loc": 0.0,
+    "activity": 1.074366881997256
+   },
+   "delay_20ms": {
+    "rmse": null,
+    "loc": 1.0,
+    "activity": null
+   },
+   "delay_40ms": {
+    "rmse": null,
+    "loc": 1.0,
+    "activity": null
+   },
+   "delay_60ms": {
+    "rmse": null,
+    "loc": 1.0,
+    "activity": null
+   }
+  },
+  {
+   "weights": {
+    "phi": 1.0,
+    "integ": 0.00390625,
+    "beta": 1.0,
+    "eta_a": 4.0,
+    "effort": 0.0625
+   },
+   "labels": [
+    "pareto_envelope@1"
+   ],
+   "selection_64": {
+    "rmse": 0.22720249927887,
+    "loc": 0.0,
+    "activity": 0.17491510190542137
+   },
+   "heldout_192": {
+    "rmse": 0.22799957927610034,
+    "loc": 0.0,
+    "activity": 0.1724473901826851
+   },
+   "all_256": {
+    "rmse": 0.22780030927679276,
+    "loc": 0.0,
+    "activity": 0.1730643181133692
+   },
+   "delay_20ms": {
+    "rmse": 0.21728900750188881,
+    "loc": 0.0,
+    "activity": 0.2849721004272182
+   },
+   "delay_40ms": {
+    "rmse": null,
+    "loc": 1.0,
+    "activity": null
+   },
+   "delay_60ms": {
+    "rmse": null,
+    "loc": 1.0,
+    "activity": null
+   }
+  },
+  {
+   "weights": {
+    "phi": 1.0,
+    "integ": 0.015625,
+    "beta": 1.0,
+    "eta_a": 4.0,
+    "effort": 0.0625
+   },
+   "labels": [
+    "pareto_envelope@2"
+   ],
+   "selection_64": {
+    "rmse": 0.4787533677135374,
+    "loc": 0.0,
+    "activity": 0.15611728698599686
+   },
+   "heldout_192": {
+    "rmse": 0.48033246146983405,
+    "loc": 0.0,
+    "activity": 0.15434622137872386
+   },
+   "all_256": {
+    "rmse": 0.47993768803075987,
+    "loc": 0.0,
+    "activity": 0.15478898778054212
+   },
+   "delay_20ms": {
+    "rmse": 0.4648687863758696,
+    "loc": 0.0,
+    "activity": 0.16462083395069424
+   },
+   "delay_40ms": {
+    "rmse": 0.4804431196734479,
+    "loc": 0.0,
+    "activity": 0.6324845772847737
+   },
+   "delay_60ms": {
+    "rmse": 3.6411899059943096,
+    "loc": 0.0,
+    "activity": 15.646564385590413
+   }
+  },
+  {
+   "weights": {
+    "phi": 0.0625,
+    "integ": 0.00390625,
+    "beta": 0.5,
+    "eta_a": 0.0625,
+    "effort": 0.0078125
+   },
+   "labels": [
+    "pareto_envelope@3"
+   ],
+   "selection_64": {
+    "rmse": 0.709786463225643,
+    "loc": 0.0,
+    "activity": 0.08999249351721966
+   },
+   "heldout_192": {
+    "rmse": 0.7124070554337484,
+    "loc": 0.0,
+    "activity": 0.08883285333199485
+   },
+   "all_256": {
+    "rmse": 0.711751907381722,
+    "loc": 0.0,
+    "activity": 0.08912276337830105
+   },
+   "delay_20ms": {
+    "rmse": 0.6961374845732486,
+    "loc": 0.0,
+    "activity": 0.08823034487599632
+   },
+   "delay_40ms": {
+    "rmse": 0.7238578372591806,
+    "loc": 0.0,
+    "activity": 0.17377053867186992
+   },
+   "delay_60ms": {
+    "rmse": 0.8080938090990487,
+    "loc": 0.0,
+    "activity": 0.6399429102148408
+   }
+  },
+  {
+   "weights": {
+    "phi": 0.125,
+    "integ": 0.0625,
+    "beta": 1.0,
+    "eta_a": 4.0,
+    "effort": 0.03125
+   },
+   "labels": [
+    "pareto_envelope@4"
+   ],
+   "selection_64": {
+    "rmse": 1.4368589752259306,
+    "loc": 0.0,
+    "activity": 0.13934514999175585
+   },
+   "heldout_192": {
+    "rmse": 1.4423939254416667,
+    "loc": 0.0,
+    "activity": 0.13773140811478923
+   },
+   "all_256": {
+    "rmse": 1.4410101878877326,
+    "loc": 0.0,
+    "activity": 0.1381348435840309
+   },
+   "delay_20ms": {
+    "rmse": 1.401546823989031,
+    "loc": 0.0,
+    "activity": 0.1349754938932918
+   },
+   "delay_40ms": {
+    "rmse": 1.4264624865235176,
+    "loc": 0.0,
+    "activity": 0.2236092162516026
+   },
+   "delay_60ms": {
+    "rmse": 1.4687012955914311,
+    "loc": 0.0,
+    "activity": 0.6569831750308212
+   }
+  },
+  {
+   "weights": {
+    "phi": 4.0,
+    "integ": 0.00390625,
+    "beta": 0.125,
+    "eta_a": 16.0,
+    "effort": 0.5
+   },
+   "labels": [
+    "pareto_design_points@0"
+   ],
+   "selection_64": {
+    "rmse": 0.07205952550541356,
+    "loc": 0.0,
+    "activity": 0.6292912356460498
+   },
+   "heldout_192": {
+    "rmse": 0.07223242508836689,
+    "loc": 0.0,
+    "activity": 0.608969716856521
+   },
+   "all_256": {
+    "rmse": 0.07218920019262855,
+    "loc": 0.0,
+    "activity": 0.6140500965539033
+   },
+   "delay_20ms": {
+    "rmse": null,
+    "loc": 1.0,
+    "activity": null
+   },
+   "delay_40ms": {
+    "rmse": null,
+    "loc": 1.0,
+    "activity": null
+   },
+   "delay_60ms": {
+    "rmse": null,
+    "loc": 1.0,
+    "activity": null
+   }
+  },
+  {
+   "weights": {
+    "phi": 1.0,
+    "integ": 0.015625,
+    "beta": 1.0,
+    "eta_a": 4.0,
+    "effort": 0.125
+   },
+   "labels": [
+    "pareto_design_points@1"
+   ],
+   "selection_64": {
+    "rmse": 0.332249770461577,
+    "loc": 0.0,
+    "activity": 0.1530179748965686
+   },
+   "heldout_192": {
+    "rmse": 0.33334517164723976,
+    "loc": 0.0,
+    "activity": 0.151179887117723
+   },
+   "all_256": {
+    "rmse": 0.33307132135082407,
+    "loc": 0.0,
+    "activity": 0.15163940906243442
+   },
+   "delay_20ms": {
+    "rmse": 0.31953300712815,
+    "loc": 0.0,
+    "activity": 0.17946151388439088
+   },
+   "delay_40ms": {
+    "rmse": 1.1712025496458245,
+    "loc": 0.0,
+    "activity": 13.663390166736425
+   },
+   "delay_60ms": {
+    "rmse": 15.030640499756476,
+    "loc": 0.2890625,
+    "activity": 18.030713838765436
+   }
+  },
+  {
+   "weights": {
+    "phi": 1.0,
+    "integ": 0.0078125,
+    "beta": 1.0,
+    "eta_a": 1.0,
+    "effort": 0.03125
+   },
+   "labels": [
+    "pareto_design_points@2"
+   ],
+   "selection_64": {
+    "rmse": 0.48421807835060904,
+    "loc": 0.0,
+    "activity": 0.10356539411808408
+   },
+   "heldout_192": {
+    "rmse": 0.48604387217414075,
+    "loc": 0.0,
+    "activity": 0.10254330922567227
+   },
+   "all_256": {
+    "rmse": 0.48558742371825786,
+    "loc": 0.0,
+    "activity": 0.10279883044877522
+   },
+   "delay_20ms": {
+    "rmse": 0.47171773354916346,
+    "loc": 0.0,
+    "activity": 0.10407579193524855
+   },
+   "delay_40ms": {
+    "rmse": 0.4902778328113587,
+    "loc": 0.0,
+    "activity": 0.30890991592664985
+   },
+   "delay_60ms": {
+    "rmse": 2.3622121492228123,
+    "loc": 0.0,
+    "activity": 5.546410982962584
+   }
+  },
+  {
+   "weights": {
+    "phi": 0.125,
+    "integ": 0.03125,
+    "beta": 1.0,
+    "eta_a": 4.0,
+    "effort": 0.03125
+   },
+   "labels": [
+    "pareto_design_points@3"
+   ],
+   "selection_64": {
+    "rmse": 1.0113240268200465,
+    "loc": 0.0,
+    "activity": 0.15120649235628866
+   },
+   "heldout_192": {
+    "rmse": 1.0143651362743429,
+    "loc": 0.0,
+    "activity": 0.14932047357382824
+   },
+   "all_256": {
+    "rmse": 1.013604858910769,
+    "loc": 0.0,
+    "activity": 0.14979197826944335
+   },
+   "delay_20ms": {
+    "rmse": 0.9874345016114133,
+    "loc": 0.0,
+    "activity": 0.1476388105967997
+   },
+   "delay_40ms": {
+    "rmse": 1.0116582181373894,
+    "loc": 0.0,
+    "activity": 0.27989381678718683
+   },
+   "delay_60ms": {
+    "rmse": 1.0629973513994042,
+    "loc": 0.0,
+    "activity": 0.9718712896288182
+   }
+  },
+  {
+   "weights": {
+    "phi": 0.125,
+    "integ": 0.0625,
+    "beta": 1.0,
+    "eta_a": 1.0,
+    "effort": 0.03125
+   },
+   "labels": [
+    "pareto_design_points@4"
+   ],
+   "selection_64": {
+    "rmse": 1.5013530063374587,
+    "loc": 0.0,
+    "activity": 0.07266090097261127
+   },
+   "heldout_192": {
+    "rmse": 1.5098026067608823,
+    "loc": 0.0,
+    "activity": 0.07205577896910494
+   },
+   "all_256": {
+    "rmse": 1.5076902066550266,
+    "loc": 0.0,
+    "activity": 0.07220705946998152
+   },
+   "delay_20ms": {
+    "rmse": 1.4632147846472305,
+    "loc": 0.0,
+    "activity": 0.07098905509354828
+   },
+   "delay_40ms": {
+    "rmse": 1.4960814870704477,
+    "loc": 0.0,
+    "activity": 0.11242862481262628
+   },
+   "delay_60ms": {
+    "rmse": 1.5394869905573771,
+    "loc": 0.0,
+    "activity": 0.29514271996846964
+   }
+  },
+  {
+   "weights": {
+    "phi": 0.125,
+    "integ": 0.03125,
+    "beta": 0.125,
+    "eta_a": 4.0,
+    "effort": 0.03125
+   },
+   "labels": [
+    "gs"
+   ],
+   "selection_64": {
+    "rmse": 1.0581219383511378,
+    "loc": 0.0,
+    "activity": 0.13555540912251338
+   },
+   "heldout_192": {
+    "rmse": 1.0630134273176906,
+    "loc": 0.0,
+    "activity": 0.1344670368057807
+   },
+   "all_256": {
+    "rmse": 1.0617905550760525,
+    "loc": 0.0,
+    "activity": 0.1347391298849639
+   },
+   "delay_20ms": {
+    "rmse": 1.027202428170257,
+    "loc": 0.0,
+    "activity": 0.13609766178397875
+   },
+   "delay_40ms": {
+    "rmse": 1.0430044682626798,
+    "loc": 0.0,
+    "activity": 0.2774793771833617
+   },
+   "delay_60ms": {
+    "rmse": 1.0814324723290625,
+    "loc": 0.0,
+    "activity": 1.0380117111320504
+   }
+  },
+  {
+   "weights": {
+    "phi": 1.0,
+    "integ": 0.03125,
+    "beta": 0.125,
+    "eta_a": 4.0,
+    "effort": 0.25
+   },
+   "labels": [
+    "gs_hg"
+   ],
+   "selection_64": {
+    "rmse": 0.3570655249597673,
+    "loc": 0.0,
+    "activity": 0.15511920478999863
+   },
+   "heldout_192": {
+    "rmse": 0.35846122459195257,
+    "loc": 0.0,
+    "activity": 0.15330080774536017
+   },
+   "all_256": {
+    "rmse": 0.3581122996839063,
+    "loc": 0.0,
+    "activity": 0.1537554070065198
+   },
+   "delay_20ms": {
+    "rmse": 0.3482149099466254,
+    "loc": 0.0,
+    "activity": 2.567415266391003
+   },
+   "delay_40ms": {
+    "rmse": 1.804709623673956,
+    "loc": 0.0,
+    "activity": 33.95763439716055
+   },
+   "delay_60ms": {
+    "rmse": null,
+    "loc": 1.0,
+    "activity": null
+   }
+  },
+  {
+   "weights": {
+    "phi": 8.0,
+    "integ": 0.00390625,
+    "beta": 0.0625,
+    "eta_a": 0.0625,
+    "effort": 1.0
+   },
+   "labels": [
+    "gs_hg_wide"
+   ],
+   "selection_64": {
+    "rmse": 0.05811596830001252,
+    "loc": 0.0,
+    "activity": 0.10908889568102008
+   },
+   "heldout_192": {
+    "rmse": 0.05828632621214177,
+    "loc": 0.0,
+    "activity": 0.11391178313701034
+   },
+   "all_256": {
+    "rmse": 0.05824373673410945,
+    "loc": 0.0,
+    "activity": 0.11270606127301278
+   },
+   "delay_20ms": {
+    "rmse": null,
+    "loc": 1.0,
+    "activity": null
+   },
+   "delay_40ms": {
+    "rmse": null,
+    "loc": 1.0,
+    "activity": null
+   },
+   "delay_60ms": {
+    "rmse": null,
+    "loc": 1.0,
+    "activity": null
+   }
+  }
+ ]
+}

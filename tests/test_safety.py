@@ -58,3 +58,20 @@ def test_margin_makes_the_decrease_hold_off_grid(setup):
     gains = interpolate_gains(setup.grid, setup.lat_gains["lpv"], dense)
     out = sampled_decrease(f_safe, dense, gains, {"safe": project}, samples=512)
     assert out["safe"]["decay"].min() == 1.0
+
+
+def test_discrete_time_filter_enforces_the_ellipsoid(setup):
+    from morphjax.safety import dt_ellipsoid, dt_project, make_dt_safety_filter
+
+    f = make_dt_safety_filter(setup)._replace(margin=0.002)
+    rng = np.random.default_rng(0)
+    rho = (jnp.asarray(87.0), jnp.asarray(3300.0), jnp.asarray(-9.0))
+    for scale in (1e-3, 0.1, 3.0):
+        dx = jnp.asarray(rng.normal(size=8)) * f.xs * scale
+        du = jnp.asarray(rng.uniform(-1, 1, size=3)) * RESIDUAL_SCALE
+        h, c, e = dt_ellipsoid(f, rho, dx)
+        assert float(e) <= 0  # du = 0 is feasible (the LPV loop decreases V)
+        d = dt_project(f, rho, dx, du) / f.us
+        assert float(d @ h @ d + 2 * c @ d + e) <= 1e-9 * max(1.0, abs(float(e)))
+    zero = dt_project(f, rho, jnp.zeros(8), jnp.ones(3))
+    np.testing.assert_allclose(zero, 0.0, atol=1e-6)  # small-control property
