@@ -1,0 +1,542 @@
+{
+ "ppo": {
+  "rows": [
+   {
+    "config": 0,
+    "override": {},
+    "seeds": 3,
+    "returns": [
+     495.1520688955514,
+     494.9624406218391,
+     494.89476694993965
+    ],
+    "mean": 495.00309215577676
+   },
+   {
+    "config": 1,
+    "override": {
+     "lr": 0.0006382677831049199,
+     "epochs": 4,
+     "minibatches": 32,
+     "clip": 0.2,
+     "ent_coef": 0.001,
+     "init_log_std": -1.0,
+     "obs_norm": false,
+     "reward_norm": true,
+     "lam": 0.9,
+     "gamma": 0.98,
+     "vf_clip": false
+    },
+    "seeds": 3,
+    "returns": [
+     492.96274978520455,
+     491.94793861744125,
+     492.5478146673176
+    ],
+    "mean": 492.4861676899878
+   },
+   {
+    "config": 2,
+    "override": {
+     "lr": 0.00025613752305563513,
+     "epochs": 4,
+     "minibatches": 8,
+     "clip": 0.1,
+     "ent_coef": 0.0,
+     "init_log_std": -2.0,
+     "obs_norm": true,
+     "reward_norm": false,
+     "lam": 0.95,
+     "gamma": 0.995,
+     "vf_clip": false
+    },
+    "seeds": 3,
+    "returns": [
+     495.1514926376746,
+     494.2377522198157,
+     495.43024739157073
+    ],
+    "mean": 494.939830749687
+   },
+   {
+    "config": 3,
+    "override": {
+     "lr": 0.000272237251964316,
+     "epochs": 4,
+     "minibatches": 32,
+     "clip": 0.1,
+     "ent_coef": 0.01,
+     "init_log_std": 0.0,
+     "obs_norm": true,
+     "reward_norm": false,
+     "lam": 0.95,
+     "gamma": 0.99,
+     "vf_clip": false
+    },
+    "seeds": 3,
+    "returns": [
+     495.4537269191726,
+     495.5623918805772,
+     495.370904013342
+    ],
+    "mean": 495.46234093769726
+   },
+   {
+    "config": 4,
+    "override": {
+     "lr": 0.0004749953431548741,
+     "epochs": 6,
+     "minibatches": 8,
+     "clip": 0.3,
+     "ent_coef": 0.001,
+     "init_log_std": 0.0,
+     "obs_norm": false,
+     "reward_norm": false,
+     "lam": 0.98,
+     "gamma": 0.98,
+     "vf_clip": false
+    },
+    "seeds": 3,
+    "returns": [
+     490.0256245266541,
+     490.0611133542199,
+     490.0767917962551
+    ],
+    "mean": 490.0545098923764
+   },
+   {
+    "config": 5,
+    "override": {
+     "lr": 0.00047772892033850415,
+     "epochs": 4,
+     "minibatches": 32,
+     "clip": 0.2,
+     "ent_coef": 0.0,
+     "init_log_std": -1.0,
+     "obs_norm": true,
+     "reward_norm": true,
+     "lam": 0.98,
+     "gamma": 0.98,
+     "vf_clip": false
+    },
+    "seeds": 3,
+    "returns": [
+     492.38707993233066,
+     495.9220803715578,
+     496.05918968841024
+    ],
+    "mean": 494.7894499974329
+   },
+   {
+    "config": 6,
+    "override": {
+     "lr": 0.0005099123930849753,
+     "epochs": 10,
+     "minibatches": 8,
+     "clip": 0.1,
+     "ent_coef": 0.001,
+     "init_log_std": -1.0,
+     "obs_norm": false,
+     "reward_norm": true,
+     "lam": 0.9,
+     "gamma": 0.99,
+     "vf_clip": false
+    },
+    "seeds": 3,
+    "returns": [
+     493.24780057976506,
+     493.74793558695984,
+     493.31603813121484
+    ],
+    "mean": 493.4372580993133
+   },
+   {
+    "config": 7,
+    "override": {
+     "lr": 0.0006400521061853438,
+     "epochs": 4,
+     "minibatches": 8,
+     "clip": 0.1,
+     "ent_coef": 0.0,
+     "init_log_std": -2.0,
+     "obs_norm": true,
+     "reward_norm": true,
+     "lam": 0.95,
+     "gamma": 0.98,
+     "vf_clip": true
+    },
+    "seeds": 3,
+    "returns": [
+     492.3913840127336,
+     491.18491559012836,
+     494.4862367667201
+    ],
+    "mean": 492.68751212319404
+   },
+   {
+    "config": 8,
+    "override": {
+     "lr": 0.000171995251648231,
+     "epochs": 4,
+     "minibatches": 8,
+     "clip": 0.1,
+     "ent_coef": 0.01,
+     "init_log_std": -1.0,
+     "obs_norm": true,
+     "reward_norm": false,
+     "lam": 0.95,
+     "gamma": 0.995,
+     "vf_clip": false
+    },
+    "seeds": 3,
+    "returns": [
+     495.01046362270046,
+     494.9753241002265,
+     494.8773730956618
+    ],
+    "mean": 494.95438693952957
+   },
+   {
+    "config": 9,
+    "override": {
+     "lr": 0.0001034037479443464,
+     "epochs": 4,
+     "minibatches": 32,
+     "clip": 0.3,
+     "ent_coef": 0.0,
+     "init_log_std": 0.0,
+     "obs_norm": true,
+     "reward_norm": false,
+     "lam": 0.95,
+     "gamma": 0.995,
+     "vf_clip": true
+    },
+    "seeds": 3,
+    "returns": [
+     489.7269955126403,
+     489.5485833906201,
+     489.28004596482384
+    ],
+    "mean": 489.5185416226947
+   },
+   {
+    "config": 10,
+    "override": {
+     "lr": 0.0002508564439512896,
+     "epochs": 4,
+     "minibatches": 32,
+     "clip": 0.1,
+     "ent_coef": 0.001,
+     "init_log_std": 0.0,
+     "obs_norm": false,
+     "reward_norm": false,
+     "lam": 0.98,
+     "gamma": 0.98,
+     "vf_clip": true
+    },
+    "seeds": 3,
+    "returns": [
+     489.46893041507474,
+     489.2689977841439,
+     489.30173384597464
+    ],
+    "mean": 489.34655401506444
+   },
+   {
+    "config": 11,
+    "override": {
+     "lr": 0.0004832871104268437,
+     "epochs": 6,
+     "minibatches": 16,
+     "clip": 0.3,
+     "ent_coef": 0.0,
+     "init_log_std": -1.0,
+     "obs_norm": true,
+     "reward_norm": true,
+     "lam": 0.9,
+     "gamma": 0.98,
+     "vf_clip": true
+    },
+    "seeds": 3,
+    "returns": [
+     479.2910531861264,
+     487.203459836792,
+     490.9424340531439
+    ],
+    "mean": 485.8123156920208
+   },
+   {
+    "config": 12,
+    "override": {
+     "lr": 0.0004319035760323408,
+     "epochs": 10,
+     "minibatches": 16,
+     "clip": 0.1,
+     "ent_coef": 0.01,
+     "init_log_std": -2.0,
+     "obs_norm": false,
+     "reward_norm": false,
+     "lam": 0.95,
+     "gamma": 0.98,
+     "vf_clip": true
+    },
+    "seeds": 3,
+    "returns": [
+     494.57649548935206,
+     494.7619148428619,
+     494.61474775351127
+    ],
+    "mean": 494.65105269524173
+   },
+   {
+    "config": 13,
+    "override": {
+     "lr": 0.0002401460074366452,
+     "epochs": 4,
+     "minibatches": 32,
+     "clip": 0.1,
+     "ent_coef": 0.001,
+     "init_log_std": -2.0,
+     "obs_norm": true,
+     "reward_norm": true,
+     "lam": 0.98,
+     "gamma": 0.99,
+     "vf_clip": true
+    },
+    "seeds": 3,
+    "returns": [
+     492.92159644897214,
+     494.7652155253043,
+     495.1282439139436
+    ],
+    "mean": 494.2716852960734
+   },
+   {
+    "config": 14,
+    "override": {
+     "lr": 0.0006439376362098974,
+     "epochs": 4,
+     "minibatches": 8,
+     "clip": 0.2,
+     "ent_coef": 0.01,
+     "init_log_std": -1.0,
+     "obs_norm": true,
+     "reward_norm": true,
+     "lam": 0.95,
+     "gamma": 0.99,
+     "vf_clip": true
+    },
+    "seeds": 3,
+    "returns": [
+     494.5891467046067,
+     494.8275163718081,
+     494.9707601668081
+    ],
+    "mean": 494.795807747741
+   },
+   {
+    "config": 15,
+    "override": {
+     "lr": 0.00030163918018324043,
+     "epochs": 6,
+     "minibatches": 32,
+     "clip": 0.3,
+     "ent_coef": 0.0,
+     "init_log_std": -1.0,
+     "obs_norm": false,
+     "reward_norm": false,
+     "lam": 0.9,
+     "gamma": 0.995,
+     "vf_clip": false
+    },
+    "seeds": 3,
+    "returns": [
+     492.8675892648916,
+     493.3107902054706,
+     493.02303923254
+    ],
+    "mean": 493.06713956763406
+   }
+  ],
+  "winner": {
+   "config": 3,
+   "override": {
+    "lr": 0.000272237251964316,
+    "epochs": 4,
+    "minibatches": 32,
+    "clip": 0.1,
+    "ent_coef": 0.01,
+    "init_log_std": 0.0,
+    "obs_norm": true,
+    "reward_norm": false,
+    "lam": 0.95,
+    "gamma": 0.99,
+    "vf_clip": false
+   },
+   "seeds": 3,
+   "returns": [
+    495.4537269191726,
+    495.5623918805772,
+    495.370904013342
+   ],
+   "mean": 495.46234093769726
+  },
+  "default_row": {
+   "config": 0,
+   "override": {},
+   "seeds": 3,
+   "returns": [
+    495.1520688955514,
+    494.9624406218391,
+    494.89476694993965
+   ],
+   "mean": 495.00309215577676
+  }
+ },
+ "diffsim": {
+  "rows": [
+   {
+    "config": 0,
+    "override": {},
+    "seeds": 3,
+    "returns": [
+     496.0089091388466,
+     496.00532081455896,
+     496.00763144951594
+    ],
+    "mean": 496.0072871343072
+   },
+   {
+    "config": 1,
+    "override": {
+     "lr": 0.0012839773447449602,
+     "window": 125,
+     "max_grad_norm": 2.6526294366906775
+    },
+    "seeds": 3,
+    "returns": [
+     496.0060415327162,
+     496.0020475584976,
+     495.99525311250017
+    ],
+    "mean": 496.00111406790467
+   },
+   {
+    "config": 2,
+    "override": {
+     "lr": 0.0006374866113516153,
+     "window": 250,
+     "max_grad_norm": 3.082201486906017
+    },
+    "seeds": 3,
+    "returns": [
+     495.86127528965153,
+     495.87615592321663,
+     495.87921635037566
+    ],
+    "mean": 495.8722158544146
+   },
+   {
+    "config": 3,
+    "override": {
+     "lr": 0.0004621640868507665,
+     "window": 250,
+     "max_grad_norm": 0.45421292376595457
+    },
+    "seeds": 3,
+    "returns": [
+     495.87531620911295,
+     495.8773758178747,
+     495.8766215570143
+    ],
+    "mean": 495.87643786133395
+   },
+   {
+    "config": 4,
+    "override": {
+     "lr": 0.0007624649909553102,
+     "window": 250,
+     "max_grad_norm": 0.3745185314780375
+    },
+    "seeds": 3,
+    "returns": [
+     495.9740685472114,
+     495.97960243888593,
+     495.97675104935416
+    ],
+    "mean": 495.9768073451505
+   },
+   {
+    "config": 5,
+    "override": {
+     "lr": 0.0021635163716479996,
+     "window": 250,
+     "max_grad_norm": 0.43630410444179285
+    },
+    "seeds": 3,
+    "returns": [
+     496.047494140335,
+     496.0473578320771,
+     496.04800607506655
+    ],
+    "mean": 496.04761934915956
+   },
+   {
+    "config": 6,
+    "override": {
+     "lr": 0.001009782247440198,
+     "window": 250,
+     "max_grad_norm": 0.5729826833152561
+    },
+    "seeds": 3,
+    "returns": [
+     496.00300823799006,
+     496.0006168472364,
+     496.0014604751174
+    ],
+    "mean": 496.0016951867813
+   },
+   {
+    "config": 7,
+    "override": {
+     "lr": 0.0009308869772598079,
+     "window": 125,
+     "max_grad_norm": 0.40388902414925765
+    },
+    "seeds": 3,
+    "returns": [
+     496.0334460926038,
+     496.03699183216446,
+     496.03648063194106
+    ],
+    "mean": 496.0356395189031
+   }
+  ],
+  "winner": {
+   "config": 5,
+   "override": {
+    "lr": 0.0021635163716479996,
+    "window": 250,
+    "max_grad_norm": 0.43630410444179285
+   },
+   "seeds": 3,
+   "returns": [
+    496.047494140335,
+    496.0473578320771,
+    496.04800607506655
+   ],
+   "mean": 496.04761934915956
+  },
+  "default_row": {
+   "config": 0,
+   "override": {},
+   "seeds": 3,
+   "returns": [
+    496.0089091388466,
+    496.00532081455896,
+    496.00763144951594
+   ],
+   "mean": 496.0072871343072
+  }
+ }
+}

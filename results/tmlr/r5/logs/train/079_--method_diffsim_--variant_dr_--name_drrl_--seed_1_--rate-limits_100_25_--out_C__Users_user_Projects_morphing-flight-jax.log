@@ -1,0 +1,27 @@
+# slot 1 mask 0x3e0: scripts/train_policy.py --method diffsim --variant dr --name drrl --seed 1 --rate-limits 100,25 --out C:/Users/user/Projects/morphing-flight-jax/results/tmlr/r5/policies
+design grid: 63 points, max trim residual 4.5e-15; LPV optimal_inaccurate, Lyapunov margin -1.039; weights LatWeights(phi=0.125, integ=0.03125, beta=0.125, eta_a=4.0, effort=0.03125)
+iter    0  steps    32,000  return   357.5  survival 1.00  (3s)
+iter   10  steps   352,000  return   476.0  survival 1.00  (29s)
+iter   20  steps   672,000  return   481.2  survival 1.00  (56s)
+iter   30  steps   992,000  return   485.0  survival 1.00  (82s)
+iter   40  steps 1,312,000  return   466.8  survival 0.95  (105s)
+iter   50  steps 1,632,000  return   476.0  survival 0.95  (130s)
+iter   60  steps 1,952,000  return   480.5  survival 0.98  (156s)
+iter   70  steps 2,272,000  return   485.7  survival 1.00  (181s)
+iter   80  steps 2,592,000  return   485.0  survival 1.00  (205s)
+iter   90  steps 2,912,000  return   488.8  survival 1.00  (231s)
+iter  100  steps 3,232,000  return   487.6  survival 0.98  (257s)
+iter  110  steps 3,552,000  return   484.2  survival 0.98  (290s)
+iter  120  steps 3,872,000  return   487.0  survival 1.00  (320s)
+iter  130  steps 4,192,000  return   463.8  survival 0.92  (350s)
+iter  140  steps 4,512,000  return   486.0  survival 1.00  (379s)
+iter  150  steps 4,832,000  return   483.8  survival 1.00  (408s)
+iter  160  steps 5,152,000  return   484.4  survival 0.98  (437s)
+iter  170  steps 5,472,000  return   475.3  survival 0.95  (468s)
+iter  180  steps 5,792,000  return   482.4  survival 0.97  (495s)
+iter  190  steps 6,112,000  return   487.3  survival 1.00  (523s)
+iter  199  steps 6,400,000  return   474.3  eval   467.9  survival 0.95  (547s)
+saved C:\Users\user\Projects\morphing-flight-jax\results\tmlr\r5\policies\diffsim_drrl_seed1.npz
+
+# 731 s
+JOB OK
