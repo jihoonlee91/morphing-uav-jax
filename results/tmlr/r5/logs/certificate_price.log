@@ -1,0 +1,20 @@
+﻿gs 0.0 0.0013171628108025802 optimal
+gs 0.1 0.0016541649577945013 optimal
+gs_hg 0.0 0.0804344940916923 optimal
+gs_hg 0.1 0.08367252880422317 optimal
+gs_hg_wide 0.0 6.298581800215846e-05 optimal
+gs_hg_wide 0.1 6.329892240016432e-05 optimal
+fixed 0.0 8.689906356570893e-05 optimal
+fixed 0.1 9.622234858994742e-05 optimal
+lpv 0.0 -0.014065690987632603 optimal
+lpv 0.1 -0.012860569766436344 optimal
+radius=30.0/lambda=0.05 1.509480282335459 {'rel': 4, 'abs': -1}
+radius=30.0/lambda=0.1 1.50160112662984 {'rel': 4, 'abs': -1}
+radius=30.0/lambda=0.2 1.486076449410298 {'rel': 4, 'abs': -1}
+radius=60.0/lambda=0.05 1.267919662357837 {'rel': 2, 'abs': -1}
+radius=60.0/lambda=0.1 1.2583169428176568 {'rel': 2, 'abs': -1}
+radius=60.0/lambda=0.2 1.239700310627571 {'rel': 2, 'abs': -1}
+radius=None/lambda=0.05 1.2233669440524686 {'rel': 2, 'abs': -1}
+radius=None/lambda=0.1 1.2137618215332902 {'rel': 2, 'abs': -1}
+radius=None/lambda=0.2 1.19472364626115 {'rel': 2, 'abs': -1}
+{'conditions': 2025, 'D_positive_definite': 2025, 'min_eig_D': 0.019098108509019007, 'g_d': 0.7353646034262096, 'max_g': 0.3611816199847478, 'covered_g_le_g_d': 2025}

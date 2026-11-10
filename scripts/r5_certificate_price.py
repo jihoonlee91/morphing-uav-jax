@@ -75,7 +75,7 @@ def main() -> None:
     # (b) LPV synthesis variants
     k_lon = design.longitudinal_gains(setup.grid)
     _, held = nominal_split()
-    dense, on_grid = dense_grid(setup)
+    dense, _on_grid = dense_grid(setup)
     pts = np.stack(np.meshgrid(dense.v_syn, dense.alt, dense.eta_s, indexing="ij"), -1)
     env = (pts[..., 0] >= 70) & (pts[..., 0] <= 110) & (pts[..., 1] >= 500) & (pts[..., 1] <= 9500)
     env_idx = [i for i in np.ndindex(*env.shape) if env[i]]

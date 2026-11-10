@@ -1,0 +1,33 @@
+﻿design grid: 63 points, max trim residual 4.5e-15; LPV optimal_inaccurate, Lyapunov margin -1.039; weights LatWeights(phi=0.125, integ=0.03125, beta=0.125, eta_a=4.0, effort=0.03125)
+LPV no-disk optimal (margin -1.040); pointwise statuses ['optimal']
+controllers: ppo_rl x5, diffsim_rl x5, ppo_drrl x5, diffsim_drrl x5, ppo_smoothls2 x3
+[   388s] Frozen shape             ppo_rl: 0.46 deg / 100%  diffsim_rl: 0.22 deg / 100%  ppo_drrl: 0.71 deg / 100%  diffsim_drrl: 0.54 deg / 100%  ppo_smoothls2: 0.89 deg / 100%
+[   462s] Fast morphing            ppo_rl: 0.45 deg / 100%  diffsim_rl: 0.21 deg / 100%  ppo_drrl: 0.69 deg / 100%  diffsim_drrl: 0.52 deg / 100%  ppo_smoothls2: 0.85 deg / 100%
+[   537s] + noise, 40 ms delay     ppo_rl: 9.08 deg / 100%  diffsim_rl: 17.31 deg / 99%  ppo_drrl: 0.73 deg / 100%  diffsim_drrl: 0.58 deg / 100%  ppo_smoothls2: 4.12 deg / 100%
+[   611s] + model error            ppo_rl: 0.47 deg / 100%  diffsim_rl: 0.22 deg / 100%  ppo_drrl: 0.71 deg / 100%  diffsim_drrl: 0.54 deg / 100%  ppo_smoothls2: 0.88 deg / 100%
+[   704s] + aileron at 0-30 %      ppo_rl: 1.56 deg / 88%  diffsim_rl: 2.83 deg / 97%  ppo_drrl: 14.23 deg / 85%  diffsim_drrl: 4.16 deg / 87%  ppo_smoothls2: 2.58 deg / 100%
+[  1180s] sweep morph_rate done
+[  1451s] sweep aileron done
+[  1686s] sweep delay done
+training-distribution return: {'ppo_rl': 493.66, 'diffsim_rl': 495.96, 'ppo_drrl': 490.56, 'diffsim_drrl': 492.96, 'ppo_smoothls2': 487.71}
+| Controller | Frozen shape | Fast morphing | + noise, 40 ms delay | + model error | + aileron at 0-30 % |
+|---|---:|---:|---:|---:|---:|
+| PPO, trained with rate limits | 0.46° · 100.0% | 0.45° · 100.0% | 9.08° · 100.0% | 0.47° · 100.0% | 1.56° · 87.9% |
+| Diff-sim, trained with rate limits | 0.22° · 100.0% | 0.21° · 100.0% | 17.31° · 99.5% | 0.22° · 100.0% | 2.83° · 97.0% |
+| PPO + DR, trained with rate limits | 0.71° · 100.0% | 0.69° · 100.0% | 0.73° · 100.0% | 0.71° · 100.0% | 14.23° · 85.2% |
+| Diff-sim + DR, trained with rate limits | 0.54° · 100.0% | 0.52° · 100.0% | 0.58° · 100.0% | 0.54° · 100.0% | 4.16° · 87.3% |
+| PPO, rate penalty x1000, log-std -2 | 0.89° · 100.0% | 0.85° · 100.0% | 4.12° · 100.0% | 0.88° · 100.0% | 2.58° · 100.0% |
+
+Cells: roll-tracking RMS error over successful runs · share of runs without loss of control. 95 % bootstrap intervals are in `metrics.json`.
+
+| Controller (fast morphing) | Sideslip, p95 of max | Command activity | RMS η_a |
+|---|---:|---:|---:|
+| PPO, trained with rate limits | 0.30° | 0.28 /s | 1.99 % |
+| Diff-sim, trained with rate limits | 0.14° | 0.17 /s | 0.26 % |
+| PPO + DR, trained with rate limits | 0.55° | 0.14 /s | 0.81 % |
+| Diff-sim + DR, trained with rate limits | 0.59° | 0.12 /s | 0.96 % |
+| PPO, rate penalty x1000, log-std -2 | 0.66° | 0.11 /s | 0.25 % |
+
+Command activity: mean |du/dt| of aileron, rudder and asymmetric-span commands, each divided by its position limit (higher = busier actuators).
+
+done in 2177s

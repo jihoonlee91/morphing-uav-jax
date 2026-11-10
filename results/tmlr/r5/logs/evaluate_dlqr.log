@@ -1,0 +1,31 @@
+﻿design grid: 63 points, max trim residual 4.5e-15; LPV optimal_inaccurate, Lyapunov margin -1.039; weights LatWeights(phi=0.125, integ=0.03125, beta=0.125, eta_a=4.0, effort=0.03125)
+LPV no-disk optimal (margin -1.040); pointwise statuses ['optimal']
+controllers: dlqr0 x1, dlqr1 x1, dlqr2 x1, dlqr3 x1
+[   732s] Frozen shape             dlqr0: 0.28 deg / 100%  dlqr1: 0.37 deg / 100%  dlqr2: 11.35 deg / 88%  dlqr3: 25.46 deg / 46%
+[   746s] Fast morphing            dlqr0: 0.27 deg / 100%  dlqr1: 0.37 deg / 100%  dlqr2: 11.54 deg / 86%  dlqr3: 26.07 deg / 47%
+[   761s] + noise, 40 ms delay     dlqr0: 5.36 deg / 9%  dlqr1: 0.62 deg / 100%  dlqr2: 0.46 deg / 100%  dlqr3: 27.00 deg / 54%
+[   777s] + model error            dlqr0: 0.28 deg / 100%  dlqr1: 0.37 deg / 100%  dlqr2: 12.17 deg / 90%  dlqr3: 25.02 deg / 45%
+[   792s] + aileron at 0-30 %      dlqr0: 2.83 deg / 92%  dlqr1: 1.88 deg / 100%  dlqr2: 13.87 deg / 89%  dlqr3: 26.04 deg / 41%
+[  1055s] sweep morph_rate done
+[  1106s] sweep aileron done
+[  1148s] sweep delay done
+training-distribution return: {'dlqr0': 495.39, 'dlqr1': 329.8, 'dlqr2': 106.33, 'dlqr3': 38.32}
+| Controller | Frozen shape | Fast morphing | + noise, 40 ms delay | + model error | + aileron at 0-30 % |
+|---|---:|---:|---:|---:|---:|
+| Discrete LQR (ZOH), 0 ms | 0.28° · 100.0% | 0.27° · 100.0% | 5.36° · 8.6% | 0.28° · 100.0% | 2.83° · 91.8% |
+| Discrete delay-aware LQR, 20 ms | 0.37° · 100.0% | 0.37° · 100.0% | 0.62° · 100.0% | 0.37° · 100.0% | 1.88° · 100.0% |
+| Discrete delay-aware LQR, 40 ms | 11.35° · 88.3% | 11.54° · 86.3% | 0.46° · 100.0% | 12.17° · 90.2% | 13.87° · 89.1% |
+| Discrete delay-aware LQR, 60 ms | 25.46° · 46.5% | 26.07° · 46.9% | 27.00° · 53.5% | 25.02° · 44.5% | 26.04° · 41.0% |
+
+Cells: roll-tracking RMS error over successful runs · share of runs without loss of control. 95 % bootstrap intervals are in `metrics.json`.
+
+| Controller (fast morphing) | Sideslip, p95 of max | Command activity | RMS η_a |
+|---|---:|---:|---:|
+| Discrete LQR (ZOH), 0 ms | 0.12° | 0.16 /s | 0.36 % |
+| Discrete delay-aware LQR, 20 ms | 1.19° | 190.02 /s | 0.39 % |
+| Discrete delay-aware LQR, 40 ms | 11.45° | 167.23 /s | 0.84 % |
+| Discrete delay-aware LQR, 60 ms | 12.61° | 141.77 /s | 0.69 % |
+
+Command activity: mean |du/dt| of aileron, rudder and asymmetric-span commands, each divided by its position limit (higher = busier actuators).
+
+done in 1758s

@@ -1,0 +1,17 @@
+| Controller | Frozen shape | Fast morphing | + noise, 40 ms delay | + model error | + aileron at 0-30 % |
+|---|---:|---:|---:|---:|---:|
+| PPO, tuned (random search) | 0.21° · 100.0% | 0.20° · 100.0% | 12.91° · 100.0% | 0.21° · 100.0% | 2.38° · 80.1% |
+| Diff-sim, tuned (random search) | 0.20° · 100.0% | 0.20° · 100.0% | 22.59° · 30.6% | 0.20° · 100.0% | 1.07° · 99.8% |
+| PPO + DR, tuned config | 0.47° · 100.0% | 0.46° · 100.0% | 0.55° · 100.0% | 0.48° · 100.0% | 3.56° · 73.3% |
+| Diff-sim + DR, tuned config | 0.38° · 100.0% | 0.37° · 100.0% | 0.48° · 100.0% | 0.38° · 100.0% | 2.24° · 100.0% |
+
+Cells: roll-tracking RMS error over successful runs · share of runs without loss of control. 95 % bootstrap intervals are in `metrics.json`.
+
+| Controller (fast morphing) | Sideslip, p95 of max | Command activity | RMS η_a |
+|---|---:|---:|---:|
+| PPO, tuned (random search) | 0.18° | 0.69 /s | 3.51 % |
+| Diff-sim, tuned (random search) | 0.06° | 0.21 /s | 0.07 % |
+| PPO + DR, tuned config | 0.37° | 0.22 /s | 1.38 % |
+| Diff-sim + DR, tuned config | 0.43° | 0.15 /s | 0.64 % |
+
+Command activity: mean |du/dt| of aileron, rudder and asymmetric-span commands, each divided by its position limit (higher = busier actuators).

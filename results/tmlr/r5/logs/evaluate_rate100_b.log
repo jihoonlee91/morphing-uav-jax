@@ -1,0 +1,30 @@
+﻿design grid: 63 points, max trim residual 4.5e-15; LPV optimal_inaccurate, Lyapunov margin -1.039; weights LatWeights(phi=0.125, integ=0.03125, beta=0.125, eta_a=4.0, effort=0.03125)
+LPV no-disk optimal (margin -1.040); pointwise statuses ['optimal']
+controllers: ppo_rl x5, diffsim_rl x5, ppo_drrl x5, diffsim_drrl x5
+[   402s] Frozen shape             ppo_rl: 0.46 deg / 100%  diffsim_rl: 0.22 deg / 100%  ppo_drrl: 0.71 deg / 100%  diffsim_drrl: 0.54 deg / 100%
+[   469s] Fast morphing            ppo_rl: 0.45 deg / 100%  diffsim_rl: 0.21 deg / 100%  ppo_drrl: 0.69 deg / 100%  diffsim_drrl: 0.52 deg / 100%
+[   537s] + noise, 40 ms delay     ppo_rl: 28.50 deg / 11%  diffsim_rl: nan deg / 0%  ppo_drrl: 0.74 deg / 100%  diffsim_drrl: 0.62 deg / 100%
+[   598s] + model error            ppo_rl: 0.47 deg / 100%  diffsim_rl: 0.22 deg / 100%  ppo_drrl: 0.71 deg / 100%  diffsim_drrl: 0.54 deg / 100%
+[   662s] + aileron at 0-30 %      ppo_rl: 5.23 deg / 87%  diffsim_rl: 10.79 deg / 42%  ppo_drrl: 14.15 deg / 85%  diffsim_drrl: 4.32 deg / 86%
+[  1070s] sweep aileron done
+[  1269s] sweep delay done
+training-distribution return: {'ppo_rl': 493.07, 'diffsim_rl': 495.95, 'ppo_drrl': 490.56, 'diffsim_drrl': 492.97}
+| Controller | Frozen shape | Fast morphing | + noise, 40 ms delay | + model error | + aileron at 0-30 % |
+|---|---:|---:|---:|---:|---:|
+| PPO, trained with rate limits | 0.46° · 99.9% | 0.45° · 100.0% | 28.50° · 11.4% | 0.47° · 99.7% | 5.23° · 86.6% |
+| Diff-sim, trained with rate limits | 0.22° · 100.0% | 0.21° · 100.0% | — · 0.0% | 0.22° · 100.0% | 10.79° · 42.3% |
+| PPO + DR, trained with rate limits | 0.71° · 100.0% | 0.69° · 100.0% | 0.74° · 100.0% | 0.71° · 100.0% | 14.15° · 85.1% |
+| Diff-sim + DR, trained with rate limits | 0.54° · 100.0% | 0.52° · 100.0% | 0.62° · 100.0% | 0.54° · 100.0% | 4.32° · 86.2% |
+
+Cells: roll-tracking RMS error over successful runs · share of runs without loss of control. 95 % bootstrap intervals are in `metrics.json`.
+
+| Controller (fast morphing) | Sideslip, p95 of max | Command activity | RMS η_a |
+|---|---:|---:|---:|
+| PPO, trained with rate limits | 0.30° | 0.29 /s | 1.99 % |
+| Diff-sim, trained with rate limits | 0.20° | 0.20 /s | 0.26 % |
+| PPO + DR, trained with rate limits | 0.55° | 0.14 /s | 0.81 % |
+| Diff-sim + DR, trained with rate limits | 0.60° | 0.12 /s | 0.96 % |
+
+Command activity: mean |du/dt| of aileron, rudder and asymmetric-span commands, each divided by its position limit (higher = busier actuators).
+
+done in 1661s
