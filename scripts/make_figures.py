@@ -24,6 +24,7 @@ def main() -> None:
     results = ROOT / "results"
     metrics = json.loads((results / "metrics.json").read_text(encoding="utf-8"))
     fig_dir = results / "figures"
+    fig_dir.mkdir(parents=True, exist_ok=True)
     names = [k for k in PLOTTED if k in metrics["table"]["nominal"]]
     stress_tests(metrics["sweeps"], names, fig_dir / "stress_tests.png")
     residual = [k for k in ("lpv", "residual_dr", "residual_proj_trained", "residual_safe")
